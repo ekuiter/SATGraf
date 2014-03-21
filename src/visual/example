@@ -1,0 +1,35 @@
+    // joint communities
+    const int I = TopQ.Val3;
+    const int J = TopQ.Val2;
+    CmtyIdUF.Union(I, J); // join
+    Q += TopQ.Val1;
+    TCmtyDat& DatJ = CmtyQH.GetDat(J);
+    TCmtyDat& DatI = CmtyQH.GetDat(I);
+    DatI.DelLink(J);  
+    DatJ.DelLink(I);
+    
+    for (int i = -1; DatJ.NIdQH.FNextKeyId(i); ) {
+      const int K = DatJ.NIdQH.GetKey(i);
+      TCmtyDat& DatK = CmtyQH.GetDat(K);
+      double NewQ = DatJ.NIdQH[i];
+      if (DatI.NIdQH.IsKey(K)) { NewQ = NewQ+DatI.NIdQH.GetDat(K);  DatK.DelLink(I); }     // K connected to I and J
+      else { NewQ = NewQ-2*DatI.DegFrac*DatK.DegFrac; }  // K connected to J not I
+      DatJ.AddQ(K, NewQ);
+      DatK.AddQ(J, NewQ);
+      MxQHeap.PushHeap(TFltIntIntTr(NewQ, TMath::Mn(J,K), TMath::Mx(J,K)));
+    }
+    for (int i = -1; DatI.NIdQH.FNextKeyId(i); ) {
+      const int K = DatI.NIdQH.GetKey(i);
+      if (! DatJ.NIdQH.IsKey(K)) { // K connected to I not J
+        TCmtyDat& DatK = CmtyQH.GetDat(K);
+        const double NewQ = DatI.NIdQH[i]-2*DatJ.DegFrac*DatK.DegFrac; 
+        DatJ.AddQ(K, NewQ);
+        DatK.DelLink(I);
+        DatK.AddQ(J, NewQ);
+        MxQHeap.PushHeap(TFltIntIntTr(NewQ, TMath::Mn(J,K), TMath::Mx(J,K)));
+      }
+    } 
+    DatJ.DegFrac += DatI.DegFrac; }
+    if (DatJ.NIdQH.Empty()) { CmtyQH.DelKey(J); } // isolated community (done)
+    CmtyQH.DelKey(I);
+    return true;
