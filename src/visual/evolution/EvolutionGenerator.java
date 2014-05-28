@@ -5,6 +5,8 @@
  */
 
 package visual.evolution;
+import gnu.trove.impl.hash.TIntIntHash;
+import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TObjectCharHashMap;
 import java.text.DecimalFormat;
 import javax.swing.JOptionPane;
@@ -231,6 +233,8 @@ public class EvolutionGenerator extends javax.swing.JDialog {
   }
   public static CommunityGraph makeCommunity(int vars_count, int clauses_count, int coms_count, double q){
     CommunityGraph cg = new ConcreteCommunityGraph();
+    TIntIntHashMap varDist = new TIntIntHashMap();
+    cg.setVariableDistribution(varDist);
     while(cg.getClausesCount() < clauses_count){
       int[] clause = makeClause(vars_count, coms_count, q);
       boolean _a = clause[0] > 0;
@@ -245,6 +249,9 @@ public class EvolutionGenerator extends javax.swing.JDialog {
       if(!_c){
         clause[2] = 0 - clause[2];
       }
+      varDist.put(clause[0], varDist.get(clause[0]) + 1);
+      varDist.put(clause[1], varDist.get(clause[1]) + 1);
+      varDist.put(clause[2], varDist.get(clause[2]) + 1);
       TObjectCharHashMap<CommunityNode> nodes = new TObjectCharHashMap<CommunityNode>();
       CommunityNode a = cg.createNode(clause[0], null);
       CommunityNode b = cg.createNode(clause[1], null);

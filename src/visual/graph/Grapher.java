@@ -6,7 +6,6 @@ package visual.graph;
 
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectCharHashMap;
-
 import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,15 +15,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.regex.Pattern;
-
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JSplitPane;
-
 import visual.UI.GraphCanvasPanel;
 import visual.UI.GraphOptionsPanel;
+import visual.community.CommunityGraph;
 
 /**
  *
@@ -251,11 +249,17 @@ public abstract class Grapher <T extends Node, T1 extends Edge, T2 extends Claus
           }
           T n1 = null;
           if(all_names.containsKey(lit2)){
-            n1 = graph.createNode(lit2, (String)all_names.get(lit2));
+              n1 = graph.getNode(lit2);
+              if(n1 == null){
+                n1 = graph.createNode(lit2, (String)all_names.get(lit2));
+              }
             n1.addGroup(s_named);
           }
           else{
-            n1 = graph.createNode(lit2, null);
+              n1 = graph.getNode(lit2);
+              if(n1 == null){
+                n1 = graph.createNode(lit2, null);
+              }
           }
           
           nodes.put(n1, lit_2value ? '1' : '0');
@@ -266,7 +270,7 @@ public abstract class Grapher <T extends Node, T1 extends Edge, T2 extends Claus
         }
       }
       if(graph.getClausesCount() % 100 == 0){
-        System.err.printf("%d\n", graph.getClausesCount());
+        //System.err.printf("%d\n", graph.getClausesCount());
         if(runtime.freeMemory() / MB < 1){
           return;
         }

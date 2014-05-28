@@ -8,6 +8,7 @@ package visual.graph;
 
 import gnu.trove.map.hash.TObjectCharHashMap;
 import java.util.HashMap;
+import visual.community.CommunityGraph;
 
 /**
  *
@@ -40,4 +41,9 @@ public class SimpleGraph extends AbstractGraph<Node, Edge, Clause>{
     return new Clause(null);
   }
   
+  
+  @Override
+  public SimpleGraph to3CNF(){
+      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
 }

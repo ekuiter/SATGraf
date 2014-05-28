@@ -6,6 +6,7 @@
 
 package visual.community;
 
+import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TObjectCharHashMap;
 import java.io.File;
 import java.io.IOException;
@@ -149,6 +150,22 @@ public class CommunityGraphAdapter extends AbstractGraph<CommunityNode, Communit
   @Override
   public void writeDimacs(File dimacsFile) throws IOException {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+  
+  
+  @Override
+  public void setVariableDistribution(TIntIntHashMap dist){
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+  
+  @Override
+  public TIntIntHashMap getVariableDistribution(){
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+  
+  @Override
+  public CommunityGraph to3CNF(){
+      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
   
 }

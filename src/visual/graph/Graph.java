@@ -61,4 +61,6 @@ public interface Graph <T extends Node, T1 extends Edge, T2 extends Clause>{
   public int indexOf(T node);
 
   public void writeDimacs(File dimacsFile) throws IOException;
+  
+  public Graph<T, T1, T2> to3CNF();
 }

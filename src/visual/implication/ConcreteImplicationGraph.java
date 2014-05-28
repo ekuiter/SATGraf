@@ -59,4 +59,10 @@ public class ConcreteImplicationGraph extends AbstractGraph<ImplicationNode, Edg
     clauses.put(c, c);
     return c;
   }
+  
+  
+  @Override
+  public ImplicationGraph to3CNF(){
+      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
 }

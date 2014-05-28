@@ -13,8 +13,6 @@ import visual.community.CommunityEdge;
 import visual.community.CommunityGraph;
 import visual.community.CommunityNode;
 import visual.graph.DrawableNode;
-import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.visualization.Coordinates;
 
 public class KKPlacer extends AbstractPlacer {
 	
@@ -444,15 +442,10 @@ public class KKPlacer extends AbstractPlacer {
     	return width;
     }
     
-    public double getX(Vertex n) {
-		Coordinates d2d = (Coordinates)locations.get(n);
-		return(d2d.getX());
-    }
-
-    public double getY(Vertex n) {
-		Coordinates d2d = (Coordinates)locations.get(n);
-		return(d2d.getY());
-    }
+    /*public double getX(Vertex n) {
+        Coordinates d2d = (Coordinates)locations.get(n);
+        return(d2d.getX());
+    }*/
 
     public Coordinates getCoordinates(CommunityNode v) {
     	return((Coordinates)locations.get(v));
@@ -462,9 +455,6 @@ public class KKPlacer extends AbstractPlacer {
 
     public boolean incrementsAreDone() {
     	return(done);
-    }
-
-    public void initialize_local_vertex(edu.uci.ics.jung.graph.Vertex v) {
     }
 
     public void initialize_local() {
@@ -517,7 +507,7 @@ public class KKPlacer extends AbstractPlacer {
 
 	@Override
 	public int getX(CommunityNode node) {
-		return (int)locations.get(node).x;
+            return (int)locations.get(node).getX();
 	}
 	
     public int getX(int id){
@@ -561,7 +551,7 @@ public class KKPlacer extends AbstractPlacer {
 
 	@Override
 	public int getY(CommunityNode node) {
-		return (int) locations.get(node).y;
+            return (int) locations.get(node).getY();
 	}
 	
 	public void rescaleAndReposition(Collection<CommunityNode> comp) {
@@ -621,25 +611,25 @@ public class KKPlacer extends AbstractPlacer {
 			    while (it2.hasNext()) {
 			    	CommunityNode node2 = it2.next();
 			    	if (node1 != node2) {
-				    	Coordinates c2 = locations.get(node2);
-				    	
-				    	// Calculate exact position difference
-				    	double xDiff = Math.abs(c1.x - c2.x);
-				    	double yDiff = Math.abs(c1.y - c2.y);
-				    	double theta = Math.atan(yDiff/xDiff);
-				    	double xDisp = radius * Math.cos(theta);
-				    	double yDisp = radius * Math.sin(theta);
-				    	
-				    	if (c1.x < c2.x) { // to the right
-				    		c2.setX(c2.x + xDisp);
-				    	} else {
-				    		c2.setX(c2.x - xDisp);
-				    	}
-				    	if (c1.y < c2.y) { // to the bottom
-				    		c2.setY(c2.y + yDisp);
-				    	} else {
-				    		c2.setY(c2.y - yDisp);
-				    	}
+                                    Coordinates c2 = locations.get(node2);
+
+                                    // Calculate exact position difference
+                                    double xDiff = Math.abs(c1.getX() - c2.getX());
+                                    double yDiff = Math.abs(c1.getY() - c2.getY());
+                                    double theta = Math.atan(yDiff/xDiff);
+                                    double xDisp = radius * Math.cos(theta);
+                                    double yDisp = radius * Math.sin(theta);
+
+                                    if (c1.getX() < c2.getX()) { // to the right
+                                            c2.setX(c2.getX() + xDisp);
+                                    } else {
+                                            c2.setX(c2.getX() - xDisp);
+                                    }
+                                    if (c1.getY() < c2.getY()) { // to the bottom
+                                            c2.setY(c2.getY() + yDisp);
+                                    } else {
+                                            c2.setY(c2.getY() - yDisp);
+                                    }
 			    	}
 			    }
 		    }

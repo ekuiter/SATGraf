@@ -6,6 +6,7 @@
 
 package visual.community;
 
+import gnu.trove.map.hash.TIntIntHashMap;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -32,4 +33,10 @@ public interface CommunityGraph extends Graph<CommunityNode, CommunityEdge, Clau
   public Iterator<CommunityEdge> getDummyEdges();
   
   public void removeEdge(CommunityEdge e);
+  
+  public void setVariableDistribution(TIntIntHashMap dist);
+  
+  public TIntIntHashMap getVariableDistribution();
+  
+  public CommunityGraph to3CNF();
 }

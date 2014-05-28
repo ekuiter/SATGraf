@@ -6,12 +6,14 @@
 
 package visual.community;
 
+import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectCharHashMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import test.CommunityClauses;
 import visual.graph.AbstractGraph;
 import visual.graph.Clause;
 import visual.graph.Node;
@@ -24,6 +26,7 @@ public class ConcreteCommunityGraph extends AbstractGraph<CommunityNode, Communi
   private final TIntObjectHashMap<Community> communities = new TIntObjectHashMap<Community>();
   private ArrayList<CommunityEdge> dummyEdges = new ArrayList<CommunityEdge>();
   private int edge_count;
+  private TIntIntHashMap varDist = new TIntIntHashMap();
   public Community getCommunity(int community){
     return communities.get(community);
   }
@@ -77,6 +80,7 @@ public class ConcreteCommunityGraph extends AbstractGraph<CommunityNode, Communi
   @Override
   public CommunityNode createNode(int id, String name, boolean is_head, boolean is_tail){
     synchronized(nodes){
+        varDist.put(id, varDist.get(id) + 1);
       if(nodes.containsKey(id)){
         CommunityNode node = nodes.get(id);
         if(name != null){
@@ -119,5 +123,81 @@ public class ConcreteCommunityGraph extends AbstractGraph<CommunityNode, Communi
       clauses.put(c,c);
       return c;
     }
+  }
+  
+  
+  @Override
+  public void setVariableDistribution(TIntIntHashMap dist){
+      this.varDist = dist;
+  }
+  
+  @Override
+  public TIntIntHashMap getVariableDistribution(){
+      return this.varDist;
+  }
+  
+  public int getMaxLiteral(){
+      int max = 0;
+      for(Node n : getNodes()){
+          if(n.getId() > max){
+              max = n.getId();
+          }
+      }
+      return max;
+  }
+  
+  @Override
+  public CommunityGraph to3CNF(){
+      ConcreteCommunityGraph graph = new ConcreteCommunityGraph();
+      int maxLit = getMaxLiteral();
+      Iterator<Clause> clauses = getClauses();
+      int found = 0;
+      while(clauses.hasNext()){
+        Clause c = clauses.next();
+        Iterator<Node> nodes = c.getNodes();
+        TObjectCharHashMap<CommunityNode> newNodes = new TObjectCharHashMap<>();
+          if(c.size() > 3){
+            int varCount = 0;
+            int limit = 2;
+            int processed = 0;
+            while(nodes.hasNext()){
+                Node n = nodes.next();
+                if(limit == 1){
+                    newNodes.put(graph.createNode(maxLit, ""), '0');
+                }
+                newNodes.put(graph.createNode(n.getId(), n.getName()), c.getValue(n) ? '1' : '0');
+                varCount++;
+                processed++;
+                if(varCount == limit){
+                    if(processed != c.size() - 1){
+                        newNodes.put(graph.createNode(++maxLit, ""), '1');
+                    }
+                    else{
+                        Node n1 = nodes.next();
+                        newNodes.put(graph.createNode(n1.getId(), ""), c.getValue(n1) ? '1' : '0');
+                    }
+                    graph.createEdge((CommunityNode)newNodes.keys()[0], (CommunityNode)newNodes.keys()[1], false);
+                    graph.createEdge((CommunityNode)newNodes.keys()[1], (CommunityNode)newNodes.keys()[2], false);
+                    graph.createEdge((CommunityNode)newNodes.keys()[0], (CommunityNode)newNodes.keys()[2], false);
+                    Clause c1 = graph.createClause(newNodes);
+                    newNodes = new TObjectCharHashMap<>();
+                    limit = 1;
+                    varCount = 0;
+                }
+            }
+          }
+          else{
+            while(nodes.hasNext()){
+                Node n = nodes.next();
+                newNodes.put(graph.createNode(n.getId(), n.getName()), c.getValue(n) ? '1' : '0');
+            }
+            if(newNodes.size() == 2){
+                graph.createEdge((CommunityNode)newNodes.keys()[0], (CommunityNode)newNodes.keys()[1], false);
+            }
+            Clause c1 = graph.createClause(newNodes);
+          }
+      }
+      
+      return graph;
   }
 }

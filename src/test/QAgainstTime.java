@@ -43,7 +43,7 @@ public class QAgainstTime {
     
     if(satCompTime == 0.0){
       Runtime run = Runtime.getRuntime();
-      Process minipure = run.exec(String.format("/home/sfischme/work/vijay/minisat/minisat %s", f.getAbsolutePath()));
+      Process minipure = run.exec(String.format("/usr/bin/minisat %s", f.getAbsolutePath()));
       try {
         synchronized(minipure){
           minipure.wait(timeout);
@@ -55,16 +55,16 @@ public class QAgainstTime {
           
         }
         long endTime = System.currentTimeMillis();
-        System.out.printf("%d,%d,%f", endTime-startTime, minipure.exitValue(), Q);
+        System.out.printf("%d,%d,%f\n", endTime-startTime, minipure.exitValue(), Q);
       } 
       catch (Exception ex) {
         long endTime = System.currentTimeMillis();
-        System.out.printf("%d,%d,%f", endTime-startTime, 30, Q);
+        System.out.printf("%d,%d,%f\n", endTime-startTime, 30, Q);
       }
       
     }
     else{
-        System.out.printf("%d,%d,%f", (int)(satCompTime * 1000), 40, Q);
+        System.out.printf("%d,%d,%f\n", (int)(satCompTime * 1000), 40, Q);
     }
   }
   public void run(double satCompTime) throws IOException{
