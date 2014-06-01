@@ -60,10 +60,13 @@ public class To3CNF {
     }
     
     public static void main(String[] args){
+        if(args.length == 0){
+            args = new String[]{"/home/zacknewsham/Sites/satgraf/formula/satcomp/target/"};
+        }
         To3CNF cnf = new To3CNF();
         String[] files = new String[]{
             "connm-ue-csp-sat-n800-d-0.02-s1542454144.sat05-533.reshuffled-07.cnf",
-            "em_11_3_4_exp.cnf",
+            /*"em_11_3_4_exp.cnf",
             "em_12_2_4_exp.cnf",
             "em_7_4_8_all.cnf",
             "em_7_4_9_all.cnf",
@@ -83,8 +86,7 @@ public class To3CNF {
             "LABS_n087_goal008.cnf",
             "LABS_n088_goal008.cnf",
             "LABS_n091_goal008.cnf",
-            "LABS_n091_goal009.cnf",
-            "LABS_n100_goal009.cnf",
+            "LABS_n091_goal009.cnf",*/
             "mod2c-rand3bip-sat-240-2.shuffled-as.sat05-2519.cnf",
             "mod2c-rand3bip-sat-240-3.shuffled-as.sat05-2520.cnf",
             "mod2c-rand3bip-sat-250-3.shuffled-as.sat05-2535.cnf",
@@ -129,7 +131,7 @@ public class To3CNF {
         };
         for(String file : files){
             try{
-                file = "/home/zacknewsham/Sites/satgraf/formula/satcomp/target/".concat(file);
+                file = args[0].concat(file);
                 cnf.run(file);
             }
             catch(Exception e){

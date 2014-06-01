@@ -231,7 +231,7 @@ public class OLCommunityMetric implements CommunityMetric{
 
   private boolean IsJoin(int deg)
   {
-      int p = (int)(Math.random() * deg);
+      int p = 1;//(int)(Math.random() * deg);
       if (p >= 1)
       {
           return true;
