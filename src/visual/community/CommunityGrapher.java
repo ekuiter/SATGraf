@@ -11,6 +11,7 @@ import java.util.HashMap;
 
 import visual.UI.GraphCanvasPanel;
 import visual.community.drawing_algorithms.AbstractPlacer;
+import visual.community.drawing_algorithms.FruchPlacer;
 import visual.community.drawing_algorithms.GridKKPlacer;
 import visual.community.drawing_algorithms.GridPlacer;
 import visual.graph.Clause;
@@ -39,8 +40,8 @@ public class CommunityGrapher extends Grapher <CommunityNode, CommunityEdge, Cla
     }
     
     this.placerName = placer;
-    if(!placerName.equals("kk") && !placerName.equals("grid")){
-      throw new IllegalArgumentException("third argument must be either kk or grid");
+    if(!placerName.equals("kk") && !placerName.equals("f") && !placerName.equals("grid")){
+      throw new IllegalArgumentException("third argument must be either kk or grid or f");
     }
   }
   public CommunityGrapher(String dimacsFile, String mapFile, HashMap<String, String> patterns){
@@ -73,21 +74,18 @@ public class CommunityGrapher extends Grapher <CommunityNode, CommunityEdge, Cla
     else if(placerName.equals("grid")){
       this.placer = new GridPlacer((CommunityGraph)graph);
     }
+    else if(placerName.equals("f")){
+      this.placer = new FruchPlacer((CommunityGraph)graph);
+    }
   }
   
   public static void main(String[] args) throws URISyntaxException {
     if(args.length == 0){                     
       args = new String[]{
-       "formula/satcomp/dimacs/fiasco.dimacs",
+       "formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
        "cnm",
-	   "kk",
-	   "5",
-	   "Message 1", "m1_[0-9]+_[0-9]+", 
-       "Hash 1", "h1_[0-9]+_[0-9]+",
-       "Message 2", "m2_[0-9]+_[0-9]+", 
-       "Hash 2", "h2_[0-9]+_[0-9]+",
-       "Messages", "m(1|2)_[0-9]+_[0-9]+", 
-       "Hashes", "h(1|2)_[0-9]+_[0-9]+"
+	   "f",
+	   "5"
       };
     }
     HashMap<String, String> patterns = new HashMap<String, String>();
