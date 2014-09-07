@@ -157,16 +157,16 @@ public class FruchPlacer extends AbstractPlacer {
     }
 
 
-    private double calcAttraction(double dist) {
-	return dist * dist / optDist;
-    }
+	private double calcAttraction(double dist) {
+		return dist * dist / optDist;
+	}
 
     private double calcRepulsion(double dist) {
-	return Math.pow(optDist,4) / dist;
+    	return Math.pow(optDist,4) / dist;
     }
 
     private double coolTemp(double val) {
-	return val / 1.1;
+    	return val / 1.1;
     }
 
     /**
@@ -185,6 +185,7 @@ public class FruchPlacer extends AbstractPlacer {
     public double getRandomBelow(int max){
       return Math.random() * max;
     }
+    
     /**
      * Randomly positions nodes on layout.  Called internally before
      * update layout is called for the first time to insure that nodes
@@ -193,29 +194,29 @@ public class FruchPlacer extends AbstractPlacer {
      * for this stream using the setRandomSeed method.
      */
     public void randomizeLayout() {
-	System.out.println("randomizing layout");
-	//MersenneTwister mt = null;
-	//if (isSeedSet) mt = new MersenneTwister(seed);
-	//else mt = new MersenneTwister(new Date());
-	//Uniform uni = new Uniform(mt);
-
-	int xLimit = width - pad;
-	int yLimit = height - pad;
-	Iterator<CommunityNode> it = nodeList.iterator();
-	while(it.hasNext()) {
-	    CommunityNode node = it.next();
-	    Coordinates c = (Coordinates)locations.get(node);
-        if(c == null){
-          c = new Coordinates(0, 0);
-          locations.put(node, c);
-        }
-	    c.setX(getRandomBelow(xLimit));
-	    c.setY(getRandomBelow(yLimit));
-	}
+		System.out.println("randomizing layout");
+		//MersenneTwister mt = null;
+		//if (isSeedSet) mt = new MersenneTwister(seed);
+		//else mt = new MersenneTwister(new Date());
+		//Uniform uni = new Uniform(mt);
+	
+		int xLimit = width - pad;
+		int yLimit = height - pad;
+		Iterator<CommunityNode> it = nodeList.iterator();
+		while(it.hasNext()) {
+		    CommunityNode node = it.next();
+		    Coordinates c = (Coordinates)locations.get(node);
+	        if(c == null){
+	          c = new Coordinates(0, 0);
+	          locations.put(node, c);
+	        }
+		    c.setX(getRandomBelow(xLimit));
+		    c.setY(getRandomBelow(yLimit));
+		}
     }
 
-    double maxWidth = 10;
-    double maxHeight = 10;
+    double maxWidth = 100;
+    double maxHeight = 100;
 
     /**
      * Positions nodes in layout according to a modified implementation
@@ -298,229 +299,234 @@ public class FruchPlacer extends AbstractPlacer {
      * may exhibit rotations drift during the layout.
      *
      */
-    public void advancePositions() {
-	if (done) {
-	    return;
+	public void advancePositions() {
+		if (done) {
+		    return;
+		}
+	
+		if (update) {
+	
+		    noBreak = true;
+	
+		    Object[] nl = nodeList.toArray();
+	
+		    // calc constants
+		    optDist = 0.46 * Math.sqrt(((width * height) / (nl.length + 1)));
+		    double temp = width / 10;
+		    int passes = 0;
+		    int nNodes = nl.length;
+		    double xDelta = 0;
+		    double yDelta = 0;
+		    double deltaLength = 0;
+		    double force = 0;
+		    HashSet edges = new HashSet();
+		    HashMap nodeIndexer = new HashMap();
+	
+		    if (firstLayout) {
+	          //make sure nodes have random initial coord to begin with
+	          randomizeLayout();
+	          firstLayout = false;
+		    }
+	
+		    Iterator<CommunityNode> it = nodeList.iterator();
+		    while(it.hasNext()) {
+	          CommunityNode workNode = it.next();
+	          locations.put(workNode,new Coordinates(getX(workNode), getY(workNode)));
+		    }
+	
+		    //make arrays corresponding to the coords of each node
+		    double[] xPos = new double[nNodes];
+		    double[] yPos = new double[nNodes];
+		    boolean[] fixed = new boolean[nNodes];
+	
+		    for (int i = 0; i < nNodes; i++) {
+				CommunityNode workNode = (CommunityNode)nl[i];
+				xPos[i] = getX(workNode);
+				yPos[i] = getY(workNode);
+				maxWidth = Math.max(maxWidth,DrawableNode.NODE_DIAMETER + DrawableNode.NODE_X_SPACING);
+				maxHeight = Math.max(maxHeight,DrawableNode.NODE_DIAMETER + DrawableNode.NODE_X_SPACING);
+				//fixed[i] = workNode.__getattr_Fixed();
+				fixed[i] = false;
+				edges.addAll(workNode.getEdgesList());
+				nodeIndexer.put(workNode, new Integer(i));
+		    }
+	
+		    //remove check for self loops and remove them
+		    //if (NetUtilities.hasSelfLoops(nodeList)) 
+			edges = (HashSet)removeLoops(edges);
+	
+		    //make arrays corresponding to the displacement vector for
+		    //each node
+		    double[] xDisp = new double[nNodes];
+		    double[] yDisp = new double[nNodes];
+		    
+		    // keep passing through the layout loop until the temp is
+		    // low initialIter + time for cooling schedule
+		    while ((temp > 1) && (passes < maxPasses) && noBreak) {
+				//calculate repulsive forces between each pair of nodes (set both)
+				int limit = nNodes - 1;
+				for (int v = 0; v < limit; v++) {	
+					xDisp[v] = 0;
+			    	yDisp[v] = 0;
+					
+				    // can skip many loops by assuming that uv = -vu
+				    // and looping in factorial
+				    for (int u = v + 1; u < nNodes; u++) {
+						//get difference of position vectors
+						xDelta = xPos[v] - xPos[u];
+						yDelta = yPos[v] - yPos[u];
+			
+						//trap condition where nodes have same position
+						if ((xDelta == 0) && (yDelta == 0)) {
+						    //don't do anything in hopes that someone
+						    //else will kick them apart
+			
+						    // Do we continue or break here? Waiting
+						    // for Skye's answer.
+						    continue;
+						    //break;
+						}
+						
+						//set vu disp vector
+						deltaLength = Math.sqrt((xDelta * xDelta) + (yDelta * yDelta));
+						force = calcRepulsion(deltaLength);
+						
+						xDisp[v] += (xDelta / deltaLength) * force;
+						yDisp[v] += (yDelta / deltaLength) * force;
+						
+						//set uv disp vector (-vu)
+						xDisp[u] -= (xDelta / deltaLength) * force;
+						yDisp[u] -= (yDelta / deltaLength) * force;
+				    }
+				}
+		
+				//calculate attractive forces between nodes connected by an edge
+				Iterator iter = edges.iterator();
+				int z = 0;
+				while (iter.hasNext() && noBreak) {
+					z++;
+				    CommunityEdge edge = (CommunityEdge) iter.next();
+				    int vIndex = ((Integer) nodeIndexer.get(edge.getStart())).intValue();
+				    int uIndex = ((Integer) nodeIndexer.get(edge.getEnd())).intValue();
+		
+				    //get difference of position vectors
+				    xDelta = xPos[vIndex] - xPos[uIndex];
+				    yDelta = yPos[vIndex] - yPos[uIndex];
+				    
+				    //set vu disp vector
+				    deltaLength = Math.sqrt((xDelta * xDelta) + (yDelta * yDelta));
+				    
+				    // get div by 0 "errors" if deltaLength is 0.
+				    // BUT WHAT SHOULD deltaLength BE IN THESE CASES?
+				    if (deltaLength == 0) 
+				    	deltaLength = 0.001;
+				    
+				    force = calcAttraction(deltaLength);
+				    
+				    xDisp[vIndex] -= (xDelta / deltaLength) * force;
+				    yDisp[vIndex] -= (yDelta / deltaLength) * force;
+				    
+				    //set uv disp vector to (-vu) because nodes may not be mutually
+				    xDisp[uIndex] += (xDelta / deltaLength) * force;
+				    yDisp[uIndex] += (yDelta / deltaLength) * force;
+				}
+		
+				//caculate displacement, but limit max displacement to temp
+				for (int v = 0; v < nNodes; v++) {
+				    double xDispVal = xDisp[v];
+				    double yDispVal = yDisp[v];
+				    deltaLength = Math.sqrt((xDispVal * xDispVal) + (yDispVal * yDispVal));
+				    
+				    if (!fixed[v]) {
+						if (deltaLength > temp) {
+						    xPos[v] += xDisp[v] / (deltaLength / temp);
+						    yPos[v] += yDisp[v] / (deltaLength / temp);
+						    
+						} else {
+						    xPos[v] += xDisp[v];
+						    yPos[v] += yDisp[v];
+						}
+						int l = 0;
+				    }
+				}
+				
+				//cool temp
+				if (passes > initialIter) 
+					temp = coolTemp(temp);
+		
+				passes++;
+				//System.out.println("passes: " + passes);
+		    }
+	
+		    if (rescaleLayout) {
+		    	rescalePositions(nl, xPos, yPos);
+		    }
+		    
+		    //removeOverlaps(nl, nNodes, xPos, yPos); // TODO: The problem is here
+		}
+		done = true;
 	}
 
-	if (update) {
-
-	    noBreak = true;
-
-	    Object[] nl = nodeList.toArray();
-
-	    // calc constants
-	    optDist = 
-		0.46 * Math.sqrt(((width * height) / (nl.length + 1)));
-	    double temp = width / 10;
-	    int passes = 0;
-	    int nNodes = nl.length;
-	    double xDelta = 0;
-	    double yDelta = 0;
-	    double deltaLength = 0;
-	    double force = 0;
-	    HashSet edges = new HashSet();
-	    HashMap nodeIndexer = new HashMap();
-
-	    if (firstLayout) {
-          //make sure nodes have random initial coord to begin with
-          randomizeLayout();
-          firstLayout = false;
-	    }
-
-	    Iterator<CommunityNode> it = nodeList.iterator();
-	    while(it.hasNext()) {
-          CommunityNode workNode = it.next();
-          locations.put(workNode,new Coordinates(getX(workNode), getY(workNode)));
-	    }
-
-	    //make arrays corresponding to the coords of each node
-	    double[] xPos = new double[nNodes];
-	    double[] yPos = new double[nNodes];
-	    boolean[] fixed = new boolean[nNodes];
-
-	    for (int i = 0; i < nNodes; i++) {
-		CommunityNode workNode = (CommunityNode)nl[i];
-		xPos[i] = getX(workNode);
-		yPos[i] = getY(workNode);
-		maxWidth = Math.max(maxWidth,DrawableNode.NODE_DIAMETER + DrawableNode.NODE_X_SPACING);
-		maxHeight = Math.max(maxHeight,DrawableNode.NODE_DIAMETER + DrawableNode.NODE_X_SPACING);
-		//fixed[i] = workNode.__getattr_Fixed();
-		fixed[i] = false;
-		edges.addAll(workNode.getEdgesList());
-		nodeIndexer.put(workNode, new Integer(i));
-	    }
-
-	    //remove check for self loops and remove them
-	    //if (NetUtilities.hasSelfLoops(nodeList)) 
-		edges = (HashSet)removeLoops(edges);
-
-
-	    //make arrays corresponding to the displacement vector for
-	    //each node
-	    double[] xDisp = new double[nNodes];
-	    double[] yDisp = new double[nNodes];
-	    
-	    // keep passing through the layout loop until the temp is
-	    // low initialIter + time for cooling schedule
-	    while ((temp > 1) && (passes < maxPasses) && noBreak) {
-		//calculate repulsive forces between each pair of
-		//nodes (set both)
-		int limit = nNodes - 1;
-		for (int v = 0; v < limit; v++) {
-		    xDisp[v] = 0;
-		    yDisp[v] = 0;
-		    // can skip many loops by assuming that uv = -vu
-		    // and looping in factorial
-		    for (int u = v + 1; u < nNodes; u++) {
-			//get difference of position vectors
-			xDelta = xPos[v] - xPos[u];
-			yDelta = yPos[v] - yPos[u];
-
-			//trap condition where nodes have same position
-			if ((xDelta == 0) && (yDelta == 0)) {
-			    //don't do anything in hopes that someone
-			    //else will kick them apart
-
-			    // Do we continue or break here? Waiting
-			    // for Skye's answer.
-			    continue;
-			    //break;
-			}
-			//set vu disp vector
-			deltaLength = Math.sqrt((xDelta * xDelta) + (yDelta * yDelta));
-			force = calcRepulsion(deltaLength);
-			xDisp[v] += (xDelta / deltaLength) * force;
-			yDisp[v] += (yDelta / deltaLength) * force;
-			//set uv disp vector (-vu)
-			xDisp[u] -= (xDelta / deltaLength) * force;
-			yDisp[u] -= (yDelta / deltaLength) * force;
-		    }
-		}
-
-		//calculate attractive forces between nodes connected by an edge
-		Iterator iter = edges.iterator();
-		while (iter.hasNext() && noBreak) {
-		    CommunityEdge edge = (CommunityEdge) iter.next();
-		    int vIndex = ((Integer) nodeIndexer.get(edge.getStart())).intValue();
-		    int uIndex = ((Integer) nodeIndexer.get(edge.getEnd())).intValue();
-
-		    //get difference of position vectors
-		    xDelta = xPos[vIndex] - xPos[uIndex];
-		    yDelta = yPos[vIndex] - yPos[uIndex];
-		    //set vu disp vector
-		    deltaLength = Math.sqrt((xDelta * xDelta) + (yDelta * yDelta));
-		    // get div by 0 "errors" if deltaLength is 0.
-		    // BUT WHAT SHOULD deltaLength BE IN THESE CASES?
-		    if (deltaLength == 0) deltaLength = 0.001;
-		    force = calcAttraction(deltaLength);
-		    xDisp[vIndex] -= (xDelta / deltaLength) * force;
-		    yDisp[vIndex] -= (yDelta / deltaLength) * force;
-		    //set uv disp vector to (-vu) because nodes may not be mutually
-		    xDisp[uIndex] += (xDelta / deltaLength) * force;
-		    yDisp[uIndex] += (yDelta / deltaLength) * force;
-
-		    /*
-		      if (Double.isNaN(xDisp[uIndex]) && Double.isNaN(yDisp[uIndex]))
-		      {
-		      System.out.println();
-		      System.out.println("xDisp[uIndex] = " + xDisp[uIndex]);
-		      System.out.println("yDisp[uIndex] = " + yDisp[uIndex]);
-		      System.out.println("xDelta: " + xDelta);
-		      System.out.println("yDelta: " + yDelta);
-		      System.out.println("deltaLength: " + deltaLength);
-		      System.out.println("force: " + force);
-		      }
-		    */
-		}
-
-		//caculate displacement, but limit max displacement to temp
-		for (int v = 0; v < nNodes; v++) {
-		    double xDispVal = xDisp[v];
-		    double yDispVal = yDisp[v];
-		    deltaLength = Math.sqrt((xDispVal * xDispVal) +
-					    (yDispVal * yDispVal));
-		    if (!fixed[v]) {
-			if (deltaLength > temp) {
-			    xPos[v] += round(xDisp[v] / (deltaLength / temp),Math.rint(maxWidth));
-			    yPos[v] += round(yDisp[v] / (deltaLength / temp),Math.rint(maxHeight));
-			} else {
-			    xPos[v] += round(xDisp[v],Math.rint(maxWidth));
-			    yPos[v] += round(yDisp[v],Math.rint(maxHeight));
-			}
-		    }
-		}
-
-		//cool temp
-		if (passes > initialIter) temp = coolTemp(temp);
-
-		passes++;
-		//System.out.println("passes: " + passes);
-	    }
-
-	    if (rescaleLayout)
-		rescalePositions(nl, xPos, yPos);
-
-	    Random r = new Random();
+	private void removeOverlaps(Object[] nl, int nNodes, double[] xPos, double[] yPos) {
+		Random r = new Random();
 	    int overlapping = 0;
 	    boolean[][] cells = new boolean[(int)width/(int)Math.rint(maxWidth)+10][(int)height/(int)Math.rint(maxHeight)+10];
+	    
 	    for (int i = 0; i < nNodes; i++) {
-		CommunityNode node = (CommunityNode) nl[i];
-		//System.out.println("updating..." + node.getX() + " " + xPos[i]);
-		int ci = (int)xPos[i]/(int)Math.rint(maxWidth);
-		int cj = (int)yPos[i]/(int)Math.rint(maxHeight);
-		boolean found = false;
-		if (cells[ci][cj]) {
-		    //System.out.println(ci + " " + cj);
-		    for (int t = 1 ; t <= 4 ; t++) {
-			for (int s = 0 ; s <= t ; s++) {
-			    ci = Math.min(Math.max(0,ci+t),cells.length-1);
-			    cj = Math.min(Math.max(0,cj+s),cells[ci].length-1);
-			    //System.out.println("\t"+ ci + " " + cj);
-			    if (!cells[ci][cj]) {
-				found = true;
-				break;
-			    }
-			    ci = Math.min(Math.max(0,ci-t),cells.length-1);
-			    cj = Math.min(Math.max(0,cj-s),cells[ci].length-1);
-			    //System.out.println("\t"+ ci + " " + cj);
-			    if (!cells[ci][cj]) {
-				found = true;
-				break;
+			CommunityNode node = (CommunityNode) nl[i];
+			//System.out.println("updating..." + node.getX() + " " + xPos[i]);
+			int ci = (int)xPos[i]/(int)Math.rint(maxWidth);
+			int cj = (int)yPos[i]/(int)Math.rint(maxHeight);
+			boolean found = false;
+			if (cells[ci][cj]) {
+			    //System.out.println(ci + " " + cj);
+			    for (int t = 1 ; t <= 4 ; t++) {
+					for (int s = 0 ; s <= t ; s++) {
+					    ci = Math.min(Math.max(0,ci+t),cells.length-1);
+					    cj = Math.min(Math.max(0,cj+s),cells[ci].length-1);
+					    //System.out.println("\t"+ ci + " " + cj);
+					    if (!cells[ci][cj]) {
+							found = true;
+							break;
+					    }
+					    ci = Math.min(Math.max(0,ci-t),cells.length-1);
+					    cj = Math.min(Math.max(0,cj-s),cells[ci].length-1);
+					    //System.out.println("\t"+ ci + " " + cj);
+					    if (!cells[ci][cj]) {
+							found = true;
+							break;
+					    }
+					}
+					if (found)
+					    break;
 			    }
 			}
-			if (found)
-			    break;
-		    }
-		}
-		
-		Coordinates c = (Coordinates)locations.get(node);
-		c.setX(ci*Math.rint(maxWidth));
-		c.setY(cj*Math.rint(maxHeight));
-
-		if (cells[ci][cj]) {
-		    overlapping++;
-		    c.setX(c.getX()+r.nextInt((int)maxWidth));
-		    c.setY(c.getY()+r.nextInt((int)maxHeight));
-		}
-		cells[ci][cj] = true;
+			
+			Coordinates c = (Coordinates)locations.get(node);
+			c.setX((double)ci*Math.rint(maxWidth));
+			c.setY((double)cj*Math.rint(maxHeight));
+	
+			if (cells[ci][cj]) {
+			    overlapping++;
+			    c.setX(c.getX()+r.nextInt((int)maxWidth));
+			    c.setY(c.getY()+r.nextInt((int)maxHeight));
+			}
+			cells[ci][cj] = true;
 	    }
 	    if (overlapping > 0) {
-		System.out.println("\tThere are " + 
-				   overlapping +
-				   " overlapping nodes, (you may want "+
-				   "to increase the height/width)");
+			System.out.println("\tThere are " + 
+					   overlapping +
+					   " overlapping nodes, (you may want "+
+					   "to increase the height/width)");
 	    }
 	}
-	done = true;
-    }
 
-    public double round(double a, double modx) {
-	double temp = Math.rint(a);
-	double temp2 = temp - temp%modx;
-	//System.out.println(temp2);
-	return(temp2);
-    } 
+	public double round(double a, double modx) {
+		double temp = Math.rint(a);
+		double temp2 = temp - temp%modx;
+		//System.out.println(temp2);
+		return(temp2);
+	} 
 
     /**
      * Rescales the x and y coordinates of each node so that the network
@@ -530,77 +536,73 @@ public class FruchPlacer extends AbstractPlacer {
      *
      * @param nodes the nodes to rescale.
      */
-    private void rescalePositions(Object[] nList, 
-				  double[] xPos, 
-				  double[] yPos) {
-	//System.out.println("rescaling...");
-	int nNodes = nList.length;
-	//find largest coords
-	double xMax = xPos[0];
-	double yMax = yPos[0];
-	double xMin = xPos[0];
-	double yMin = yPos[0];
-	for (int i = 1; i < nNodes; i++) {
-	    xMax = Math.max(xMax, xPos[i]);
-	    yMax = Math.max(yMax, yPos[i]);
-	    xMin = Math.min(xMin, xPos[i]);
-	    yMin = Math.min(yMin, yPos[i]);
+	private void rescalePositions(Object[] nList, double[] xPos, double[] yPos) {
+		//System.out.println("rescaling...");
+		int nNodes = nList.length;
+		//find largest coords
+		double xMax = xPos[0];
+		double yMax = yPos[0];
+		double xMin = xPos[0];
+		double yMin = yPos[0];
+		for (int i = 1; i < nNodes; i++) {
+		    xMax = Math.max(xMax, xPos[i]);
+		    yMax = Math.max(yMax, yPos[i]);
+		    xMin = Math.min(xMin, xPos[i]);
+		    yMin = Math.min(yMin, yPos[i]);
+		}
+		//rescale coords of nodes to fit inside frame
+		double xDiff = xMax - xMin;
+		double yDiff = yMax - yMin;
+		double xPadVal = width - pad;
+		double yPadVal = height - pad;
+		for (int i = 0; i < nNodes; i++) {
+		    xPos[i] = ((xPos[i] - xMin) / xDiff) * xPadVal;
+		    yPos[i] = ((yPos[i] - yMin) / yDiff) * yPadVal;
+		    CommunityNode node = (CommunityNode)nList[i];
+		    Coordinates c = (Coordinates)locations.get(node);
+		    c.setX(xPos[i]);
+		    c.setY(yPos[i]);
+		}
 	}
-	//rescale coords of nodes to fit inside frame
-	double xDiff = xMax - xMin;
-	double yDiff = yMax - yMin;
-	int xPadVal = width - pad;
-	int yPadVal = height - pad;
-	for (int i = 0; i < nNodes; i++) {
-	    xPos[i] = round(((xPos[i] - xMin) / xDiff) * 
-			    xPadVal,Math.rint(maxWidth));
-	    yPos[i] = round(((yPos[i] - yMin) / yDiff) * 
-			    yPadVal,Math.rint(maxHeight));
-	    CommunityNode node = (CommunityNode)nList[i];
-	    Coordinates c = (Coordinates)locations.get(node);
-	    c.setX(xPos[i]);
-	    c.setY(yPos[i]);
-	}
-    }
     
     
-    private Set removeLoops(Set edges) {
-	HashSet returnList = new HashSet();
-	Iterator edgeIter = edges.iterator();
-	while (edgeIter.hasNext()) {
-	    CommunityEdge edge = (CommunityEdge)edgeIter.next();
-	    if (edge == null) {
-		continue;
-	    }
-	    if (edge.getStart()!= edge.getEnd()) {
-		returnList.add(edge);
-	    }
+	private Set removeLoops(Set edges) {
+		HashSet returnList = new HashSet();
+		Iterator edgeIter = edges.iterator();
+		while (edgeIter.hasNext()) {
+		    CommunityEdge edge = (CommunityEdge)edgeIter.next();
+		    if (edge == null) {
+			continue;
+		    }
+		    if (edge.getStart()!= edge.getEnd()) {
+			returnList.add(edge);
+		    }
+		}
+		
+		return returnList;
 	}
-	
-	return returnList;
-    }
     
     /**
      * Implements the ActionListener interface. Whenever this is called the
      * layout will be interrupted as soon as possible.
      */
-    public void actionPerformed(ActionEvent evt) {
-	noBreak = false;
-    }
+	public void actionPerformed(ActionEvent evt) {
+		noBreak = false;
+	}
 
     /**
      * Gets the height of the area on which to layout the graph.
      */
-    public int getHeight() {
-	return height;
-    }
+	public int getHeight() {
+		return height;
+	}
     
     /**
      * Gets the width of the area on which to layout the graph.
      */
-    public int getWidth() {
-	return width;
-    }
+	public int getWidth() {
+		return width;
+	}
     
     public void setUpdate(boolean doUpdate) {
 	update = doUpdate;
