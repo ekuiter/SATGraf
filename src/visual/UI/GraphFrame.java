@@ -48,10 +48,17 @@ public class GraphFrame extends JFrame{
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setSize(1000, 700);
     setContentPane(mainPane);
-    
-    menu.add("File");
-    menu.add(open);
-    menu.add(save);
+    if(menu.getMenuComponentCount() == 0){
+      menu.add("File");
+      menu.add(open);
+      menu.add(save);
+    }
+    for(int i = 0; i < save.getActionListeners().length; i++){
+      save.removeActionListener(save.getActionListeners()[i]);
+    }
+    for(int i = 0; i < open.getActionListeners().length; i++){
+      open.removeActionListener(open.getActionListeners()[i]);
+    }
     save.addActionListener(new SaveAction(graphViewer));
     open.addActionListener(new OpenAction(this));
     menu.add(export);

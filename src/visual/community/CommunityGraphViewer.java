@@ -12,7 +12,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import org.json.simple.JSONObject;
 import visual.community.drawing_algorithms.AbstractPlacer;
+import visual.community.drawing_algorithms.CommunityPlacer;
 import static visual.graph.DrawableNode.COMMUNITY_COLORS;
 import visual.graph.Edge;
 import visual.graph.GraphViewer;
@@ -23,17 +25,19 @@ import visual.graph.GraphViewer;
  */
 public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEdge>{
 
-  public AbstractPlacer placer;
+  public CommunityPlacer placer;
   
-  public CommunityGraphViewer(CommunityGraph graph, HashMap<String, TIntObjectHashMap<String>> node_lists, AbstractPlacer pl) {
+  public CommunityGraphViewer(CommunityGraph graph, HashMap<String, TIntObjectHashMap<String>> node_lists, CommunityPlacer pl) {
     super(graph, node_lists);
     placer = pl;
     init();
   }
+  
   public CommunityGraph getGraph(){
     return (CommunityGraph) graph;
   }
-  public String save(){
+  
+  public String toJson(){
     StringBuilder json = new StringBuilder();
     ArrayList<String> nodes = new ArrayList<>();
     ArrayList<String> edges = new ArrayList<>();
@@ -44,14 +48,13 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
       nsb.append("\"x\":");
       nsb.append(placer.getX(node));
       nsb.append(",\"y\":");
-      nsb.append(placer.getX(node));
-      nsb.append("}");
+      nsb.append(placer.getY(node));
+      nsb.append("},");
       
       json.append(nsb.toString());
-      json.append(",");
     }
     json.setCharAt(json.length() - 1, ']');
-    json.append("{\"edges\":[");
+    json.append(",\"edges\":[");
     for(CommunityEdge edge : getGraph().getEdgesList()){
       json.append(edge.toJson());
       json.append(",");

@@ -35,7 +35,7 @@ public class SaveAction implements ActionListener{
     if(returnVal == JFileChooser.APPROVE_OPTION) {
       FileWriter f = null;
       try {
-        String s = graphViewer.save();
+        String s = graphViewer.toJson();
         f = new FileWriter(chooser.getSelectedFile());
         f.write(s);
         f.close();

@@ -28,7 +28,7 @@ public class SimpleGraphViewer extends GraphViewer<Node, Edge>{
   public void init() {
     
   }
-  public String save(){
+  public String toJson(){
     return "";
   }
   protected Graph getGraph(){

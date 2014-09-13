@@ -6,6 +6,7 @@
 
 package visual.community;
 
+import org.json.simple.JSONObject;
 import visual.graph.Edge;
 
 /**
@@ -41,6 +42,13 @@ public class CommunityEdge extends Edge<CommunityNode>{
   public int getCommunity(){
     return 0;//community_id;
   }
+  
+  public static CommunityEdge fromJson(JSONObject json, CommunityGraph graph){
+    CommunityEdge edge = new CommunityEdge(graph.getNode(((Long)json.get("start")).intValue()),graph.getNode(((Long)json.get("end")).intValue()));
+    edge.id = ((Long)json.get("id")).intValue();
+    return edge;
+  }
+  
   
   public int getType(){
     if(a.getId() == 0 && dummy){

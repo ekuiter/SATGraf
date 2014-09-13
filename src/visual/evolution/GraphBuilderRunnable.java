@@ -21,8 +21,7 @@ import visual.community.CommunityGraphViewer;
 import visual.community.CommunityMetric;
 import visual.community.CommunityNode;
 import visual.community.ConcreteCommunityGraph;
-import visual.community.drawing_algorithms.AbstractPlacer;
-import visual.community.drawing_algorithms.GridKKPlacer;
+import visual.community.drawing_algorithms.CommunityPlacer;
 /**
  *
  * @author zacknewsham
@@ -36,8 +35,8 @@ class GraphBuilderRunnable implements Runnable{
   private boolean finished = false;
   private boolean finishedAll = false;
   private final Class<? extends CommunityMetric> metricClass;
-  private final Class<? extends AbstractPlacer> placerClass;
-  public GraphBuilderRunnable(CommunityGraph original, HashMap<String, Pattern> patterns, Class<? extends CommunityMetric> metricClass, Class<? extends AbstractPlacer> placerClass){
+  private final Class<? extends CommunityPlacer> placerClass;
+  public GraphBuilderRunnable(CommunityGraph original, HashMap<String, Pattern> patterns, Class<? extends CommunityMetric> metricClass, Class<? extends CommunityPlacer> placerClass){
     this.original = original;
     this.patterns = patterns;
     this.metricClass = metricClass;

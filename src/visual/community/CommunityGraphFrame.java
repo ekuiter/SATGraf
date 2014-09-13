@@ -6,15 +6,18 @@
 
 package visual.community;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import visual.UI.GraphCanvasPanel;
 import visual.UI.GraphFrame;
-import visual.graph.GraphViewer;
 
 /**
  *
@@ -31,7 +34,7 @@ public class CommunityGraphFrame extends GraphFrame{
     return (CommunityGraphViewer)graphViewer;
   }
   public void show() {
-    if(panel == null && graphViewer != null){
+    if(graphViewer != null){
       canvasPanel = new GraphCanvasPanel(new CommunityCanvas(getGraphViewer()));
 
       panel = new CommunityOptionsPanel(getGraphViewer(), patterns.keySet());
@@ -46,14 +49,31 @@ public class CommunityGraphFrame extends GraphFrame{
   }
   
   public void open(File file){
-    CommunityGrapher grapher = new CommunityGrapher(file.getAbsolutePath(), "ol", "f", new HashMap<String, String>());
-    
     try {
-      grapher.generateGraph();
-      this.graphViewer = new CommunityGraphViewer(grapher.getGraph(), grapher.getNode_lists(), grapher.placer);
-      this.patterns = new HashMap<>();
-      init();
-      show();
+      String[] parts = file.getAbsolutePath().split("\\.");
+      if(parts[parts.length - 1].equals("cnf")){
+        CommunityGrapher grapher = new CommunityGrapher(file.getAbsolutePath(), "ol", "f", new HashMap<String, String>());
+        grapher.generateGraph();
+        this.graphViewer = new CommunityGraphViewer(grapher.getGraph(), grapher.getNode_lists(), grapher.placer);
+        this.patterns = new HashMap<>();
+        init();
+        show();
+      }
+      else{
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        StringBuilder contents = new StringBuilder();
+        String line;
+        while((line = reader.readLine()) != null){
+          contents.append(line).append("\n");
+        }
+        JSONObject json = (JSONObject)JSONValue.parse(contents.toString());
+        JSONCommunityGraph graph = new JSONCommunityGraph(json);
+        graph.init();
+        this.graphViewer = new CommunityGraphViewer(graph, graph.getNodeLists(), graph);
+        this.patterns = new HashMap<>();
+        init();
+        show();
+      }
     } 
     catch (IOException ex) {
       Logger.getLogger(CommunityGraphFrame.class.getName()).log(Level.SEVERE, null, ex);

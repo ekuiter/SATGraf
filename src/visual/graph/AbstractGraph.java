@@ -23,12 +23,8 @@ import java.util.Iterator;
 public abstract class AbstractGraph <T extends Node, T1 extends Edge, T2 extends Clause> implements Graph<T, T1, T2>{
   protected int clause_count;
   protected final HashMap<T2, T2> clauses = new HashMap<T2, T2>();
-  //private final CacheManager cacheManager = new CacheManager();
   protected final TIntObjectHashMap<T> nodes = new TIntObjectHashMap<T>();
-  //protected final HashMap<Integer, T> nodes = new HashMap<Integer, T>();
-  //private final ArrayList<T> head_nodes = new ArrayList<T>();
-  //private final ArrayList<T> tail_nodes = new ArrayList<T>();
-  private final HashMap<String, ArrayList<T>> nodes_set = new HashMap<>();
+  protected final HashMap<String, ArrayList<T>> nodes_set = new HashMap<>();
   protected final ArrayList<T1> connections = new ArrayList<T1>();
   protected UnionFind uf = new UnionFind();
 

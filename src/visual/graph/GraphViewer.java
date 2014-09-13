@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import javax.swing.Timer;
+import org.json.simple.JSONObject;
 import visual.UI.GraphCanvas;
 import visual.UI.GraphOptionsPanel;
 
@@ -41,11 +42,12 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   protected final ArrayList yOrderedNodes = new ArrayList<T>();
   
   private final Timer actionTimer = new Timer(1000, this);
+  
   public GraphViewer(Graph graph, HashMap<String, TIntObjectHashMap<String>> node_lists){
     this.node_lists = node_lists;
     this.graph = graph;
   }
-  public abstract String save();
+  public abstract String toJson();
   
   public abstract void init();
   protected abstract Graph getGraph();

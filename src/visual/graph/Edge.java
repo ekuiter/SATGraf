@@ -38,18 +38,17 @@ public class Edge <T extends Node> implements HasGraphPosition, Comparable<Edge>
     return b;
   }
   
+  
   public String toJson(){
     StringBuilder json = new StringBuilder();
     json.append("{");
-    json.append("\"id\":");
-    json.append(this.getId());
-    json.append(",\"start\":");
-    json.append(this.getStart().getId());
-    json.append(",\"end\":");
-    json.append(this.getEnd().getId());
+    json.append("\"id\":").append(this.getId());
+    json.append(",\"start\":").append(this.getStart().getId());
+    json.append(",\"end\":").append(this.getEnd().getId());
     json.append("}");
     return json.toString();
   }
+  
   public int getId(){
     if(id == 0){
       int _id = (this.a.getId() & 0xffff) << 16;

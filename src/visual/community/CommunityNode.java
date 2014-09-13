@@ -6,6 +6,8 @@
 
 package visual.community;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import visual.graph.Node;
 
 /**
@@ -39,6 +41,18 @@ public class CommunityNode extends Node<CommunityEdge>{
   
   public void setSize(double size) {
     this.size = size;
+  }
+  
+  public static CommunityNode fromJson(JSONObject json, CommunityGraph graph){
+    CommunityNode node = new CommunityNode(((Long)json.get("id")).intValue(), (String)json.get("name"));
+    node.community = ((Long)json.get("community")).intValue();
+    JSONArray groups = (JSONArray)json.get("groups");
+    for(Object g : groups){
+      JSONObject jGroup = (JSONObject) g;
+      node.addGroup((String)jGroup.get("group"));
+    }
+    
+    return node;
   }
   
   public String toJson(){
