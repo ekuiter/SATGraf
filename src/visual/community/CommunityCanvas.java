@@ -29,7 +29,7 @@ public class CommunityCanvas extends GraphCanvas{
     Rectangle i = image.getClipBounds();
     int offsetX = (o.x - i.x);
     int offsetY = (o.x - i.x);
-    image.setColor(Color.WHITE);
+    image.setColor(Color.BLACK);
     image.fillRect(i.x, i.y, i.width, i.height);
     Iterator<Node> nodes = graph.getNodes("All", o).iterator();
     while(nodes.hasNext()){
@@ -47,7 +47,7 @@ public class CommunityCanvas extends GraphCanvas{
         image.setColor(c.getColor(graph));
       }
       else{
-        image.setColor(Color.BLACK);
+        image.setColor(Color.WHITE);
       }
       drawConnection(c, o, image);
     }
