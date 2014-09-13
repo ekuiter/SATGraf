@@ -4,6 +4,7 @@
  */
 package visual.community;
 
+import gnu.trove.map.hash.TIntObjectHashMap;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -70,6 +71,10 @@ public class CommunityGrapher extends Grapher <CommunityNode, CommunityEdge, Cla
   public void init(){
       graphViewer = new CommunityGraphViewer((CommunityGraph)graph, node_lists, this.placer);
       frmMain = new CommunityGraphFrame((CommunityGraphViewer)graphViewer, patterns);
+  }
+  
+  public HashMap<String, TIntObjectHashMap<String>> getNode_lists(){
+    return node_lists;
   }
   
   public static void main(String[] args) throws URISyntaxException {

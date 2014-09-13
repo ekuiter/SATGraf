@@ -7,11 +7,13 @@
 package visual.UI;
 
 import java.awt.Component;
+import java.io.File;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JSplitPane;
+import visual.actions.OpenAction;
 import visual.actions.SaveAction;
 import visual.graph.GraphViewer;
 
@@ -37,6 +39,11 @@ public class GraphFrame extends JFrame{
     this.graphViewer = graphViewer;
     init();
   }
+  
+  public void open(File file){
+    
+  }
+  
   public void init(){
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setSize(1000, 700);
@@ -46,14 +53,17 @@ public class GraphFrame extends JFrame{
     menu.add(open);
     menu.add(save);
     save.addActionListener(new SaveAction(graphViewer));
+    open.addActionListener(new OpenAction(this));
     menu.add(export);
     menuBar.add(menu);
     setJMenuBar(menuBar);
   }
   
   public void show(){
-    mainPane.setLeftComponent(canvasPanel);
-    mainPane.setRightComponent(panel);
+    if(graphViewer != null){
+      mainPane.setLeftComponent(canvasPanel);
+      mainPane.setRightComponent(panel);
+    }
     super.show();
   }
   protected void setLeftComponent(Component c){
