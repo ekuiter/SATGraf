@@ -82,8 +82,9 @@ public class GraphCanvasRenderer extends JPanel implements TableCellRenderer {
     g2.drawImage(image, new AffineTransformOp(AffineTransform.getScaleInstance(FRAME_WIDTH / (double) image.getWidth(), FRAME_HEIGHT / (double) image.getHeight()), AffineTransformOp.TYPE_BICUBIC), 0, 0);//, 0, 0, image.getWidth(), image.getHeight(), this);
 
     Node n = graph.getSelectedNode();
-    if ((n == null || !graph.isVisible(n)) && canvas.getMousePosition() != null) {
-      n = graph.getNodeAtXY(canvas.getMousePosition().x, canvas.getMousePosition().y);
+    Point pos = canvas.getMousePosition();
+    if ((n == null || !graph.isVisible(n)) && pos != null) {
+      n = graph.getNodeAtXY(pos.x, pos.y);
     }
     int scaled_diameter = (int) (DrawableNode.NODE_DIAMETER * graph.getScale());
     while (n != null && (graph.isVisible(n) || n == graph.getSelectedNode())) {
