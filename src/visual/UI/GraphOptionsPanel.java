@@ -37,6 +37,23 @@ public abstract class GraphOptionsPanel extends JSplitPane{
     this(graph, groups, false);
   }
   
+  public String toJson(){
+    StringBuilder json = new StringBuilder();
+    json.append("{\"optionsPanel\":");
+    json.append(optionsPanel.toJson());
+    
+    json.append(",\"checkBoxPanels\":[");
+    for(String key : checkboxPanels.keySet()){
+      json.append("{\"key\":\"");
+      json.append(key);
+      json.append("\",\"data\":");
+      json.append(checkboxPanels.get(key).toJson());
+      json.append("},");
+    }
+    json.setCharAt(json.length() - 1, '}');
+    return json.toString();
+  }
+  
   public NodePanel getNodePanel(){
     return optionsPanel.getNodePanel();
   }

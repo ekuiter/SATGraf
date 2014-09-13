@@ -14,8 +14,8 @@ import java.util.ArrayList;
  */
 public class GraphBuilderExecutor implements Runnable{
   private final ArrayList<GraphBuilderRunnable> runnables = new ArrayList<>();
-  private final EvolutionGrapher callback;
-  public GraphBuilderExecutor(EvolutionGrapher callback){
+  private final EvolutionGraphFrame callback;
+  public GraphBuilderExecutor(EvolutionGraphFrame callback){
     this.callback = callback;
   }
   @Override

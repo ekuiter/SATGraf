@@ -6,15 +6,14 @@
 
 package visual.community;
 
-import static visual.graph.DrawableNode.COMMUNITY_COLORS;
 import gnu.trove.map.hash.TIntObjectHashMap;
-
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import visual.community.drawing_algorithms.AbstractPlacer;
+import static visual.graph.DrawableNode.COMMUNITY_COLORS;
 import visual.graph.Edge;
 import visual.graph.GraphViewer;
 
@@ -24,7 +23,7 @@ import visual.graph.GraphViewer;
  */
 public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEdge>{
 
-  private AbstractPlacer placer;
+  public AbstractPlacer placer;
   
   public CommunityGraphViewer(CommunityGraph graph, HashMap<String, TIntObjectHashMap<String>> node_lists, AbstractPlacer pl) {
     super(graph, node_lists);
@@ -33,6 +32,42 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
   }
   public CommunityGraph getGraph(){
     return (CommunityGraph) graph;
+  }
+  public String save(){
+    StringBuilder json = new StringBuilder();
+    ArrayList<String> nodes = new ArrayList<>();
+    ArrayList<String> edges = new ArrayList<>();
+    json.append("{\"nodes\":[");
+    for(CommunityNode node : getGraph().getNodes()){
+      StringBuilder nsb = new StringBuilder(node.toJson());
+      nsb.setCharAt(nsb.length() - 1, ',');
+      nsb.append("\"x\":");
+      nsb.append(placer.getX(node));
+      nsb.append(",\"y\":");
+      nsb.append(placer.getX(node));
+      nsb.append("}");
+      
+      json.append(nsb.toString());
+      json.append(",");
+    }
+    json.setCharAt(json.length() - 1, ']');
+    json.append("{\"edges\":[");
+    for(CommunityEdge edge : getGraph().getEdgesList()){
+      json.append(edge.toJson());
+      json.append(",");
+    }
+    json.setCharAt(json.length() - 1, ']');
+    
+    if(getSelectedNode() != null){
+      json.append(",\"selectedNode\":");
+      json.append(getSelectedNode().getId());
+    }
+    
+    json.append(",\"options\":");
+    json.append(panel.toJson());
+    
+    json.append("}");
+    return json.toString();
   }
   
   public void init(){

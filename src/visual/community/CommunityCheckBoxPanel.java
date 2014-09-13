@@ -11,7 +11,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import javax.swing.JPanel;
+import visual.graph.Node;
 
 /**
  *
@@ -19,12 +21,23 @@ import javax.swing.JPanel;
  */
 class CommunityCheckBoxPanel extends JPanel{
   int count = 0;
-
+  private HashMap<Integer, CommunityCheckBox> checkBoxes = new HashMap<>();
   private final CommunityGraphViewer graph;
   public CommunityCheckBoxPanel(CommunityGraphViewer graph) {
     this.graph = graph;
     init();
     this.setLayout(new GridLayout(count, 1));
+  }
+  public String toJson(){
+    StringBuilder json = new StringBuilder();
+    
+    json.append("{\"boxes\":[");
+    for(Integer com : checkBoxes.keySet()){
+      json.append("{\"id\":").append(com).append(",\"checked\":").append(checkBoxes.get(com).isSelected()).append("},");
+    }
+    json.setCharAt(json.length() - 1, ']');
+    json.append("}");
+    return json.toString();
   }
   private void init(){
     int community = 0;
@@ -32,6 +45,7 @@ class CommunityCheckBoxPanel extends JPanel{
     while(communities != null){
       int intercomm = graph.getInterCommunityConnections(community).size();
       CommunityCheckBox jc = new CommunityCheckBox(community, communities.size(), intercomm);
+      checkBoxes.put(community, jc);
       jc.setSelected(true);
       jc.addItemListener(new ItemListener() {
         @Override

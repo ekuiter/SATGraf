@@ -25,15 +25,13 @@ public class ImplicationGrapher extends Grapher{
    graph = new ConcreteImplicationGraph();
   }
   
-  protected void show() {
+  public void init(){
     if(graphViewer == null){
       graphViewer = new ImplicationGraphViewer(getGraph(), node_lists);
-      canvasPanel = new GraphCanvasPanel(new SimpleCanvas(graphViewer));
+      graphViewer.init();
+      frmMain = new ImplicationGraphFrame((ImplicationGraphViewer)graphViewer, patterns);
+      frmMain.init();
     }
-    graphViewer.init();
-    
-    panel = new ImplicationOptionsPanel((ImplicationGraphViewer)graphViewer, patterns.keySet());
-    super.show();
   }
   public ImplicationGraph getGraph(){
     return (ImplicationGraph)graph;
@@ -75,7 +73,8 @@ public class ImplicationGrapher extends Grapher{
     ImplicationGrapher ag = new ImplicationGrapher(args[0], patterns);
     try{
       ag.generateGraph();
-      ag.show();
+      ag.init();
+      ag.getFrame().show();
     }
     catch(FileNotFoundException e){
       e.printStackTrace();

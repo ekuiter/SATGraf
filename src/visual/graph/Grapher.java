@@ -21,12 +21,15 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JSplitPane;
 import visual.UI.GraphCanvasPanel;
+import visual.UI.GraphFrame;
 import visual.UI.GraphOptionsPanel;
-import visual.community.CommunityGraph;
+import visual.actions.SaveAction;
 
 /**
  *
  * @author zacknewsham
+ * @param <T>
+ * @param <T2>
  */
 public abstract class Grapher <T extends Node, T1 extends Edge, T2 extends Clause>{
   protected File dimacsFile;
@@ -41,22 +44,12 @@ public abstract class Grapher <T extends Node, T1 extends Edge, T2 extends Claus
   protected final HashMap<String, Pattern> patterns = new HashMap<String, Pattern>();
   protected final TIntObjectHashMap<String> all_names = new TIntObjectHashMap<String>();
   protected final TIntObjectHashMap<String> all = new TIntObjectHashMap<String>();
-  protected JFrame frmMain;
-  protected JMenu menu = new JMenu("File");
-  protected JMenuBar menuBar = new JMenuBar();
-  
-  private JMenuItem open = new JMenuItem("Open");
-  private JMenuItem save = new JMenuItem("Save");
-  private JMenuItem export = new JMenuItem("Export");
-  
-  protected final JSplitPane mainPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-  protected GraphCanvasPanel canvasPanel;
-  protected GraphOptionsPanel panel;
+  protected GraphFrame frmMain;
   static{
     s_all = s_all.intern();
     s_named = s_named.intern();
   }
-  public JFrame getFrame(){
+  public GraphFrame getFrame(){
     return frmMain;
   }
   public Grapher(String dimacsFile, String mapFile, HashMap<String, String> patterns){
@@ -70,6 +63,9 @@ public abstract class Grapher <T extends Node, T1 extends Edge, T2 extends Claus
     initPatterns(patterns);
     this.dimacsFile = null;
     this.mapFile = null;
+  }
+  public void init(){
+    this.frmMain = new GraphFrame(graphViewer);
   }
   
   public Grapher(String dimacsFile, HashMap<String, String> patterns){
@@ -92,19 +88,6 @@ public abstract class Grapher <T extends Node, T1 extends Edge, T2 extends Claus
     this.mapFile = new File(mapFile);
   }
   
-  protected void initFrame(){
-    frmMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frmMain.setSize(1000, 700);
-    frmMain.setContentPane(mainPane);
-    
-    menu.add("File");
-    menu.add(open);
-    menu.add(save);
-    menu.add(export);
-    menuBar.add(menu);
-    frmMain.setJMenuBar(menuBar);
-  }
-  
   private void initPatterns(HashMap<String, String> patterns){
     Iterator<String> ps = patterns.keySet().iterator();
     while(ps.hasNext()){
@@ -113,21 +96,6 @@ public abstract class Grapher <T extends Node, T1 extends Edge, T2 extends Claus
       this.node_lists.put(next, new TIntObjectHashMap<String>());
     }
     this.node_lists.put("All", all);
-  }
-  protected void show(){
-    if(frmMain == null){
-      frmMain = new JFrame();
-      initFrame();
-    }
-    mainPane.setLeftComponent(canvasPanel);
-    mainPane.setRightComponent(panel);
-    frmMain.setVisible(true);
-  }
-  protected void setLeftComponent(Component c){
-    mainPane.setLeftComponent(c);
-  }
-  protected void setRightComponent(Component c){
-    mainPane.setRightComponent(c);
   }
   protected void generateGraph() throws FileNotFoundException, IOException {
     BufferedReader reader;

@@ -45,6 +45,8 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
     this.node_lists = node_lists;
     this.graph = graph;
   }
+  public abstract String save();
+  
   public abstract void init();
   protected abstract Graph getGraph();
   public void setGraphCanvas(GraphCanvas canvas){

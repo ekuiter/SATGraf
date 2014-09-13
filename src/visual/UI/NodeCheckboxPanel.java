@@ -34,7 +34,18 @@ public class NodeCheckboxPanel extends JPanel{
     this.graph = graph;
     set = "";
   }
-  
+  public String toJson(){
+    StringBuilder json = new StringBuilder();
+    
+    json.append("{\"hideAll\":").append(hideAll.isSelected()).append(",");
+    json.append("\"nodes\":[");
+    for(Node node : checkBoxes.keySet()){
+      json.append("{\"id\":").append(node.getId()).append(",\"checked\":").append(checkBoxes.get(node).isSelected()).append("},");
+    }
+    json.setCharAt(json.length() - 1, ']');
+    json.append("}");
+    return json.toString();
+  }
   public void update(){
     Iterator<Node> nodes = checkBoxes.keySet().iterator();
     while(nodes.hasNext()){

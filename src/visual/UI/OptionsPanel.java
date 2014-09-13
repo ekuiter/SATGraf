@@ -61,6 +61,13 @@ public class OptionsPanel extends JPanel{
     this.add(options, BorderLayout.NORTH);
   }
   
+  public String toJson(){
+    StringBuilder json = new StringBuilder();
+    json.append("{\"hideAllNodes\":").append(hideAllNodes.isSelected()).append(",");
+    json.append("\"hideAllEdges\":").append(hideAllEdges.isSelected()).append("}");
+    return json.toString();
+  }
+  
   public NodePanel getNodePanel(){
     return this.nodePanel;
   }

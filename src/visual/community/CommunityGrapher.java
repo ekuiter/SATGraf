@@ -51,17 +51,6 @@ public class CommunityGrapher extends Grapher <CommunityNode, CommunityEdge, Cla
     return (CommunityGraph) graph;
   }
   
-  @Override
-  protected void show() {
-    if(panel == null){
-      graphViewer = new CommunityGraphViewer((CommunityGraph)graph, node_lists, this.placer);
-      canvasPanel = new GraphCanvasPanel(new CommunityCanvas(graphViewer));
-
-      panel = new CommunityOptionsPanel((CommunityGraphViewer)graphViewer, patterns.keySet());
-    }
-    super.show();
-  }
-  
   
   public void generateGraph() throws FileNotFoundException, IOException {
     graph = new ConcreteCommunityGraph();
@@ -77,6 +66,10 @@ public class CommunityGrapher extends Grapher <CommunityNode, CommunityEdge, Cla
     else if(placerName.equals("f")){
       this.placer = new FruchPlacer((CommunityGraph)graph);
     }
+  }
+  public void init(){
+      graphViewer = new CommunityGraphViewer((CommunityGraph)graph, node_lists, this.placer);
+      frmMain = new CommunityGraphFrame((CommunityGraphViewer)graphViewer, patterns);
   }
   
   public static void main(String[] args) throws URISyntaxException {
@@ -97,7 +90,8 @@ public class CommunityGrapher extends Grapher <CommunityNode, CommunityEdge, Cla
     CommunityGrapher ag = new CommunityGrapher(args[0], args[1], args[2], patterns);
     try{
       ag.generateGraph();
-      ag.show();
+      ag.init();
+      ag.getFrame().show();
     }
     catch(FileNotFoundException e){
       e.printStackTrace();

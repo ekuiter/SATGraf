@@ -24,16 +24,16 @@ import visual.community.OLCommunityMetric;
  */
 public class EvolutionGenerator extends javax.swing.JDialog {
 
-  private EvolutionGrapher grapher;
+  private EvolutionGraphFrame frame;
   /**
    * Creates new form EvolutionGenerator
    */
   public EvolutionGenerator(){
     initComponents();
   }
-  public EvolutionGenerator(EvolutionGrapher grapher) {
-    super(grapher.getFrame(), true);
-    this.grapher = grapher;
+  public EvolutionGenerator(EvolutionGraphFrame frame) {
+    super(frame, true);
+    this.frame = frame;
     initComponents();
   }
 
@@ -187,7 +187,7 @@ public class EvolutionGenerator extends javax.swing.JDialog {
       return;
     }
     CommunityGraph cg = makeCommunity(vars, clauses, coms, target_mod);
-    grapher.process(cg);
+    frame.process(cg);
     this.setVisible(false);
   }//GEN-LAST:event_btnGenerateActionPerformed
 

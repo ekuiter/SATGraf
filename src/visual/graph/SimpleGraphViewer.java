@@ -28,6 +28,9 @@ public class SimpleGraphViewer extends GraphViewer<Node, Edge>{
   public void init() {
     
   }
+  public String save(){
+    return "";
+  }
   protected Graph getGraph(){
     return graph;
   }

@@ -41,4 +41,14 @@ public class CommunityNode extends Node<CommunityEdge>{
     this.size = size;
   }
   
+  public String toJson(){
+    String tmp = super.toJson();
+    StringBuilder json = new StringBuilder(tmp); 
+    json.setCharAt(json.length() - 1, ',');
+    json.append("\"community\":");
+    json.append(community);
+    json.append("}");
+    return json.toString();
+  }
+  
 }

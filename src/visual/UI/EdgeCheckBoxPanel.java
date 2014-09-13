@@ -6,15 +6,16 @@
 
 package visual.UI;
 
-import visual.graph.GraphViewer;
-import visual.graph.Edge;
-import visual.graph.Node;
 import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import javax.swing.JPanel;
+import visual.graph.Edge;
+import visual.graph.GraphViewer;
+import visual.graph.Node;
 
 /**
  *
@@ -23,6 +24,7 @@ import javax.swing.JPanel;
 public class EdgeCheckBoxPanel<T extends Node, T1 extends Edge> extends JPanel{
   private final GraphViewer graph;
   private int count = 2;
+  private HashMap<Integer, EdgeCheckBox> checkBoxes = new HashMap<>();
   public EdgeCheckBoxPanel(GraphViewer graph, Node n, Iterator<T> nodes){
     this.graph = graph;
     count = 0;
@@ -34,6 +36,19 @@ public class EdgeCheckBoxPanel<T extends Node, T1 extends Edge> extends JPanel{
     }
     this.setLayout(new GridLayout(count, 1));
   }
+  
+  public String toJson(){
+    StringBuilder json = new StringBuilder();
+    
+    json.append("{\"boxes\":[");
+    for(Integer com : checkBoxes.keySet()){
+      json.append("{\"id\":").append(com).append(",\"checked\":").append(checkBoxes.get(com).isSelected()).append("},");
+    }
+    json.setCharAt(json.length() - 1, ']');
+    json.append("}");
+    return json.toString();
+  }
+  
   public EdgeCheckBoxPanel(GraphViewer graph, HashSet<T1> connections) {
     this.graph = graph;
     int community = 0;
@@ -54,6 +69,7 @@ public class EdgeCheckBoxPanel<T extends Node, T1 extends Edge> extends JPanel{
   }
   final void add(Edge conn){
     EdgeCheckBox jc = new EdgeCheckBox(conn);
+    checkBoxes.put(conn.getId(), jc);
       jc.setSelected(true);
       jc.addItemListener(new ItemListener() {
         @Override

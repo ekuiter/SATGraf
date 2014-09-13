@@ -52,6 +52,17 @@ public class CommunityOptionsPanel extends GraphOptionsPanel{
     optionsPanel.update();
   }
   
+  public String toJson(){
+    StringBuilder json = new StringBuilder(super.toJson());
+    
+    json.setCharAt(json.length() - 1, ',');
+    json.append("\"communities\":").append(communityPanel.toJson()).append(",");
+    json.append("\"interEdges\":").append(interConnectionPanel.toJson()).append(",");
+    json.append("\"intraEdges\":").append(intraConnectionPanel.toJson()).append("}");
+    
+    return json.toString();
+  }
+  
   protected void setGraph(CommunityGraphViewer graph){
     super.setGraph(graph);
     synchronized(checkBoxPanel){

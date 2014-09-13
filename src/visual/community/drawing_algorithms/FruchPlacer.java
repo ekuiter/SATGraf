@@ -53,8 +53,6 @@ package visual.community.drawing_algorithms;
 import java.util.*;
 import java.awt.event.ActionEvent;
 
-import java.lang.Math;
-import javax.swing.SwingUtilities;
 import visual.community.CommunityEdge;
 import visual.community.CommunityGraph;
 import visual.community.CommunityNode;
@@ -110,8 +108,8 @@ public class FruchPlacer extends AbstractPlacer {
     private boolean isSeedSet = false;
 
     private Collection<CommunityNode> nodeList;
-    private int width = 1000;
-    private int height = 1000;
+    private int width = 2500;
+    private int height = 2500;
     private boolean update = true;
 
     private HashMap locations = new HashMap();

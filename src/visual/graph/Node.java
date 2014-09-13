@@ -37,6 +37,22 @@ public class Node<T extends Edge> implements HasGraphPosition{
     }*/
   }
 
+  public String toJson(){
+    StringBuilder json = new StringBuilder();
+    json.append("{");
+    json.append("\"id\":");
+    json.append(this.getId());
+    json.append(",\"name\":\"");
+    json.append(this.getName());
+    json.append("\",\"groups\":[");
+    for(String group : groups){
+      json.append("{\"group\":\"");
+      json.append(group);
+      json.append("\"}");
+    }
+    json.append("]}");
+    return json.toString();
+  }
   public int hashCode(){
     return this.id;
   }
