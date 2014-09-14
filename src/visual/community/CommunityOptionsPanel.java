@@ -55,9 +55,9 @@ public class CommunityOptionsPanel extends GraphOptionsPanel{
   
   public void fromJson(JSONObject json){
     super.fromJson(json);
-    communityPanel.fromJson((JSONObject)json.get("communities"));
-    interConnectionPanel.fromJson((JSONObject)json.get("interEdges"));
-    intraConnectionPanel.fromJson((JSONObject)json.get("intraEdges"));
+    //communityPanel.fromJson((JSONObject)json.get("communities"));
+    //interConnectionPanel.fromJson((JSONObject)json.get("interEdges"));
+    //intraConnectionPanel.fromJson((JSONObject)json.get("intraEdges"));
   }
   public String toJson(){
     StringBuilder json = new StringBuilder(super.toJson());

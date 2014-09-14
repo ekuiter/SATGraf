@@ -46,7 +46,7 @@ public abstract class GraphOptionsPanel extends JSplitPane{
     checkBoxPanel.setVisibleBar(((Long)json.get("selectedCheckBoxPanel")).intValue());
     for(Object o : (JSONArray)json.get("checkBoxPanels")){
       JSONObject cb = (JSONObject)o;
-      checkboxPanels.get((String)cb.get("key")).fromJson((JSONObject)cb.get("data"));
+      //checkboxPanels.get((String)cb.get("key")).fromJson((JSONObject)cb.get("data"));
     }
   }
   public String toJson(){

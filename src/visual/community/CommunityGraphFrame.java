@@ -18,6 +18,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import visual.UI.GraphCanvasPanel;
 import visual.UI.GraphFrame;
+import visual.evolution.EvolutionGraphFrame;
 
 /**
  *
@@ -34,7 +35,7 @@ public class CommunityGraphFrame extends GraphFrame{
     return (CommunityGraphViewer)graphViewer;
   }
   public void show() {
-    if(graphViewer != null){
+    if(graphViewer != null && panel == null){
       canvasPanel = new GraphCanvasPanel(new CommunityCanvas(getGraphViewer()));
 
       panel = new CommunityOptionsPanel(getGraphViewer(), patterns.keySet());
@@ -47,15 +48,16 @@ public class CommunityGraphFrame extends GraphFrame{
     
     frame.show();
   }
-  
   public void fromJson(JSONObject json){
-    JSONCommunityGraph graph = new JSONCommunityGraph((JSONObject)json.get("graphViewer"));
-    graph.init();
-    this.graphViewer = new CommunityGraphViewer(graph, graph.getNodeLists(), graph);
-    this.patterns = new HashMap<>();
-    init();
-    show();
-    this.graphViewer.fromJson((JSONObject)json.get("graphViewer"));
+    if(!(this instanceof EvolutionGraphFrame)){
+      JSONCommunityGraph graph = new JSONCommunityGraph((JSONObject)json.get("graphViewer"));
+      graph.init();
+      this.graphViewer = new CommunityGraphViewer(graph, graph.getNodeLists(), graph);
+      this.patterns = new HashMap<>();
+      init();
+      show();
+      this.graphViewer.fromJson((JSONObject)json.get("graphViewer"));
+    }
     super.fromJson(json);
   }
   public String toJson(){
@@ -73,6 +75,7 @@ public class CommunityGraphFrame extends GraphFrame{
         this.graphViewer = new CommunityGraphViewer(grapher.getGraph(), grapher.getNode_lists(), grapher.placer);
         this.patterns = new HashMap<>();
         init();
+        this.panel = null;
         show();
       }
       else{

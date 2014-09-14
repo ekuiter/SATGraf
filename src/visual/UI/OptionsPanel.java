@@ -71,13 +71,13 @@ public class OptionsPanel extends JPanel{
     if(hideAllNodes.isSelected() != allNodes){
       hideAllNodes.setSelected(allNodes);
     }
-    scale.setScale(((Long)json.get("scale")).intValue());
+    //scale.setScale(((Long)json.get("scale")).intValue());
   }
   
   public String toJson(){
     StringBuilder json = new StringBuilder();
     json.append("{\"hideAllNodes\":").append(hideAllNodes.isSelected()).append(",");
-    json.append(",\"scale\":").append(scale.getScale());
+    //json.append(",\"scale\":").append(scale.getScale());
     json.append("\"hideAllEdges\":").append(hideAllEdges.isSelected()).append("}");
     return json.toString();
   }

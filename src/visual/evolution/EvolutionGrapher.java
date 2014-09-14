@@ -11,7 +11,6 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import visual.community.CommunityGraph;
@@ -95,7 +94,7 @@ public class EvolutionGrapher extends CommunityGrapher{
 	    args = new String[]{
 	      "formula/satcomp/dimacs/fiasco.dimacs",
 	      "ol",
-	      "kk",
+	      "f",
 	      "5"
 	    };
 	}
@@ -107,6 +106,7 @@ public class EvolutionGrapher extends CommunityGrapher{
     EvolutionGrapher ag = new EvolutionGrapher(args[0], args[1], args[2], Integer.parseInt(args[3]), patterns);
     try{
       ag.generateGraph();
+      ag.init();
       ag.getFrame().show();
     }
     catch(FileNotFoundException e){

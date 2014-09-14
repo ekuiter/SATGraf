@@ -29,6 +29,12 @@ public class GraphCanvasPanel extends JPanel{
     this.setLayout(new BorderLayout());
     this.add(canvasPane, BorderLayout.CENTER);
   }
+  public int getHorizontalScrollPosition(){
+    return canvasPane.getHorizontalScrollBar().getValue();
+  }
+  public int getVerticalScrollPosition(){
+    return canvasPane.getVerticalScrollBar().getValue();
+  }
   public void repaint(){
     super.repaint();
     if(canvas != null){

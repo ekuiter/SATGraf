@@ -19,13 +19,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.JMenuItem;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import visual.NamedFifo;
 import visual.UI.GraphFrame;
 import visual.community.CommunityGraph;
 import visual.community.CommunityGraphFrame;
 import visual.community.CommunityGraphViewer;
+import visual.community.CommunityGrapher;
 import visual.community.CommunityMetric;
 import visual.community.ConcreteCommunityGraph;
+import visual.community.JSONCommunityGraph;
 import visual.graph.GraphViewer;
 
 /**
@@ -33,7 +38,6 @@ import visual.graph.GraphViewer;
  * @author zacknewsham
  */
 public class EvolutionGraphFrame extends CommunityGraphFrame{
-  private EvolutionPanel ep;
   EvolutionGrapher grapher;
   private JMenuItem generate = new JMenuItem("Generate");
   private ArrayList<CommunityGraphViewer> graphs = new ArrayList<CommunityGraphViewer>();
@@ -51,31 +55,103 @@ public class EvolutionGraphFrame extends CommunityGraphFrame{
     });
   }
   
+  public void fromJson(JSONObject json){
+    JSONCommunityGraph graph = new JSONCommunityGraph((JSONObject)json.get("graphViewer"));
+    graph.init();
+    this.graphViewer = new CommunityGraphViewer(graph, graph.getNodeLists(), graph);
+    this.patterns = new HashMap<>();
+    init();
+    show(false);
+    
+    for(Object o : (JSONArray)json.get("graphs")){
+      JSONObject g = (JSONObject)o;
+      JSONCommunityGraph _graph = new JSONCommunityGraph(g);
+      addGraph(new CommunityGraphViewer(_graph, _graph.getNodeLists(), _graph));
+    }
+    this.graphViewer.fromJson((JSONObject)json.get("graphViewer"));
+    super.fromJson(json);
+  }
   
-  public void show(){
-    panel = new EvolutionOptionsPanel((CommunityGraphViewer)graphViewer, patterns.keySet());
-    ep = new EvolutionPanel((CommunityGraphViewer)graphViewer, (EvolutionOptionsPanel)panel);
-    ((EvolutionOptionsPanel)panel).setEvolutionPanel(ep);
-    super.show();
-    setLeftComponent(ep);
-    setRightComponent(panel);
-    Runnable r = new Runnable() {
-
-      @Override
-      public void run() {
-        try {
-          loadAdditionalGraphs();
-        } catch (IOException ex) {
-          Logger.getLogger(EvolutionGrapher.class.getName()).log(Level.SEVERE, null, ex);
-        }
+  public String toJson(){
+    StringBuilder json = new StringBuilder(super.toJson());
+    json.setCharAt(json.length() - 1, ',');
+    json.append("\"graphs\":[");
+    for(CommunityGraphViewer graph : graphs){
+      graph.setGraphPanel(panel);
+      json.append(graph.toJson()).append(",");
+    }
+    json.setCharAt(json.length() - 1, ']');
+    json.append("}");
+    
+    return json.toString();
+  }
+  
+  
+  public void open(File file){
+    try {
+      String[] parts = file.getAbsolutePath().split("\\.");
+      if(parts[parts.length - 1].equals("cnf")){
+        /*CommunityGrapher grapher = new CommunityGrapher(file.getAbsolutePath(), "ol", "f", new HashMap<String, String>());
+        grapher.generateGraph();
+        this.graphViewer = new CommunityGraphViewer(grapher.getGraph(), grapher.getNode_lists(), grapher.placer);
+        this.patterns = new HashMap<>();
+        init();
+        this.panel = null;
+        show();*/
       }
-    };
-    Thread t = new Thread(r);
-    t.start();
+      else{
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        StringBuilder contents = new StringBuilder();
+        String line;
+        while((line = reader.readLine()) != null){
+          contents.append(line).append("\n");
+        }
+        JSONObject json = (JSONObject)JSONValue.parse(contents.toString());
+        this.fromJson(json);
+      }
+    } 
+    catch (IOException ex) {
+      Logger.getLogger(CommunityGraphFrame.class.getName()).log(Level.SEVERE, null, ex);
+    }
+  }
+  
+  public void init(){
+    super.init();
+  }
+  public void show(){
+    show(true);
+  }
+  public void show(boolean loadExtra){
+    if(graphViewer != null){
+      panel = new EvolutionOptionsPanel((CommunityGraphViewer)graphViewer, patterns.keySet());
+      canvasPanel = new EvolutionPanel((CommunityGraphViewer)graphViewer, (EvolutionOptionsPanel)panel);
+      ((EvolutionOptionsPanel)panel).setEvolutionPanel((EvolutionPanel)canvasPanel);
+      super.show();
+      setLeftComponent(canvasPanel);
+      setRightComponent(panel);
+      if(loadExtra){
+        Runnable r = new Runnable() {
+
+          @Override
+          public void run() {
+            try {
+              loadAdditionalGraphs();
+            } catch (IOException ex) {
+              Logger.getLogger(EvolutionGrapher.class.getName()).log(Level.SEVERE, null, ex);
+            }
+          }
+        };
+        Thread t = new Thread(r);
+        t.start();
+      }
+    }
+    else{
+      super.show();
+    }
   }
   public void addGraph(CommunityGraphViewer graph){
     graphs.add(graph);
-    ep.addGraph(graph);
+    ((EvolutionPanel)canvasPanel).addGraph(graph);
   }
   
   public void process(CommunityGraph cg){
@@ -120,5 +196,12 @@ public class EvolutionGraphFrame extends CommunityGraphFrame{
         gbr.addLine(line);
       }
     }
+  }
+  
+  
+  public static void main(String args[]){
+    EvolutionGraphFrame frame = new EvolutionGraphFrame(null, null, null);
+    
+    frame.show();
   }
 }

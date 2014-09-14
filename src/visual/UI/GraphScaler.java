@@ -69,5 +69,7 @@ public class GraphScaler extends JPanel implements ChangeListener{
     scale.removeChangeListener(this);
     scale.setValue((int)(graph.getScale() * 100));
     scale.addChangeListener(this);
+    scale.revalidate();
+    scale.repaint();
   }
 }

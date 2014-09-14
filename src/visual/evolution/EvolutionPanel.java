@@ -21,7 +21,7 @@ import visual.community.CommunityGraphViewer;
  *
  * @author zacknewsham
  */
-public class EvolutionPanel extends JPanel{
+public class EvolutionPanel extends GraphCanvasPanel{
   private ArrayList<CommunityGraphViewer> graphs = new ArrayList<>();
   JTabbedPane pane = new JTabbedPane();
   private int dump_count = 0;
@@ -38,6 +38,7 @@ public class EvolutionPanel extends JPanel{
         public void stateChanged(ChangeEvent e) {
             if(selected_graph != pane.getSelectedIndex()){
               selected_graph = pane.getSelectedIndex();
+              
               EvolutionPanel.this.options.setGraph(graphs.get(selected_graph));
             }
         }
@@ -50,6 +51,12 @@ public class EvolutionPanel extends JPanel{
     }
   }
   
+  public int getHorizontalScrollPosition(){
+    return 0;
+  }
+  public int getVerticalScrollPosition(){
+    return 0;
+  }
   public CommunityGraphViewer getGraph(int index){
     return graphs.get(index);
   }

@@ -43,6 +43,7 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
     if(json.containsKey("selectedNode")){
       this.selectNode(getGraph().getNode(((Long)json.get("selectedNode")).intValue()));
     }
+    setScale((Double)json.get("scale"));
   }
   
   public String toJson(){
@@ -73,7 +74,7 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
       json.append(",\"selectedNode\":");
       json.append(getSelectedNode().getId());
     }
-    
+    json.append(",\"scale\":").append(getScale());
     json.append(",\"options\":");
     json.append(panel.toJson());
     

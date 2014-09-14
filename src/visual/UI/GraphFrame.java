@@ -66,8 +66,11 @@ public class GraphFrame extends JFrame{
       ((Long)json.get("height")).intValue()
     ));
     mainPane.setDividerLocation(((Long)json.get("dividerLocation")).intValue());
-    canvasPanel.canvasPane.getHorizontalScrollBar().setValue(((Long)json.get("scrollX")).intValue());
-    canvasPanel.canvasPane.getVerticalScrollBar().setValue(((Long)json.get("scrollY")).intValue());
+    if(canvasPanel.canvasPane != null){
+      canvasPanel.canvasPane.getHorizontalScrollBar().setValue(((Long)json.get("scrollX")).intValue());
+      canvasPanel.canvasPane.getVerticalScrollBar().setValue(((Long)json.get("scrollY")).intValue());
+    }
+    panel.setGraph(graphViewer);
   }
   public String toJson(){
     StringBuilder json = new StringBuilder();
@@ -75,8 +78,8 @@ public class GraphFrame extends JFrame{
     json.append(",\"y\":").append(this.getLocation().y);
     json.append(",\"width\":").append(this.getWidth());
     json.append(",\"height\":").append(this.getHeight());
-    json.append(",\"scrollX\":").append(canvasPanel.canvasPane.getHorizontalScrollBar().getValue());
-    json.append(",\"scrollY\":").append(canvasPanel.canvasPane.getVerticalScrollBar().getValue());
+    json.append(",\"scrollX\":").append(canvasPanel.getHorizontalScrollPosition());
+    json.append(",\"scrollY\":").append(canvasPanel.getVerticalScrollPosition());
     json.append(",\"dividerLocation\":").append(mainPane.getDividerLocation());
     json.append(",\"graphViewer\":").append(graphViewer.toJson()).append("}");
     return json.toString();
