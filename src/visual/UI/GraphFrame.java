@@ -7,6 +7,8 @@
 package visual.UI;
 
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Point;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,6 +19,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JSplitPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import org.json.simple.JSONObject;
 import visual.actions.OpenAction;
 import visual.actions.SaveAction;
 import visual.graph.GraphViewer;
@@ -37,7 +40,6 @@ public class GraphFrame extends JFrame{
   protected GraphCanvasPanel canvasPanel;
   protected GraphOptionsPanel panel;
   protected GraphViewer graphViewer;
-  
   public GraphFrame(GraphViewer graphViewer){
     super();
     try {
@@ -54,9 +56,38 @@ public class GraphFrame extends JFrame{
       Logger.getLogger(GraphFrame.class.getName()).log(Level.SEVERE, null, ex);
     }
   }
-  
+  public void fromJson(JSONObject json){
+    this.setLocation(new Point(
+      ((Long)json.get("x")).intValue(),
+      ((Long)json.get("y")).intValue()
+    ));
+    this.setSize(new Dimension(
+      ((Long)json.get("width")).intValue(),
+      ((Long)json.get("height")).intValue()
+    ));
+    mainPane.setDividerLocation(((Long)json.get("dividerLocation")).intValue());
+    canvasPanel.canvasPane.getHorizontalScrollBar().setValue(((Long)json.get("scrollX")).intValue());
+    canvasPanel.canvasPane.getVerticalScrollBar().setValue(((Long)json.get("scrollY")).intValue());
+  }
+  public String toJson(){
+    StringBuilder json = new StringBuilder();
+    json.append("{\"x\":").append(this.getLocation().x);
+    json.append(",\"y\":").append(this.getLocation().y);
+    json.append(",\"width\":").append(this.getWidth());
+    json.append(",\"height\":").append(this.getHeight());
+    json.append(",\"scrollX\":").append(canvasPanel.canvasPane.getHorizontalScrollBar().getValue());
+    json.append(",\"scrollY\":").append(canvasPanel.canvasPane.getVerticalScrollBar().getValue());
+    json.append(",\"dividerLocation\":").append(mainPane.getDividerLocation());
+    json.append(",\"graphViewer\":").append(graphViewer.toJson()).append("}");
+    return json.toString();
+  }
   public void open(File file){
     
+  }
+  
+  
+  public GraphViewer getGraphViewer(){
+    return graphViewer;
   }
   
   public void init(){
@@ -77,7 +108,7 @@ public class GraphFrame extends JFrame{
     for(int i = 0; i < open.getActionListeners().length; i++){
       open.removeActionListener(open.getActionListeners()[i]);
     }
-    save.addActionListener(new SaveAction(graphViewer));
+    save.addActionListener(new SaveAction(this));
     open.addActionListener(new OpenAction(this));
   }
   

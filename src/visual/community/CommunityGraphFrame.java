@@ -48,6 +48,22 @@ public class CommunityGraphFrame extends GraphFrame{
     frame.show();
   }
   
+  public void fromJson(JSONObject json){
+    JSONCommunityGraph graph = new JSONCommunityGraph((JSONObject)json.get("graphViewer"));
+    graph.init();
+    this.graphViewer = new CommunityGraphViewer(graph, graph.getNodeLists(), graph);
+    this.patterns = new HashMap<>();
+    init();
+    show();
+    this.graphViewer.fromJson((JSONObject)json.get("graphViewer"));
+    super.fromJson(json);
+  }
+  public String toJson(){
+    StringBuilder json = new StringBuilder(super.toJson());
+    
+    return json.toString();
+  }
+  
   public void open(File file){
     try {
       String[] parts = file.getAbsolutePath().split("\\.");
@@ -67,13 +83,7 @@ public class CommunityGraphFrame extends GraphFrame{
           contents.append(line).append("\n");
         }
         JSONObject json = (JSONObject)JSONValue.parse(contents.toString());
-        JSONCommunityGraph graph = new JSONCommunityGraph(json);
-        graph.init();
-        this.graphViewer = new CommunityGraphViewer(graph, graph.getNodeLists(), graph);
-        this.patterns = new HashMap<>();
-        init();
-        show();
-        this.graphViewer.fromJson(json);
+        this.fromJson(json);
       }
     } 
     catch (IOException ex) {

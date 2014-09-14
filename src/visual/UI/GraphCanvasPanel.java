@@ -29,4 +29,13 @@ public class GraphCanvasPanel extends JPanel{
     this.setLayout(new BorderLayout());
     this.add(canvasPane, BorderLayout.CENTER);
   }
+  public void repaint(){
+    super.repaint();
+    if(canvas != null){
+      canvas.repaint();
+    }
+    if(canvasPane != null){
+      canvasPane.repaint();
+    }
+  }
 }

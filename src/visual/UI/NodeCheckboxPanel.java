@@ -4,8 +4,6 @@
  */
 package visual.UI;
 
-import visual.graph.GraphViewer;
-import visual.graph.Node;
 import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -18,6 +16,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.json.simple.JSONObject;
+import visual.graph.GraphViewer;
+import visual.graph.Node;
 
 /**
  *
@@ -33,6 +34,10 @@ public class NodeCheckboxPanel extends JPanel{
   public NodeCheckboxPanel(GraphViewer graph) {
     this.graph = graph;
     set = "";
+  }
+  
+  public void fromJson(JSONObject json){
+    
   }
   public String toJson(){
     StringBuilder json = new StringBuilder();

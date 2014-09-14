@@ -13,6 +13,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.json.simple.JSONObject;
 import visual.graph.GraphViewer;
 
 /**
@@ -61,9 +62,22 @@ public class OptionsPanel extends JPanel{
     this.add(options, BorderLayout.NORTH);
   }
   
+  public void fromJson(JSONObject json){
+    boolean allNodes = (Boolean)json.get("hideAllNodes");
+    boolean allEdges = (Boolean)json.get("hideAllEdges");
+    if(hideAllEdges.isSelected() != allEdges){
+      hideAllEdges.setSelected(allEdges);
+    }
+    if(hideAllNodes.isSelected() != allNodes){
+      hideAllNodes.setSelected(allNodes);
+    }
+    scale.setScale(((Long)json.get("scale")).intValue());
+  }
+  
   public String toJson(){
     StringBuilder json = new StringBuilder();
     json.append("{\"hideAllNodes\":").append(hideAllNodes.isSelected()).append(",");
+    json.append(",\"scale\":").append(scale.getScale());
     json.append("\"hideAllEdges\":").append(hideAllEdges.isSelected()).append("}");
     return json.toString();
   }

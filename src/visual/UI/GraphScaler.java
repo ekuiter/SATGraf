@@ -26,6 +26,13 @@ public class GraphScaler extends JPanel implements ChangeListener{
   private final JSlider scale = new JSlider(1, 100);
   private GraphViewer graph;
   private final JButton fit = new JButton("Fit");
+  public void setScale(int pos){
+    scale.setValue(pos);
+  }
+  public int getScale(){
+    return scale.getValue();
+  }
+  
   public GraphScaler(GraphViewer graph){
     this.graph = graph;
     scale.setValue((int)(graph.getScale() * 100));

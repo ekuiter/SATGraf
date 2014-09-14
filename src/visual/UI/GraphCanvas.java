@@ -6,12 +6,7 @@ package visual.UI;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-
-import visual.graph.DrawableNode;
-import visual.graph.GraphViewer;
-import visual.graph.Edge;
-import visual.graph.Node;
-
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -19,8 +14,11 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-
 import javax.swing.JTable;
+import visual.graph.DrawableNode;
+import visual.graph.Edge;
+import visual.graph.GraphViewer;
+import visual.graph.Node;
 
 /**
  *
@@ -46,6 +44,13 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
     this.addMouseListener(this);
     this.addMouseMotionListener(this);
     this.setDefaultRenderer(Object.class, renderer);
+  }
+  
+  public Dimension getPreferredSize(){
+    Dimension d = super.getPreferredSize();
+    d.height = (int)(graph.getScale() * d.height);
+    d.width = (int)(graph.getScale() * d.width);
+    return d;
   }
 
   boolean drawnAll = false;

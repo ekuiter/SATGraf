@@ -67,7 +67,7 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   public void actionPerformed(ActionEvent e) {
     canvas.reset();
     panel.update();
-    canvas.repaint();
+    canvas.revalidate();
     actionTimer.stop();
   }
   public void updateObservers(){

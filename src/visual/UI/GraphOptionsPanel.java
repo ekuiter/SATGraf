@@ -4,14 +4,15 @@
  */
 package visual.UI;
 
-import visual.graph.GraphViewer;
 import java.awt.Dimension;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import visual.graph.GraphViewer;
 
 /**
  *
@@ -39,12 +40,20 @@ public abstract class GraphOptionsPanel extends JSplitPane{
   }
   
   public void fromJson(JSONObject json){
-    
+    optionsPanel.fromJson((JSONObject)json.get("optionsPanel"));
+    this.setDividerLocation(((Long)json.get("dividerLocation")).intValue());
+    //TODO: this doesnt work.
+    checkBoxPanel.setVisibleBar(((Long)json.get("selectedCheckBoxPanel")).intValue());
+    for(Object o : (JSONArray)json.get("checkBoxPanels")){
+      JSONObject cb = (JSONObject)o;
+      checkboxPanels.get((String)cb.get("key")).fromJson((JSONObject)cb.get("data"));
+    }
   }
   public String toJson(){
     StringBuilder json = new StringBuilder();
     json.append("{\"optionsPanel\":").append(optionsPanel.toJson());
-    
+    json.append(",\"dividerLocation\":").append(this.getDividerLocation());
+    json.append(",\"selectedCheckBoxPanel\":").append(checkBoxPanel.getVisibleBar());
     json.append(",\"checkBoxPanels\":[");
     boolean added = false;
     for(String key : checkboxPanels.keySet()){
