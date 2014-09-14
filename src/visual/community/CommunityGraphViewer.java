@@ -8,6 +8,7 @@ package visual.community;
 
 import gnu.trove.map.hash.TIntObjectHashMap;
 import java.awt.Color;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,6 +36,13 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
   
   public CommunityGraph getGraph(){
     return (CommunityGraph) graph;
+  }
+  
+  public void fromJson(JSONObject json){
+    panel.fromJson((JSONObject)json.get("options"));
+    if(json.containsKey("selectedNode")){
+      this.selectNode(getGraph().getNode(((Long)json.get("selectedNode")).intValue()));
+    }
   }
   
   public String toJson(){
@@ -161,6 +169,9 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
     updateObservers();
   }
   public void hideEdge(CommunityEdge conn){
+    if(visibleConnections == null){
+      getConnections(new Rectangle());
+    }
     if((conn.getType() & Edge.REAL) == Edge.REAL){
       if(visibleConnections.contains(conn)){
         visibleConnections.remove(conn);

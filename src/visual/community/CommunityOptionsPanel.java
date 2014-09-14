@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import javax.swing.JScrollPane;
+import org.json.simple.JSONObject;
 
 import visual.UI.EdgeCheckBoxPanel;
 import visual.UI.GraphOptionsPanel;
@@ -52,6 +53,11 @@ public class CommunityOptionsPanel extends GraphOptionsPanel{
     optionsPanel.update();
   }
   
+  public void fromJson(JSONObject json){
+    communityPanel.fromJson((JSONObject)json.get("communities"));
+    interConnectionPanel.fromJson((JSONObject)json.get("interEdges"));
+    intraConnectionPanel.fromJson((JSONObject)json.get("intraEdges"));
+  }
   public String toJson(){
     StringBuilder json = new StringBuilder(super.toJson());
     

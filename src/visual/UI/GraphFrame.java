@@ -8,11 +8,15 @@ package visual.UI;
 
 import java.awt.Component;
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JSplitPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import visual.actions.OpenAction;
 import visual.actions.SaveAction;
 import visual.graph.GraphViewer;
@@ -36,8 +40,19 @@ public class GraphFrame extends JFrame{
   
   public GraphFrame(GraphViewer graphViewer){
     super();
-    this.graphViewer = graphViewer;
-    init();
+    try {
+      UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+      this.graphViewer = graphViewer;
+      init();
+    } catch (ClassNotFoundException ex) {
+      Logger.getLogger(GraphFrame.class.getName()).log(Level.SEVERE, null, ex);
+    } catch (InstantiationException ex) {
+      Logger.getLogger(GraphFrame.class.getName()).log(Level.SEVERE, null, ex);
+    } catch (IllegalAccessException ex) {
+      Logger.getLogger(GraphFrame.class.getName()).log(Level.SEVERE, null, ex);
+    } catch (UnsupportedLookAndFeelException ex) {
+      Logger.getLogger(GraphFrame.class.getName()).log(Level.SEVERE, null, ex);
+    }
   }
   
   public void open(File file){
@@ -49,9 +64,12 @@ public class GraphFrame extends JFrame{
     setSize(1000, 700);
     setContentPane(mainPane);
     if(menu.getMenuComponentCount() == 0){
-      menu.add("File");
+      //menu.add("File");
       menu.add(open);
       menu.add(save);
+      menu.add(export);
+      menuBar.add(menu);
+      setJMenuBar(menuBar);
     }
     for(int i = 0; i < save.getActionListeners().length; i++){
       save.removeActionListener(save.getActionListeners()[i]);
@@ -61,9 +79,6 @@ public class GraphFrame extends JFrame{
     }
     save.addActionListener(new SaveAction(graphViewer));
     open.addActionListener(new OpenAction(this));
-    menu.add(export);
-    menuBar.add(menu);
-    setJMenuBar(menuBar);
   }
   
   public void show(){

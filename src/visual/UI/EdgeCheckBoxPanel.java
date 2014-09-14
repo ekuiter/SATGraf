@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import javax.swing.JPanel;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import visual.graph.Edge;
 import visual.graph.GraphViewer;
 import visual.graph.Node;
@@ -35,6 +37,16 @@ public class EdgeCheckBoxPanel<T extends Node, T1 extends Edge> extends JPanel{
       count++;
     }
     this.setLayout(new GridLayout(count, 1));
+  }
+  
+  public void fromJson(JSONObject json){
+    for(Object o : (JSONArray)json.get("boxes")){
+      int id = ((Long)((JSONObject)o).get("id")).intValue();
+      boolean selected = (Boolean)((JSONObject)o).get("checked");
+      if(checkBoxes.get(id).isSelected() != selected){
+        checkBoxes.get(id).setSelected(selected);
+      }
+    }
   }
   
   public String toJson(){

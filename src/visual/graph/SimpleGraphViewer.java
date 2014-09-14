@@ -12,6 +12,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import org.json.simple.JSONObject;
 
 /**
  *
@@ -26,6 +27,10 @@ public class SimpleGraphViewer extends GraphViewer<Node, Edge>{
 
   @Override
   public void init() {
+    
+  }
+  
+  public void fromJson(JSONObject json){
     
   }
   public String toJson(){

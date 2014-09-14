@@ -73,6 +73,7 @@ public class CommunityGraphFrame extends GraphFrame{
         this.patterns = new HashMap<>();
         init();
         show();
+        this.graphViewer.fromJson(json);
       }
     } 
     catch (IOException ex) {

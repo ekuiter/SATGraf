@@ -48,6 +48,7 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
     this.graph = graph;
   }
   public abstract String toJson();
+  public abstract void fromJson(JSONObject json);
   
   public abstract void init();
   protected abstract Graph getGraph();

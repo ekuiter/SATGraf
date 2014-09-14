@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import org.json.simple.JSONObject;
 
 /**
  *
@@ -37,6 +38,9 @@ public abstract class GraphOptionsPanel extends JSplitPane{
     this(graph, groups, false);
   }
   
+  public void fromJson(JSONObject json){
+    
+  }
   public String toJson(){
     StringBuilder json = new StringBuilder();
     json.append("{\"optionsPanel\":").append(optionsPanel.toJson());
