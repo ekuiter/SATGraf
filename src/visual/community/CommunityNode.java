@@ -15,6 +15,7 @@ import visual.graph.Node;
  * @author zacknewsham
  */
 public class CommunityNode extends Node<CommunityEdge>{
+
   private int community;
   private double size;
 

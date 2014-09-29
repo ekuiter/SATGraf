@@ -7,7 +7,11 @@
 package visual.UI;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Toolkit;
+
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -23,10 +27,16 @@ public class GraphCanvasPanel extends JPanel{
   }
   public GraphCanvasPanel(GraphCanvas canvas){
     this.canvas = canvas;
+    Toolkit tk = Toolkit.getDefaultToolkit();
+    int width = ((int) tk.getScreenSize().getWidth()) - 400;
+    int height = ((int) tk.getScreenSize().getHeight()) - 400;
+    
     canvasPane = new JScrollPane(canvas);
-    canvasPane.setSize(400, 400);
-    canvasPane.setPreferredSize(new Dimension(400,400));
+    canvasPane.setBorder(BorderFactory.createEmptyBorder());
+    canvasPane.setSize(width, height);
+    canvasPane.setPreferredSize(new Dimension(width, height));
     this.setLayout(new BorderLayout());
+    this.setBackground(Color.BLACK);
     this.add(canvasPane, BorderLayout.CENTER);
   }
   public int getHorizontalScrollPosition(){

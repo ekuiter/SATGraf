@@ -19,6 +19,7 @@ import visual.graph.DrawableNode;
 import visual.graph.Edge;
 import visual.graph.GraphViewer;
 import visual.graph.Node;
+import visual.graph.Edge.EdgeState;
 
 /**
  *
@@ -111,6 +112,10 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
   }*/
 
   protected void drawConnection(Edge c, Rectangle o,Graphics image) {
+	if (c.getState() == EdgeState.HIDE) {
+		return;
+	}
+	  
     Rectangle i = image.getClipBounds();
     if(graph.isVisible(c.getStart()) && graph.isVisible(c.getEnd())){
       Graphics2D g2d = (Graphics2D) image.create();
@@ -127,16 +132,6 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
           endX - (o.x - i.x) ,
           endY - (o.y - i.y)
       );
-    }
-  }
-
-  protected void drawConnection(Node a, Node b, Graphics g) {
-    if(graph.isVisible(a) && graph.isVisible(b)){
-      Graphics2D g2d = (Graphics2D) g.create();
-      
-      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      g2d.setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-      g2d.drawLine(a.getX(graph) + DrawableNode.NODE_DIAMETER / 2, a.getY(graph) + DrawableNode.NODE_DIAMETER / 2, b.getX(graph) + DrawableNode.NODE_DIAMETER / 2, b.getY(graph) + DrawableNode.NODE_DIAMETER / 2);
     }
   }
 

@@ -52,6 +52,7 @@ public class OptionsPanel extends JPanel{
         }
       }
     });
+    
     scale = new GraphScaler(graph);
     options.setLayout(new GridLayout(4, 1));
     this.options.add(scale);
@@ -94,5 +95,11 @@ public class OptionsPanel extends JPanel{
   }
   public void setCustomComponent(Component c){
     options.add(c);
+  }
+  
+  public void test() {
+	  options.revalidate();
+	  options.repaint();
+	  options.updateUI();
   }
 }

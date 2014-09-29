@@ -37,7 +37,7 @@ import visual.graph.GraphViewer;
  *
  * @author zacknewsham
  */
-public class EvolutionGraphFrame extends CommunityGraphFrame{
+public class EvolutionGraphFrame extends CommunityGraphFrame {
   EvolutionGrapher grapher;
   private JMenuItem generate = new JMenuItem("Generate");
   private ArrayList<CommunityGraphViewer> graphs = new ArrayList<CommunityGraphViewer>();

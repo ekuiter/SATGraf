@@ -72,7 +72,6 @@ int main(int argc, char** argv)
 {
     try {
         setUsageHelp("USAGE: %s [options] <input-file> <result-output-file>\n\n  where input may be either in plain or gzipped DIMACS.\n");
-        // printf("This is MiniSat 2.0 beta\n");
         
 #if defined(__linux__)
         fpu_control_t oldcw, newcw;
@@ -165,6 +164,9 @@ int main(int argc, char** argv)
             printStats(S);
             printf("\n"); }
         printf(ret == l_True ? "SATISFIABLE\n" : ret == l_False ? "UNSATISFIABLE\n" : "INDETERMINATE\n");
+        for (int i = 0; i < S.nVars(); i++)
+            if (S.model[i] != l_Undef)
+                printf("%s%s%d", (i==0)?"":" ", (S.model[i]==l_True)?"":"-", i+1);
         if (res != NULL){
             if (ret == l_True){
                 fprintf(res, "SAT\n");
@@ -178,12 +180,12 @@ int main(int argc, char** argv)
                 fprintf(res, "INDET\n");
             fclose(res);
         }
-        
-#ifdef NDEBUG
-        exit(ret == l_True ? 10 : ret == l_False ? 20 : 0);     // (faster than "return", which will invoke the destructor for 'Solver')
-#else
-        return (ret == l_True ? 10 : ret == l_False ? 20 : 0);
-#endif
+        #ifdef NDEBUG
+            exit(ret == l_True ? 10 : ret == l_False ? 20 : 0);     // (faster than
+        #else
+            return (ret == l_True ? 10 : ret == l_False ? 20 : 0);
+        #endif
+
     } catch (OutOfMemoryException&){
         printf("===============================================================================\n");
         printf("INDETERMINATE\n");

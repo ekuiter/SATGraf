@@ -7,7 +7,9 @@
 package visual.graph;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  *
@@ -16,12 +18,28 @@ import java.util.Comparator;
 public class Edge <T extends Node> implements HasGraphPosition, Comparable<Edge>{
   public static final int REAL = 0xf0000000;
   public static final int DUMMY = 0x2;
+  
+  public enum EdgeState { SHOW, HIDE }
+  
   protected T a;
   protected T b;
   public int id;
-  protected Edge(){
+  private EdgeState state;
+  private List<EdgeState> stateHistory = null;
+  
+  private void initState() {
+	  this.state = EdgeState.SHOW;
+	  stateHistory = new ArrayList<EdgeState>();
+	  stateHistory.add(state);
   }
+  
+  protected Edge() {
+	  initState();
+  }
+  
   public Edge(T a, T b){
+	initState();
+	  
     if(a.getId() < b.getId()){
       this.a = a;
       this.b = b;
@@ -160,5 +178,20 @@ public class Edge <T extends Node> implements HasGraphPosition, Comparable<Edge>
         return graph.getX(o1.getLeft(graph)) - graph.getX(o2.getLeft(graph));
       }
     }
+  }
+  
+  public EdgeState getState() {
+	  return this.state;
+  }
+  
+  public void setState(EdgeState state) {
+	  this.state = state;
+	  stateHistory.add(state);
+  }
+  
+  public void revertToPreviousState() {
+	  int lastElement = stateHistory.size()-1;
+	  stateHistory.remove(lastElement);
+	  this.state = stateHistory.get(lastElement-1);
   }
 }

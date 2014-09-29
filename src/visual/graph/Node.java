@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  *
@@ -19,6 +20,8 @@ import java.util.Iterator;
  * @param <T>
  */
 public class Node<T extends Edge> implements HasGraphPosition{
+  public enum NodeState { ASSIGNED_FALSE, ASSIGNED_TRUE, UNASSIGNED }
+	
   private final HashSet<String> groups = new HashSet<String>();
   //private final ArrayList<Node> conIndexes = new ArrayList<>();
   private final ArrayList<T> connections = new ArrayList<T>();
@@ -26,12 +29,18 @@ public class Node<T extends Edge> implements HasGraphPosition{
   private int id;
   private String name;
   private int set = 0; //1 = decision, 2 = implication
+  private NodeState state;
+  private List<NodeState> stateHistory = null;
+  
   public Node(int id, String name){
     this(id, name, false, false);
   }
   public Node(int id, String name, boolean is_head, boolean is_tail){
     this.id = id;
     this.name = name;
+    state = NodeState.UNASSIGNED;
+    stateHistory = new ArrayList<NodeState>();
+    stateHistory.add(state);
     /*if(this.name == null){
       return;
     }*/
@@ -76,7 +85,7 @@ public class Node<T extends Edge> implements HasGraphPosition{
     Iterator<T> edges = getEdges();
     while(edges.hasNext()){
       T next = edges.next();
-      if(next.getStart() == this && next.getEnd() == n){
+      if((next.getStart() == this && next.getEnd() == n) || (next.getStart() == n && next.getEnd() == this)){
         return next;
       }
     }
@@ -172,5 +181,20 @@ public class Node<T extends Edge> implements HasGraphPosition{
       AlphanumComparator comp = new AlphanumComparator();
       return comp.compare(o1.getName(), o2.getName());
     }
-  } 
+  }
+  
+  public NodeState getState() {
+	  return this.state;
+  }
+  
+  public void setState(NodeState state) {
+	  this.state = state;
+	  stateHistory.add(state);
+  }
+  
+  public void revertToPreviousState() {
+	  int lastElement = stateHistory.size()-1;
+	  stateHistory.remove(lastElement);
+	  this.state = stateHistory.get(lastElement-1);
+  }
 }

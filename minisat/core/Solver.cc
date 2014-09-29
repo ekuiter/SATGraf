@@ -23,6 +23,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include "mtl/Sort.h"
 #include "core/Solver.h"
 #include <sstream>
+#include <iostream>
 
 using namespace Minisat;
 
@@ -98,7 +99,7 @@ Solver::Solver() :
   , propagation_budget (-1)
   , asynch_interrupt   (false)
 {
-    Pipe::getInstance()->openPipe("piping/myPipe.txt");
+    Pipe::getInstance()->openPipe("minisat/piping/myPipe.txt");
 }
 
 
@@ -129,8 +130,6 @@ Var Solver::newVar(bool sign, bool dvar)
     decision .push();
     trail    .capacity(v+1);
     setDecisionVar(v, dvar);
-    
-    printVar(v, VAR_UNASSIGNED);
     
     return v;
 }
@@ -598,11 +597,13 @@ bool Solver::simplify()
 {
     assert(decisionLevel() == 0);
 
-    if (!ok || propagate() != CRef_Undef)
+    if (!ok || propagate() != CRef_Undef) {
         return ok = false;
+    }
 
-    if (nAssigns() == simpDB_assigns || (simpDB_props > 0))
+    if (nAssigns() == simpDB_assigns || (simpDB_props > 0)) {
         return true;
+    }
 
     // Remove satisfied clauses:
     removeSatisfied(learnts);
@@ -953,7 +954,7 @@ void Solver::printClause(const Clause& c, int state) {
     }
     
     for (int i = 0; i < c.size(); i++) {
-        ss << " " << c[i].x;
+        ss << " " << var(c[i])+1;
     }
     
     ss << " 0\n";
@@ -973,7 +974,7 @@ void Solver::printVar(const int id, int state) {
         ss << " 0 ";
     }
     
-    ss << id << "\n";
+    ss << id+1 << "\n";
     
     Pipe::getInstance()->writeToPipe(ss.str());
 }

@@ -20,6 +20,7 @@ public class CommunityEdge extends Edge<CommunityNode>{
   //used for dummy edges
   private final int community_id;
   protected boolean dummy;
+  
   public CommunityEdge(CommunityNode a, CommunityNode b, boolean dummy){
     this(a, b);
     this.dummy = dummy;

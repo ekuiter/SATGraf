@@ -6,9 +6,11 @@
 
 package visual.UI;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -94,9 +96,11 @@ public class GraphFrame extends JFrame{
   }
   
   public void init(){
+	Toolkit tk = Toolkit.getDefaultToolkit();
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    setSize(1000, 700);
+    setSize((int) tk.getScreenSize().getWidth(), (int) tk.getScreenSize().getHeight());
     setContentPane(mainPane);
+    
     if(menu.getMenuComponentCount() == 0){
       //menu.add("File");
       menu.add(open);

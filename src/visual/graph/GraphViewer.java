@@ -41,7 +41,7 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   private boolean simpleConnections = false;
   protected final ArrayList yOrderedNodes = new ArrayList<T>();
   
-  private final Timer actionTimer = new Timer(1000, this);
+  private final Timer actionTimer = new Timer(100, this);
   
   public GraphViewer(Graph graph, HashMap<String, TIntObjectHashMap<String>> node_lists){
     this.node_lists = node_lists;
@@ -71,7 +71,7 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
     actionTimer.stop();
   }
   public void updateObservers(){
-    actionTimer.restart();
+    actionTimer.start();
   }
   public ArrayList<Node> getNodes(String set, Rectangle bounds){
     synchronized(visibleNodes){

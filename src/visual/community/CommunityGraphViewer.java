@@ -19,6 +19,7 @@ import visual.community.drawing_algorithms.CommunityPlacer;
 import static visual.graph.DrawableNode.COMMUNITY_COLORS;
 import visual.graph.Edge;
 import visual.graph.GraphViewer;
+import visual.graph.Node.NodeState;
 
 /**
  *
@@ -95,11 +96,12 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
     return getColor(node);
   }
   protected Color getColor(CommunityNode n){
-    if(n.getCommunity() == -1){
+    if(n.getState() == NodeState.ASSIGNED_FALSE) {
       return Color.RED;
-    }
-    else{
-      return Color.RED;
+    } else if (n.getState() == NodeState.ASSIGNED_TRUE) {
+    	return Color.GREEN;
+    } else {
+      return Color.BLUE;
     }
   }
   protected Color getColor(CommunityEdge e){
