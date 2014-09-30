@@ -9,11 +9,14 @@ package visual.UI;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridLayout;
+
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import org.json.simple.JSONObject;
+
 import visual.graph.GraphViewer;
 
 /**
@@ -55,9 +58,15 @@ public class OptionsPanel extends JPanel{
     
     scale = new GraphScaler(graph);
     options.setLayout(new GridLayout(4, 1));
+    
+    JPanel neOptions = new JPanel();
+    neOptions.setLayout(new GridLayout(1, 2));
+    neOptions.add(hideAllNodes);
+    neOptions.add(hideAllEdges);
+
     this.options.add(scale);
-    this.options.add(hideAllNodes);
-    this.options.add(hideAllEdges);
+    this.options.add(neOptions);
+    
     this.setLayout(new BorderLayout());
     this.add(nodePanel, BorderLayout.CENTER);
     this.add(options, BorderLayout.NORTH);

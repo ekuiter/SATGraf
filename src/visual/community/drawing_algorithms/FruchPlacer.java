@@ -51,6 +51,7 @@
 package visual.community.drawing_algorithms;
 
 import java.util.*;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 
 import visual.community.CommunityEdge;
@@ -603,23 +604,34 @@ public class FruchPlacer extends AbstractPlacer {
 	}
     
     public void setUpdate(boolean doUpdate) {
-	update = doUpdate;
+    	update = doUpdate;
     }
 
     public Coordinates getCoordinates(CommunityNode v) {
-	return((Coordinates)locations.get(v));
+    	return((Coordinates)locations.get(v));
     }
 
     public boolean done = false;
 
     public boolean incrementsAreDone() {
-	return(done);
+    	return(done);
     }
 
   @Override
   public CommunityNode getNodeAtXY(int x, int y, double scale) {
-    return null;
-    //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	    x /= scale;
+		y /= scale;
+		Iterator<CommunityNode> nodes = graph.getNodes("All");
+		Rectangle r = new Rectangle(0, 0, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER);
+		while(nodes.hasNext()){
+			CommunityNode node = (CommunityNode)nodes.next();
+			r.x = getX(node);
+			r.y = getY(node);
+			if(r.contains(x, y)){
+				return node;
+			}
+		}
+		return null;
   }
 
   @Override

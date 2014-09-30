@@ -8,10 +8,13 @@ import java.awt.Dimension;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+
 import visual.graph.GraphViewer;
 
 /**
@@ -27,8 +30,8 @@ public abstract class GraphOptionsPanel extends JSplitPane{
   protected GraphOptionsPanel(GraphViewer graph, Collection<String> groups, boolean callSet){
     this.groups = groups;
     this.setOrientation(JSplitPane.VERTICAL_SPLIT);
-    this.setSize(200, 0);
-    this.setPreferredSize(new Dimension(200, 0));
+    this.setSize(200, 700);
+    this.setPreferredSize(new Dimension(200, 700));
     if(callSet){
       setGraph(graph);
     }
