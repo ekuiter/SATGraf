@@ -76,7 +76,7 @@ public class EdgeCheckBoxPanel<T extends Node, T1 extends Edge> extends JPanel{
   }
   public EdgeCheckBoxPanel(GraphViewer graph) {
     this.graph = graph;
-    addAll(graph.getConnections());
+    addAll(graph.getEdgeIterator());
     this.setLayout(new GridLayout(count, 1));
   }
   final void add(Edge conn){

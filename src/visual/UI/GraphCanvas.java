@@ -112,12 +112,12 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
   }*/
 
   protected void drawConnection(Edge c, Rectangle o,Graphics image) {
-	if (c.getState() == EdgeState.HIDE) {
+	if (c.getAssignmentState() == EdgeState.HIDE || c.getState() == EdgeState.HIDE) {
 		return;
 	}
 	  
     Rectangle i = image.getClipBounds();
-    if(graph.isVisible(c.getStart()) && graph.isVisible(c.getEnd())){
+    if(c.getStart().isVisible() && c.getEnd().isVisible()){
       Graphics2D g2d = (Graphics2D) image.create();
       int startX = c.getStart().getX(graph) +   DrawableNode.NODE_DIAMETER / 2;
       int startY = c.getStart().getY(graph) + DrawableNode.NODE_DIAMETER / 2;
@@ -139,7 +139,11 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
   public void mouseClicked(MouseEvent e) {
     Node n = graph.getNodeAtXY(e.getX(), e.getY());
     if(n != null){
-      graph.selectNode(n);
+    	if (graph.getSelectedNode() == n) {
+    		graph.selectNode(null);
+    	} else {
+    		graph.selectNode(n);
+    	}
     }
     this.repaint();
   }

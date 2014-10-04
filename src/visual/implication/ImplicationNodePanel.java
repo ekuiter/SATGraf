@@ -46,7 +46,6 @@ public class ImplicationNodePanel extends NodePanel<ImplicationNode>{
         else if(value.getSelectedItem().equals("FALSE")){
           node.setValue(false, ImplicationNode.SET.DECISION);
         }
-        ImplicationNodePanel.this.graph.updateObservers();
       }
     });
     GridBagConstraints c = new GridBagConstraints();

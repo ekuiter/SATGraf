@@ -31,7 +31,6 @@ public class ImplicationNodeLabel extends NodeLabel<ImplicationNode> implements 
       else if(e.getButton() == MouseEvent.BUTTON2){
         node.setValue(false, ImplicationNode.SET.DECISION);
       }
-      graph.updateObservers();
     }
     //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }

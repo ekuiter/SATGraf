@@ -4,14 +4,18 @@
  */
 package visual.community;
 
-import visual.UI.PaintThread;
-import visual.UI.GraphCanvas;
-import visual.graph.GraphViewer;
-import visual.graph.Node;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
+import visual.UI.GraphCanvas;
+import visual.UI.PaintThread;
+import visual.graph.Edge;
+import visual.graph.GraphViewer;
+import visual.graph.Node;
 
 /**
  *
@@ -31,26 +35,31 @@ public class CommunityCanvas extends GraphCanvas{
     int offsetY = (o.x - i.x);
     image.setColor(Color.BLACK);
     image.fillRect(i.x, i.y, i.width, i.height);
-    Iterator<Node> nodes = graph.getNodes("All", o).iterator();
+    List<CommunityEdge> drawnEdges = new ArrayList<CommunityEdge>();
+    
+    Iterator<Node> nodes = graph.getOrderedUpdatedNodesAndSetToNull(o).iterator();
     while(nodes.hasNext()){
       Node next = nodes.next();
-      boolean contains = false;
-      //if(o.contains(new Point(next.getX(graph) , next.getY(graph)))){
-        drawNode(next, o, image);
-        contains = true;
-      //}
-    }
-    Iterator<CommunityEdge> conns = graph.getConnections(o);
-    while(conns.hasNext()){
-      CommunityEdge c = conns.next();
-      if(c.getStart().getCommunity() == c.getEnd().getCommunity() && c.getStart().getCommunity() != -1){
-        image.setColor(c.getColor(graph));
+      drawNode(next, o, image);
+      
+      Iterator<CommunityEdge> eit = next.getEdges();
+      while(eit.hasNext()) {
+    	  CommunityEdge e = eit.next();
+    	  
+    	  if (drawnEdges.contains(e))
+    		  continue;
+    	  
+    	  if(e.getStart().getCommunity() == e.getEnd().getCommunity() && e.getStart().getCommunity() != -1) {
+    	    image.setColor(e.getColor(graph));
+    	  } else {
+    	    image.setColor(Color.WHITE);
+    	  }
+    	  drawConnection(e, o, image);
+    	  
+    	  drawnEdges.add(e);
       }
-      else{
-        image.setColor(Color.WHITE);
-      }
-      drawConnection(c, o, image);
     }
+    
     paint.setFinished(true);
   }
 }

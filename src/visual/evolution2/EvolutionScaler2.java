@@ -21,13 +21,14 @@ import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import visual.UI.GraphCanvas;
 import visual.community.CommunityEdge;
 import visual.community.CommunityGraph;
 import visual.community.CommunityNode;
+import visual.graph.Edge;
 import visual.graph.Edge.EdgeState;
 import visual.graph.GraphViewer;
-import visual.graph.Node.NodeState;
+import visual.graph.Node;
+import visual.graph.Node.NodeAssignmentState;
 
 public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionListener {
 	  
@@ -39,6 +40,9 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 	  int currentFile = -1;
 	  int nextFile = -1;
 	  int currentPosition = -1;
+	  int totalLines = 0;
+	  List<Node> updatedNodes = null;
+	  List<Edge> updatedEdges = null;
 	  
 	  List<String> currentFileLines = null;
 	  List<String> nextFileLines = null;
@@ -65,13 +69,17 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 	    			play.setText("Pause");
 	    			changeSlideTimer.start();
 	    		} else {
-	    			play.setText("Play");
-	    			changeSlideTimer.stop();
+	    			stopTimer();
 	    		}
 	    	}
 		});
 	    
 	    progress.addChangeListener(this);
+	  }
+	  
+	  private void stopTimer() {
+		  play.setText("Play");
+		  changeSlideTimer.stop();
 	  }
 
 	  private void buildLayout() {
@@ -109,7 +117,9 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 	  }
 	  
 	  private void updateGraph() {
-		  graphviewer.updateObservers();
+		  graphviewer.setUpdatedNodes(updatedNodes);
+		  graphviewer.setUpdatedEdges(updatedEdges);
+		  graphviewer.getGraphCanvas().repaint();
 	  }
 	  
 	  void setGraphViewer(GraphViewer graph){
@@ -127,7 +137,7 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 	  
 	  private void parseNodeLine(String line, boolean forwards) {
 		  CommunityGraph graph = EvolutionGrapher2.getInstance().getGraph();
-		  NodeState state = NodeState.UNASSIGNED;
+		  NodeAssignmentState state = NodeAssignmentState.UNASSIGNED;
 		  CommunityNode n = null;
 		  boolean stateFound = false;
 		  
@@ -144,13 +154,13 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 				  if (forwards) { // Not necessary to do if in reverse
 					  switch (Integer.parseInt(c)) {
 					  	case 0:
-					  		state = NodeState.ASSIGNED_FALSE;
+					  		state = NodeAssignmentState.ASSIGNED_FALSE;
 					  		break;
 					  	case 1:
-					  		state = NodeState.ASSIGNED_TRUE;
+					  		state = NodeAssignmentState.ASSIGNED_TRUE;
 					  		break;
 				  		default:
-					  		state = NodeState.UNASSIGNED;
+					  		state = NodeAssignmentState.UNASSIGNED;
 					  }
 				  }
 			  } else {
@@ -159,10 +169,15 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 		  }
 		  
 		  if (n != null) {
+			  NodeAssignmentState prevState = n.getAssignmentState();
+			  
 			  if (forwards)
-				  n.setState(state);
+				  n.setAssignmentState(state);
 			  else
-				  n.revertToPreviousState();
+				  n.revertToPreviousAssignmentState();
+			  
+			  if (n.getAssignmentState() != prevState) // Will redraw the node if it has changed at all
+				  updatedNodes.add(n);
 		  }
 	  }
 	  
@@ -188,6 +203,8 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 		  CommunityNode n1;
 		  CommunityNode n2;
 		  CommunityEdge e;
+		  EdgeState prevState;
+		  
 		  for (int i = 0; i < nodes.size() - 1; i++) {
 			  n1 = nodes.get(i);
 			  for (int j = i + 1; j < nodes.size(); j++) {
@@ -199,18 +216,20 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 					  e = graph.getEdge(n1, n2);
 				  } 
 				  
+				  prevState = e.getAssignmentState();
+				  
 				  if (forwards) {
-					  if (e == null) {
-						  int o = 0;
-					  }
 					  if (addEdge) {
-						  e.setState(EdgeState.SHOW);
+						  e.setAssignmentState(EdgeState.SHOW);
 					  } else {
-						  e.setState(EdgeState.HIDE);
+						  e.setAssignmentState(EdgeState.HIDE);
 					  }
 				  } else {
-					  e.revertToPreviousState();
+					  e.revertToPreviousAssignmentState();
 				  }
+				  
+				  if (e.getAssignmentState() != prevState)
+					  updatedEdges.add(e);
 			  }
 		  }
 	  }
@@ -220,7 +239,8 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 		  if (totalFiles == 0)
 			  max -= 1; // Since it starts with 1 element in it which we don't want to count
 		  totalFiles++;
-		  progress.setMaximum(max + numLinesInFile);
+		  totalLines = max + numLinesInFile;
+		  progress.setMaximum(totalLines);
 		  updateProgress();
 		  
 		  if (nextFileLines == null && bufferThread == null) {
@@ -307,6 +327,9 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 	  }
 	  
 	  private void advanceEvolution(int startingLine, int endingLine) throws InterruptedException {
+		  updatedNodes = new ArrayList<Node>();
+		  updatedEdges = new ArrayList<Edge>();
+		  
 		  if (startingLine < endingLine)
 			  forwardsEvolution(startingLine, endingLine);
 		  else
@@ -345,6 +368,9 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 	  @Override
 	  public void actionPerformed(ActionEvent arg0) {
 		  int update;
+		  
+		  if (currentPosition == totalLines)
+			  stopTimer();
 		  
 		  if (currentPosition == -1) {
 			  update = 1;

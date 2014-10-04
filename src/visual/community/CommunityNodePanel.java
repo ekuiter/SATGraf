@@ -75,6 +75,9 @@ public class CommunityNodePanel extends NodePanel<CommunityNode>{
   public void update(){
     super.update();
     if(node == null){
+    	community.setText("");
+    	interLabel.setText("");
+    	intraLabel.setText("");
       return;
     }
     community.setText(String.format("%d", node.getCommunity()));

@@ -58,7 +58,7 @@ public class NodeCheckboxPanel extends JPanel{
       JCheckBox jc = checkBoxes.get(next);
       ItemListener l = jc.getItemListeners()[0];
       jc.removeItemListener(l);
-      if(graph.isVisible(next)){
+      if(next.isVisible()){
         jc.setSelected(true);
       }
       else{

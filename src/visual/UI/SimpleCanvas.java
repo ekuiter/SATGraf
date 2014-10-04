@@ -31,7 +31,7 @@ public class SimpleCanvas extends GraphCanvas implements ThreadPaintable{
       int offsetY = (o.x - i.x);
       image.setColor(Color.WHITE);
       image.fillRect(i.x, i.y, i.width, i.height);
-      Iterator<Node> nodes = graph.getNodes("All", o).iterator();
+      Iterator<Node> nodes = graph.getNodeIterator();
       while(nodes.hasNext()){
         Node next = nodes.next();
         boolean contains = false;
@@ -40,7 +40,7 @@ public class SimpleCanvas extends GraphCanvas implements ThreadPaintable{
           contains = true;
         //}
       }
-      Iterator<Edge> conns = graph.getConnections(o);
+      Iterator<Edge> conns = graph.getEdgeIterator();
       while(conns.hasNext()){
         Edge c = conns.next();
         image.setColor(Color.BLACK);

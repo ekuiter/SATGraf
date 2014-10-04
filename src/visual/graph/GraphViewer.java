@@ -5,19 +5,27 @@
 package visual.graph;
 
 import gnu.trove.map.hash.TIntObjectHashMap;
+
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+
 import javax.swing.Timer;
+
 import org.json.simple.JSONObject;
+
 import visual.UI.GraphCanvas;
+import visual.UI.GraphCanvasPanel;
 import visual.UI.GraphOptionsPanel;
+import visual.graph.Edge.EdgeState;
+import visual.graph.Node.NodeState;
 
 /**
  *
@@ -25,27 +33,27 @@ import visual.UI.GraphOptionsPanel;
  * @param <T>
  * @param <T1>
  */
-public abstract class GraphViewer<T extends Node, T1 extends Edge> implements ActionListener{
+public abstract class GraphViewer<T extends Node, T1 extends Edge> implements ActionListener {
   protected Graph graph;
   private T selectedNode;
-  protected final HashSet<T> invisibleNodes = new HashSet<T>();
-  protected HashSet<T1> visibleConnections;//new Edge.XComparator(this));
-  protected HashMap<String, TIntObjectHashMap<T>> visibleNodes = new HashMap<>();
   protected GraphCanvas canvas;
   protected GraphOptionsPanel panel;
   protected final HashMap<String, TIntObjectHashMap<String>> node_lists;
   protected final ArrayList xOrderedNodes = new ArrayList<T>();
+  protected HashMap<String, TIntObjectHashMap<T>> nodeGroups = new HashMap<>();
   public final int OVERLAP = 50;
-  private double scale = 1.0;
+  private double scale = 0.4;
   //only required to quickly get bounds
   private boolean simpleConnections = false;
   protected final ArrayList yOrderedNodes = new ArrayList<T>();
-  
   private final Timer actionTimer = new Timer(100, this);
+  
+  private Collection<Node> updatedNodes = null;
   
   public GraphViewer(Graph graph, HashMap<String, TIntObjectHashMap<String>> node_lists){
     this.node_lists = node_lists;
     this.graph = graph;
+    setUpdatedNodes(graph.getNodesList());
   }
   public abstract String toJson();
   public abstract void fromJson(JSONObject json);
@@ -62,58 +70,20 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   public GraphCanvas getGraphCanvas(){
     return canvas;
   }
-
+  
   @Override
   public void actionPerformed(ActionEvent e) {
+	if (canvas == null || panel == null)
+		return;
+	  
     canvas.reset();
     panel.update();
     canvas.revalidate();
     actionTimer.stop();
   }
-  public void updateObservers(){
-    actionTimer.start();
-  }
-  public ArrayList<Node> getNodes(String set, Rectangle bounds){
-    synchronized(visibleNodes){
-      if(visibleNodes.get(set) == null){
-        boolean all = set.equals("All");
-        TIntObjectHashMap<T> nodes = new TIntObjectHashMap<T>();
-        visibleNodes.put(set, nodes);
-        Iterator<T> gnodes = graph.getNodeIterator();
-        while(gnodes.hasNext()){
-          T next = gnodes.next();
-          if(next.inGroup(set) || all){
-            nodes.put(next.getId(), next);
-          }
-        }
-      }
-      if(xOrderedNodes.isEmpty()){
-        xOrderedNodes.clear();
-        yOrderedNodes.clear();
-        xOrderedNodes.addAll(visibleNodes.get(set).valueCollection());
-        Collections.sort(xOrderedNodes, new Node.XComparator(this));
-        yOrderedNodes.addAll(visibleNodes.get(set).valueCollection());
-        Collections.sort(yOrderedNodes, new Node.YComparator(this));
-      }
-    }
-    ArrayList y = new ArrayList<Node>();
-    
-    ArrayList<Node> xy = new ArrayList<Node>();
-    int firstX = findFirstXIndex(xOrderedNodes, bounds.x - OVERLAP);
-    for(int i = firstX; i < xOrderedNodes.size(); i++){
-      T xn = (T)xOrderedNodes.get(i);
-      if(getX(xn) >= bounds.x && xn.getY(this) >= bounds.y - OVERLAP && xn.getY(this) <= bounds.y + bounds.height + OVERLAP){
-        if(getX(xn) <= bounds.x + bounds.width + OVERLAP){
-          if(isVisible(xn)){
-            xy.add(xn);
-          }
-        }
-        else{
-          break;
-        }
-      }
-    }
-    return xy;
+  
+  public void updateCanvas() {
+	  actionTimer.start();
   }
   
   private int findLastYIndex(ArrayList<HasGraphPosition> nodes, int y){
@@ -208,23 +178,6 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
     }
     return 0;
   }
-  public Iterator<T> getNodes(String set){
-    if(visibleNodes.get(set) == null){
-      TIntObjectHashMap<T> nodes = new TIntObjectHashMap<T>();
-      visibleNodes.put(set, nodes);
-      Iterator<T> gnodes = graph.getNodeIterator();
-      while(gnodes.hasNext()){
-        T next = gnodes.next();
-        if(next.inGroup(set)){
-          nodes.put(next.getId(), next);
-        }
-      }
-    }
-    return visibleNodes.get(set).valueCollection().iterator();
-  }
-  public Iterator<Edge> getConnections(){
-    return getConnections(new Rectangle());
-  }
   
   
   static boolean linesIntersect(int x0, int y0, int x1, int y1, int x2, int y2, int x3, int y3){
@@ -273,176 +226,66 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
     return false;
   }
   private final Object sem = new Object();
-  public Iterator<Edge> getConnections(Rectangle bounds){
-    synchronized(sem){
-      if(visibleConnections == null){
-        visibleConnections = new HashSet<>();
-        Iterator<T1> conns = graph.getEdges();
-        Edge dummy = new Edge();
-        visibleConnections.add((T1)dummy);
-        while(conns.hasNext()){
-          T1 next = conns.next();
-          visibleConnections.add(next);
-        }
-      }
-    }
-    ArrayList<Edge> edges = new ArrayList<>();
-    if(simpleConnections){
-      Iterator<Node> nodes = getNodes("All", bounds).iterator();
-      while(nodes.hasNext()){
-        Node n = nodes.next();
-        Iterator<T1> ei = n.getEdges();
-        while(ei.hasNext()){
-          T1 e = ei.next();
-          if(visibleConnections.contains(e)){
-            edges.add(e);
-          }
-        }
-      }
-    }
-    else{
-      Iterator<T1> conns = visibleConnections.iterator();
-      while(conns.hasNext()){
-        Edge con = conns.next();
 
-        //deal with dummy
-        if(con.getStart() == null){
-          continue;
-        }
-        if(simpleConnections == true){
-          if(bounds.contains(con.getStart().getX(this), con.getStart().getY(this)) || bounds.contains(con.getEnd().getX(this), con.getEnd().getY(this))){
-            edges.add(con);
-          }
-        }
-        else if(lineIntersectsRect(bounds, con.getStart().getX(this), con.getStart().getY(this), con.getEnd().getX(this), con.getEnd().getY(this))){
-          edges.add(con);
-        }
-      }
-    }
-    /*Iterator<Node> nodes = getNodes("All", bounds).iterator();
-    while(nodes.hasNext()){
-      Node node = nodes.next();
-      Iterator<Edge> cons = node.getConnections();
-      while(cons.hasNext()){
-        edges.add(cons.next());
-      }
-    }*/
-    
-    //required for synhronization
-    return edges.iterator();
-  }
   public void showConnection(T1 conn){
     if((conn.getType() & Edge.REAL) == Edge.REAL){
-      if(!visibleConnections.contains(conn)){
-        visibleConnections.add(conn);
-        updateObservers();
-      }
+    	addUpdatedEdge(conn, EdgeState.SHOW, true);
     }
-    updateObservers();
   }
   public void hideEdge(T1 conn){
     if((conn.getType() & Edge.REAL) == Edge.REAL){
-      if(visibleConnections.contains(conn)){
-        visibleConnections.remove(conn);
-        updateObservers();
-      }
+    	addUpdatedEdge(conn, EdgeState.HIDE, true);
     }
-    updateObservers();
   }
   public void showEdgeSet(String set){
-    synchronized(visibleConnections){
-      Iterator<T> ns = graph.getNodes(set);
-      while(ns.hasNext()){
-        T n = ns.next();
-        Iterator<T1> edges = n.getEdges();
-        while(edges.hasNext()){
-          T1 e = edges.next();
-          visibleConnections.add(e);
-        }
-      }
-    }
-    updateObservers();
+	  Iterator<T> ns = graph.getNodes(set);
+	  while(ns.hasNext()){
+	    T n = ns.next();
+	    Iterator<T1> edges = n.getEdges();
+	    while(edges.hasNext()){
+	      T1 e = edges.next();
+	      addUpdatedEdge(e, EdgeState.SHOW, true);
+	    }
+	  }
   }
   public void hideEdgeSet(String set){
-    synchronized(visibleConnections){
-      Iterator<T> ns = graph.getNodes(set);
-      while(ns.hasNext()){
-        T n = ns.next();
-        Iterator<T1> edges = n.getEdges();
-        while(edges.hasNext()){
-          T1 e = edges.next();
-          visibleConnections.remove(e);
-        }
-      }
-    }
-    updateObservers();
+	  Iterator<T> ns = graph.getNodes(set);
+	  while(ns.hasNext()){
+	    T n = ns.next();
+	    Iterator<T1> edges = n.getEdges();
+	    while(edges.hasNext()){
+	      T1 e = edges.next();
+	      addUpdatedEdge(e, EdgeState.HIDE, true);
+	    }
+	  }
   }
   public void showNodeSet(String set){
-    synchronized(visibleNodes){
       Iterator<T> ns = graph.getNodes(set);
       while(ns.hasNext()){
         T n = ns.next();
-        if(!visibleNodes.get(set).containsKey(n.getId())){
-          visibleNodes.get(set).put(n.getId(), n);
-          invisibleNodes.remove(n);
-        }
+        addUpdatedNode(n, NodeState.SHOW, true);
       }
-    }
-    updateObservers();
   }
   public void hideNodeSet(String set){
-    synchronized(visibleNodes){
       Iterator<T> ns = graph.getNodes(set);
       while(ns.hasNext()){
         T n = ns.next();
-        if(visibleNodes.get(set).containsKey(n.getId())){
-          visibleNodes.get(set).remove(n.getId());
-          invisibleNodes.add(n);
-        }
+        addUpdatedNode(n, NodeState.HIDE, true);
       }
-    }
-    updateObservers();
   }
-  public void showNode(T node){
-    Iterator<String> groups = node.getGroups();
-    while(groups.hasNext()){
-      String group = groups.next();
-      TIntObjectHashMap<T> nodes = visibleNodes.get(group);
-      //if(!nodes.containsValue(node)){
-        nodes.put(node.getId(), node);
-      //}
-    }
-    invisibleNodes.remove(node);
-    updateObservers();
+  public void showNode(T n){
+	  addUpdatedNode(n, NodeState.SHOW, true);
   }
-  public void hideNode(T node){
-    Iterator<String> groups = node.getGroups();
-    while(groups.hasNext()){
-      String group = groups.next();
-      TIntObjectHashMap<T> nodes = visibleNodes.get(group);
-      //if(nodes.containsValue(node)){
-        nodes.remove(node.getId());
-      //}
-    }
-    invisibleNodes.add(node);
-    updateObservers();
+  public void hideNode(T n){
+	  addUpdatedNode(n, NodeState.HIDE, true);
   }
-  public boolean isVisible(T node){
-    return !invisibleNodes.contains(node);
-  }
+  
   public abstract T getNodeAtXY(int x, int y);
   protected abstract int getX(T node);
   protected abstract int getY(T node);
   protected abstract Color getFillColor(T node);
   protected abstract Color getColor(T node);
   protected abstract Color getColor(T1 e);
-  public Rectangle getBounds(){
-    //ensure we have an ordered list
-    getNodes("All", new Rectangle(0, 0, 1000, 1000));
-    return new Rectangle(
-            ((T)xOrderedNodes.get(0)).getX(this) - 50, ((T)yOrderedNodes.get(0)).getY(this) - 50,
-            ((T)xOrderedNodes.get(xOrderedNodes.size() - 1)).getX(this) + 50,((T)yOrderedNodes.get(yOrderedNodes.size() - 1)).getY(this) + 50);
-  }
   
   public void selectNode(T node){
     this.selectedNode = node;
@@ -459,10 +302,135 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   
   public void setScale(double scale){
     this.scale = scale;
-    this.updateObservers();
+    setUpdatedNodes(this.graph.getNodesList());
   }
   public double getScale(){
     return scale;
   }
+  
+  public void setUpdatedNodes(Collection<Node> updatedNodes) {
+	  if (this.updatedNodes == null) {
+		  this.updatedNodes = updatedNodes;
+	  } else {
+		  for (Node n : updatedNodes) {
+			  this.updatedNodes.add(n);
+		  }
+	  }
+	  updateCanvas();
+  }
+  
+  public void addUpdatedNode(Node n, NodeState s, boolean updateCanvas) {
+	  n.setState(s);
+	  
+	  if (this.updatedNodes == null)
+		  this.updatedNodes = new ArrayList<Node>();
+	  
+	  this.updatedNodes.add(n);
+	  
+	  if (updateCanvas)
+		  updateCanvas();
+  }
+  
+  public void setUpdatedEdges(Collection<Edge> updatedEdges) {
+	  for (Edge e : updatedEdges) {
+		  addUpdatedEdge(e, e.getState(), false);
+	  }
+	  
+	  updateCanvas();
+  }
+  
+  public void addUpdatedEdge(Edge e, EdgeState s, boolean updateCanvas) {
+	  Node n1 = e.getStart();
+	  Node n2 = e.getEnd();
+	  
+	  addUpdatedNode(n1, n1.getState(), updateCanvas);
+	  addUpdatedNode(n2, n2.getState(), updateCanvas);
+	  
+	  e.setState(s);
+  }
+  
+  public Collection<Node> getUpdatedNodesAndSetToNull() {
+	  Collection<Node> updatedNodes = this.updatedNodes;
+	  this.updatedNodes = null;
+	  
+	  return updatedNodes;
+  }
+  
+  public Iterator<Edge> getEdgeIterator() {
+	  return graph.getEdges();
+  }
+  
+  public Iterator<Node> getNodeIterator() {
+	  return graph.getNodeIterator();
+  }
+  
+  public Rectangle getBounds(){
+	//ensure we have an ordered list
+	getOrderedUpdatedNodes(new Rectangle(0, 0, 1000, 1000));
+	Dimension canvasBounds = GraphCanvasPanel.getCanvasDimensions();
+	
+	int minX = ((T)xOrderedNodes.get(0)).getX(this) - 50;
+	int minY = ((T)yOrderedNodes.get(0)).getY(this) - 50;
+	int maxX = ((T)xOrderedNodes.get(xOrderedNodes.size() - 1)).getX(this) + 50;
+	int maxY = ((T)yOrderedNodes.get(yOrderedNodes.size() - 1)).getY(this) + 50;
+	
+	return new Rectangle(minX, minY, maxX, maxY);
+  }	
+  
+	public Iterator<T> getNodes(String group){
+	    if(nodeGroups.get(group) == null){
+	      TIntObjectHashMap<T> nodes = new TIntObjectHashMap<T>();
+	      nodeGroups.put(group, nodes);
+	      Iterator<T> gnodes = graph.getNodeIterator();
+	      while(gnodes.hasNext()){
+	        T next = gnodes.next();
+	        if(next.inGroup(group)){
+	          nodes.put(next.getId(), next);
+	        }
+	      }
+	    }
+	    return nodeGroups.get(group).valueCollection().iterator();
+	}
+	
+	public ArrayList<Node> getOrderedUpdatedNodes(Rectangle bounds) {
+		 if(xOrderedNodes.isEmpty()){
+		        xOrderedNodes.clear();
+		        yOrderedNodes.clear();
+		        xOrderedNodes.addAll(updatedNodes);
+		        Collections.sort(xOrderedNodes, new Node.XComparator(this));
+		        yOrderedNodes.addAll(updatedNodes);
+		        Collections.sort(yOrderedNodes, new Node.YComparator(this));
+		      }
+		      
+		    ArrayList y = new ArrayList<Node>();
+		    
+		    ArrayList<Node> xy = new ArrayList<Node>();
+		    int firstX = findFirstXIndex(xOrderedNodes, bounds.x - OVERLAP);
+		    T prevNode = null;
+		    
+		    for(int i = firstX; i < xOrderedNodes.size(); i++){
+		      T xn = (T)xOrderedNodes.get(i);
+		      if(getX(xn) >= bounds.x && xn.getY(this) >= bounds.y - OVERLAP && xn.getY(this) <= bounds.y + bounds.height + OVERLAP){
+		        if(getX(xn) <= bounds.x + bounds.width + OVERLAP){
+		          if(xn.isVisible() && xn != prevNode){
+		            xy.add(xn);
+		            prevNode = xn;
+		          }
+		        }
+		        else{
+		          break;
+		        }
+		      }
+		    }
+		    
+		    return xy;
+	}
+	
+	public ArrayList<Node> getOrderedUpdatedNodesAndSetToNull(Rectangle bounds){
+		ArrayList<Node> xy = getOrderedUpdatedNodes(bounds);
+	    
+	    updatedNodes = null;
+	    return xy;
+	  }
   
 }

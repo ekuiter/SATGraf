@@ -24,13 +24,15 @@ public class Edge <T extends Node> implements HasGraphPosition, Comparable<Edge>
   protected T a;
   protected T b;
   public int id;
+  private EdgeState assignmentState;
   private EdgeState state;
-  private List<EdgeState> stateHistory = null;
+  private List<EdgeState> assignmentStateHistory = null;
   
   private void initState() {
 	  this.state = EdgeState.SHOW;
-	  stateHistory = new ArrayList<EdgeState>();
-	  stateHistory.add(state);
+	  this.assignmentState = EdgeState.SHOW;
+	  assignmentStateHistory = new ArrayList<EdgeState>();
+	  assignmentStateHistory.add(assignmentState);
   }
   
   protected Edge() {
@@ -180,18 +182,34 @@ public class Edge <T extends Node> implements HasGraphPosition, Comparable<Edge>
     }
   }
   
+  public void setState(EdgeState state) {
+	  this.state = state;
+  }
+  
   public EdgeState getState() {
 	  return this.state;
   }
   
-  public void setState(EdgeState state) {
-	  this.state = state;
-	  stateHistory.add(state);
+  public boolean isVisible() {
+	  return this.state == EdgeState.SHOW;
   }
   
-  public void revertToPreviousState() {
-	  int lastElement = stateHistory.size()-1;
-	  stateHistory.remove(lastElement);
-	  this.state = stateHistory.get(lastElement-1);
+  public EdgeState getAssignmentState() {
+	  return this.assignmentState;
+  }
+  
+  public boolean isAssignmentVisible() {
+	  return this.state == EdgeState.SHOW;
+  }
+  
+  public void setAssignmentState(EdgeState state) {
+	  this.assignmentState = state;
+	  assignmentStateHistory.add(state);
+  }
+  
+  public void revertToPreviousAssignmentState() {
+	  int lastElement = assignmentStateHistory.size()-1;
+	  assignmentStateHistory.remove(lastElement);
+	  this.assignmentState = assignmentStateHistory.get(lastElement-1);
   }
 }

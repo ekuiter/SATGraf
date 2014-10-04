@@ -20,7 +20,8 @@ import java.util.List;
  * @param <T>
  */
 public class Node<T extends Edge> implements HasGraphPosition{
-  public enum NodeState { ASSIGNED_FALSE, ASSIGNED_TRUE, UNASSIGNED }
+  public enum NodeAssignmentState { ASSIGNED_FALSE, ASSIGNED_TRUE, UNASSIGNED }
+  public enum NodeState { SHOW, HIDE }
 	
   private final HashSet<String> groups = new HashSet<String>();
   //private final ArrayList<Node> conIndexes = new ArrayList<>();
@@ -29,8 +30,9 @@ public class Node<T extends Edge> implements HasGraphPosition{
   private int id;
   private String name;
   private int set = 0; //1 = decision, 2 = implication
+  private NodeAssignmentState assignmentState;
   private NodeState state;
-  private List<NodeState> stateHistory = null;
+  private List<NodeAssignmentState> assignmentStateHistory = null;
   
   public Node(int id, String name){
     this(id, name, false, false);
@@ -38,9 +40,10 @@ public class Node<T extends Edge> implements HasGraphPosition{
   public Node(int id, String name, boolean is_head, boolean is_tail){
     this.id = id;
     this.name = name;
-    state = NodeState.UNASSIGNED;
-    stateHistory = new ArrayList<NodeState>();
-    stateHistory.add(state);
+    state = NodeState.SHOW;
+    assignmentState = NodeAssignmentState.UNASSIGNED;
+    assignmentStateHistory = new ArrayList<NodeAssignmentState>();
+    assignmentStateHistory.add(assignmentState);
     /*if(this.name == null){
       return;
     }*/
@@ -183,18 +186,34 @@ public class Node<T extends Edge> implements HasGraphPosition{
     }
   }
   
+  public void setState(NodeState state) {
+	  this.state = state;
+  }
+  
   public NodeState getState() {
 	  return this.state;
   }
   
-  public void setState(NodeState state) {
-	  this.state = state;
-	  stateHistory.add(state);
+  public boolean isVisible() {
+	  return this.state == NodeState.SHOW;
   }
   
-  public void revertToPreviousState() {
-	  int lastElement = stateHistory.size()-1;
-	  stateHistory.remove(lastElement);
-	  this.state = stateHistory.get(lastElement-1);
+  public NodeAssignmentState getAssignmentState() {
+	  return this.assignmentState;
+  }
+  
+  public boolean isAssigned() {
+	  return this.assignmentState != NodeAssignmentState.UNASSIGNED;
+  }
+  
+  public void setAssignmentState(NodeAssignmentState state) {
+	  this.assignmentState = state;
+	  assignmentStateHistory.add(state);
+  }
+  
+  public void revertToPreviousAssignmentState() {
+	  int lastElement = assignmentStateHistory.size()-1;
+	  assignmentStateHistory.remove(lastElement);
+	  this.assignmentState = assignmentStateHistory.get(lastElement-1);
   }
 }

@@ -65,9 +65,11 @@ public class NodePanel<T extends Node> extends JPanel{
   }
   public void update(){
     if(node == null){
-      return;
+    	name.setText("");
+        location.setText("");
+    } else {
+    	name.setText(node.toString());
+        location.setText(String.format("(%d, %d)", node.getX(graph), node.getY(graph)));
     }
-    name.setText(node.toString());
-    location.setText(String.format("(%d, %d)", node.getX(graph), node.getY(graph)));
   }
 }

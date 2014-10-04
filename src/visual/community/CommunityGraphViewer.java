@@ -6,20 +6,22 @@
 
 package visual.community;
 
+import static visual.graph.DrawableNode.COMMUNITY_COLORS;
 import gnu.trove.map.hash.TIntObjectHashMap;
+
 import java.awt.Color;
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+
 import org.json.simple.JSONObject;
-import visual.community.drawing_algorithms.AbstractPlacer;
+
 import visual.community.drawing_algorithms.CommunityPlacer;
-import static visual.graph.DrawableNode.COMMUNITY_COLORS;
 import visual.graph.Edge;
+import visual.graph.Edge.EdgeState;
 import visual.graph.GraphViewer;
-import visual.graph.Node.NodeState;
+import visual.graph.Node.NodeAssignmentState;
 
 /**
  *
@@ -96,9 +98,9 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
     return getColor(node);
   }
   protected Color getColor(CommunityNode n){
-    if(n.getState() == NodeState.ASSIGNED_FALSE) {
+    if(n.getAssignmentState() == NodeAssignmentState.ASSIGNED_FALSE) {
       return Color.RED;
-    } else if (n.getState() == NodeState.ASSIGNED_TRUE) {
+    } else if (n.getAssignmentState() == NodeAssignmentState.ASSIGNED_TRUE) {
     	return Color.GREEN;
     } else {
       return Color.BLUE;
@@ -129,95 +131,78 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
 
   public void showConnection(CommunityEdge conn){
     if((conn.getType() & Edge.REAL) == Edge.REAL){
-      if(!visibleConnections.contains(conn)){
-        visibleConnections.add(conn);
-        updateObservers();
-      }
+    	addUpdatedEdge(conn, EdgeState.SHOW, true);
     }
     else if((conn.getType() & CommunityEdge.INTER_COMMUNITY) == CommunityEdge.INTER_COMMUNITY && (conn.getType() & Edge.DUMMY) == Edge.DUMMY){
       Iterator<CommunityEdge> conns = graph.getEdges();
       while(conns.hasNext()){
         CommunityEdge conn1 = conns.next();
         if(conn1.getStart().getCommunity() != conn1.getEnd().getCommunity()){
-          visibleConnections.add(conn1);
+        	addUpdatedEdge(conn, EdgeState.SHOW, true);
         }
       }
-      updateObservers();
     }
     else if((conn.getType() & CommunityEdge.INTER_COMMUNITY) == CommunityEdge.INTER_COMMUNITY){
       Iterator<CommunityEdge> conns = getInterCommunityConnections(conn.getCommunity()).iterator();
       while(conns.hasNext()){
         CommunityEdge conn1 = conns.next();
-        visibleConnections.add(conn1);
+        addUpdatedEdge(conn1, EdgeState.SHOW, true);
       }
-      updateObservers();
     }
     else if((conn.getType() & CommunityEdge.INTRA_COMMUNITY) == CommunityEdge.INTRA_COMMUNITY && (conn.getType() & Edge.DUMMY) == Edge.DUMMY){
       Iterator<CommunityEdge> conns = graph.getEdges();
       while(conns.hasNext()){
         CommunityEdge conn1 = conns.next();
         if(conn1.getStart().getCommunity() == conn1.getEnd().getCommunity()){
-          visibleConnections.add(conn1);
+        	addUpdatedEdge(conn1, EdgeState.SHOW, true);
         }
       }
-      updateObservers();
     }
     else if((conn.getType() & CommunityEdge.INTRA_COMMUNITY) == CommunityEdge.INTRA_COMMUNITY){
       Iterator<CommunityEdge> conns = getIntraCommunityConnections(conn.getCommunity()).iterator();
       while(conns.hasNext()){
         CommunityEdge conn1 = conns.next();
-        visibleConnections.add(conn1);
+        addUpdatedEdge(conn1, EdgeState.SHOW, true);
       }
     }
-    updateObservers();
   }
+  
   public void hideEdge(CommunityEdge conn){
-    if(visibleConnections == null){
-      getConnections(new Rectangle());
-    }
     if((conn.getType() & Edge.REAL) == Edge.REAL){
-      if(visibleConnections.contains(conn)){
-        visibleConnections.remove(conn);
-        updateObservers();
-      }
+    	addUpdatedEdge(conn, EdgeState.HIDE, true);
     }
     else if((conn.getType() & CommunityEdge.INTER_COMMUNITY) == CommunityEdge.INTER_COMMUNITY && (conn.getType() & Edge.DUMMY) == Edge.DUMMY){
       Iterator<CommunityEdge> conns = graph.getEdges();
       while(conns.hasNext()){
         Edge<CommunityNode> conn1 = conns.next();
         if(conn1.getStart().getCommunity() != conn1.getEnd().getCommunity()){
-          visibleConnections.remove(conn1);
+        	addUpdatedEdge(conn, EdgeState.HIDE, true);
         }
       }
-      updateObservers();
     }
     else if((conn.getType() & CommunityEdge.INTER_COMMUNITY) == CommunityEdge.INTER_COMMUNITY){
       Iterator<CommunityEdge> conns = getInterCommunityConnections(conn.getCommunity()).iterator();
       while(conns.hasNext()){
         Edge<CommunityNode> conn1 = conns.next();
-        visibleConnections.remove(conn1);
+        addUpdatedEdge(conn1, EdgeState.HIDE, true);
       }
-      updateObservers();
     }
     else if((conn.getType() & CommunityEdge.INTRA_COMMUNITY) == CommunityEdge.INTRA_COMMUNITY && (conn.getType() & Edge.DUMMY) == Edge.DUMMY){
       Iterator<CommunityEdge> conns = graph.getEdges();
       while(conns.hasNext()){
         Edge<CommunityNode> conn1 = conns.next();
         if(conn1.getStart().getCommunity() == conn1.getEnd().getCommunity()){
-          visibleConnections.remove(conn1);
+        	addUpdatedEdge(conn1, EdgeState.HIDE, true);
         }
       }
-      updateObservers();
     }
     else if((conn.getType() & CommunityEdge.INTRA_COMMUNITY) == CommunityEdge.INTRA_COMMUNITY){
       Iterator<CommunityEdge> conns = getIntraCommunityConnections(conn.getCommunity()).iterator();
       while(conns.hasNext()){
         Edge conn1 = conns.next();
-        visibleConnections.remove(conn1);
+        addUpdatedEdge(conn1, EdgeState.HIDE, true);
       }
-      updateObservers();
     }
-    updateObservers();
   }
   
   public void showCommunity(int community){
@@ -225,15 +210,12 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
     while(nodes.hasNext()){
       showNode(nodes.next());
     }
-    updateObservers();
   }
   public void hideCommunity(int community){
     Iterator<CommunityNode> nodes = getCommunityNodes(community).iterator();
     while(nodes.hasNext()){
       hideNode(nodes.next());
     }
-    updateObservers();
-
   }
   
 	@Override

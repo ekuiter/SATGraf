@@ -27,14 +27,12 @@ public class GraphCanvasPanel extends JPanel{
   }
   public GraphCanvasPanel(GraphCanvas canvas){
     this.canvas = canvas;
-    Toolkit tk = Toolkit.getDefaultToolkit();
-    int width = ((int) tk.getScreenSize().getWidth()) - 400;
-    int height = ((int) tk.getScreenSize().getHeight()) - 400;
+    
     
     canvasPane = new JScrollPane(canvas);
     canvasPane.setBorder(BorderFactory.createEmptyBorder());
-    canvasPane.setSize(width, height);
-    canvasPane.setPreferredSize(new Dimension(width, height));
+    canvasPane.setSize(getCanvasDimensions());
+    canvasPane.setPreferredSize(getCanvasDimensions());
     this.setLayout(new BorderLayout());
     this.setBackground(Color.BLACK);
     this.add(canvasPane, BorderLayout.CENTER);
@@ -53,5 +51,13 @@ public class GraphCanvasPanel extends JPanel{
     if(canvasPane != null){
       canvasPane.repaint();
     }
+  }
+  
+  static public Dimension getCanvasDimensions() {
+	  Toolkit tk = Toolkit.getDefaultToolkit();
+	  int width = ((int) tk.getScreenSize().getWidth()) - 400;
+	  int height = ((int) tk.getScreenSize().getHeight()) - 400;
+	  
+	  return new Dimension(width, height);
   }
 }
