@@ -49,8 +49,16 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
   
   public Dimension getPreferredSize(){
     Dimension d = super.getPreferredSize();
+    Dimension canvasBounds = GraphCanvasPanel.getCanvasDimensions();
+    
     d.height = (int)(graph.getScale() * d.height);
     d.width = (int)(graph.getScale() * d.width);
+    
+    if (d.width < canvasBounds.width)
+    	d.width = canvasBounds.width;
+    if (d.height < canvasBounds.height)
+    	d.height = canvasBounds.height;
+    
     return d;
   }
 
