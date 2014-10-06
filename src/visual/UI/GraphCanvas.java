@@ -15,12 +15,15 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+
+import javax.swing.BorderFactory;
 import javax.swing.JTable;
+
 import visual.graph.DrawableNode;
 import visual.graph.Edge;
+import visual.graph.Edge.EdgeState;
 import visual.graph.GraphViewer;
 import visual.graph.Node;
-import visual.graph.Edge.EdgeState;
 
 /**
  *
@@ -30,7 +33,6 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
   protected GraphViewer graph;
   private GraphCanvasRenderer renderer;
   public static Color HIGHLIGHT_COLOR = new Color(0xe4, 0xfd, 0x03);
-  private Point padding = new Point(0, 0);
   
   public GraphCanvas(GraphViewer graph){
     super(new GraphTableModel(graph));
@@ -50,12 +52,9 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
     this.setDefaultRenderer(Object.class, renderer);
   }
   
-  public Point getPadding() {
-	  return padding;
-  }
-  
   public Dimension getPreferredSize() {
     Dimension d = super.getPreferredSize();
+    Point padding = new Point(0,0);
     Dimension canvasBounds = GraphCanvasPanel.getCanvasDimensions();
     
     d.height = (int)(graph.getScale() * d.height);
@@ -69,6 +68,8 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
     	padding.y = canvasBounds.height - d.height;
     	d.height = canvasBounds.height;
     }
+    
+    this.setBorder(BorderFactory.createEmptyBorder(padding.x, padding.y, 0, 0));
     
     return d;
   }

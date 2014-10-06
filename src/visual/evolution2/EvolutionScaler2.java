@@ -44,7 +44,7 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 	  int totalLines = 0;
 	  List<Node> updatedNodes = null;
 	  List<Edge> updatedEdges = null;
-	  private JCheckBox showAssignedVarsBox = new JCheckBox("Hide Assigned Variables");
+	  private JCheckBox showAssignedVarsBox = new JCheckBox("Show Assigned Variables");
 	  
 	  List<String> currentFileLines = null;
 	  List<String> nextFileLines = null;
@@ -79,7 +79,7 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 	    showAssignedVarsBox.addMouseListener(new MouseAdapter() {
 	    	@Override
 	    	public void mouseClicked(MouseEvent e) {
-	    		updateShowAssignedVars(!showAssignedVarsBox.isSelected());
+	    		updateShowAssignedVars(showAssignedVarsBox.isSelected());
 	    		updateGraph();
 	    	}
 	    });

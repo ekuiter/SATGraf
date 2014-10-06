@@ -48,7 +48,7 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   private boolean simpleConnections = false;
   protected final ArrayList yOrderedNodes = new ArrayList<T>();
   private final Timer actionTimer = new Timer(100, this);
-  private boolean showAssignedVars = true;
+  private boolean showAssignedVars = false;
   
   private Collection<Node> updatedNodes = null;
   
@@ -369,7 +369,6 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   public Rectangle getBounds(){
 	//ensure we have an ordered list
 	getOrderedUpdatedNodes(new Rectangle(0, 0, 1000, 1000));
-	Dimension canvasBounds = GraphCanvasPanel.getCanvasDimensions();
 	
 	int minX = ((T)xOrderedNodes.get(0)).getX(this) - 50;
 	int minY = ((T)yOrderedNodes.get(0)).getY(this) - 50;
