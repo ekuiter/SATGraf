@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -43,6 +44,7 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 	  int totalLines = 0;
 	  List<Node> updatedNodes = null;
 	  List<Edge> updatedEdges = null;
+	  private JCheckBox showAssignedVarsBox = new JCheckBox("Hide Assigned Variables");
 	  
 	  List<String> currentFileLines = null;
 	  List<String> nextFileLines = null;
@@ -74,6 +76,14 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 	    	}
 		});
 	    
+	    showAssignedVarsBox.addMouseListener(new MouseAdapter() {
+	    	@Override
+	    	public void mouseClicked(MouseEvent e) {
+	    		updateShowAssignedVars(!showAssignedVarsBox.isSelected());
+	    		updateGraph();
+	    	}
+	    });
+	    
 	    progress.addChangeListener(this);
 	  }
 	  
@@ -90,6 +100,8 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 		  
 		  this.add(progress, BorderLayout.CENTER);
 		  this.add(play, BorderLayout.EAST);
+		  
+		  this.add(showAssignedVarsBox, BorderLayout.SOUTH);
 	  }
 	  
 	  @Override
@@ -379,5 +391,9 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 		  }
 		  
 		  progress.setValue(update);
+	  }
+	  
+	  private void updateShowAssignedVars(boolean show) {
+		  graphviewer.setShowAssignedVars(show);
 	  }
 }

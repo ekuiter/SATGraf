@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
@@ -29,6 +30,8 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
   protected GraphViewer graph;
   private GraphCanvasRenderer renderer;
   public static Color HIGHLIGHT_COLOR = new Color(0xe4, 0xfd, 0x03);
+  private Point padding = new Point(0, 0);
+  
   public GraphCanvas(GraphViewer graph){
     super(new GraphTableModel(graph));
     renderer = new GraphCanvasRenderer(this, graph);
@@ -47,17 +50,25 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
     this.setDefaultRenderer(Object.class, renderer);
   }
   
-  public Dimension getPreferredSize(){
+  public Point getPadding() {
+	  return padding;
+  }
+  
+  public Dimension getPreferredSize() {
     Dimension d = super.getPreferredSize();
     Dimension canvasBounds = GraphCanvasPanel.getCanvasDimensions();
     
     d.height = (int)(graph.getScale() * d.height);
     d.width = (int)(graph.getScale() * d.width);
     
-    if (d.width < canvasBounds.width)
+    if (d.width < canvasBounds.width) {
+    	padding.x = canvasBounds.width - d.width;
     	d.width = canvasBounds.width;
-    if (d.height < canvasBounds.height)
+    }
+    if (d.height < canvasBounds.height) {
+    	padding.y = canvasBounds.height - d.height;
     	d.height = canvasBounds.height;
+    }
     
     return d;
   }
@@ -84,7 +95,11 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
     renderer.reset();
     ((GraphTableModel)this.getModel()).reset();
   }
+  
   protected void drawNode(Node n, Rectangle o,Graphics image) {
+	if (!graph.getShowAssignedVars() && n.isAssigned())
+		return;
+	  
     Rectangle i = image.getClipBounds();
     int x = n.getX(graph) - (o.x - i.x);
     int y = n.getY(graph) - (o.y - i.y);
@@ -93,6 +108,7 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
     image.setColor(n.getFillColor(graph));
     image.fillArc(x, y, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER, 0, 360);
   }
+  
   /*public void paintComponent(Graphics g){
     if(lastPaint.x < g.getClipBounds().x){
       generateNewFrames(g, ThreadPaintablePanel.SCROLL_DIRECTION.EAST);
@@ -122,12 +138,14 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
   protected void drawConnection(Edge c, Rectangle o,Graphics image) {
 	if (c.getAssignmentState() == EdgeState.HIDE || c.getState() == EdgeState.HIDE) {
 		return;
+	} else if (!graph.getShowAssignedVars() && (c.getStart().isAssigned() || c.getEnd().isAssigned())) {
+		return;
 	}
 	  
     Rectangle i = image.getClipBounds();
     if(c.getStart().isVisible() && c.getEnd().isVisible()){
       Graphics2D g2d = (Graphics2D) image.create();
-      int startX = c.getStart().getX(graph) +   DrawableNode.NODE_DIAMETER / 2;
+      int startX = c.getStart().getX(graph) + DrawableNode.NODE_DIAMETER / 2;
       int startY = c.getStart().getY(graph) + DrawableNode.NODE_DIAMETER / 2;
       int endX = c.getEnd().getX(graph) + DrawableNode.NODE_DIAMETER / 2;
       int endY = c.getEnd().getY(graph) + DrawableNode.NODE_DIAMETER / 2;

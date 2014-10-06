@@ -31,8 +31,6 @@ public class CommunityCanvas extends GraphCanvas{
     Rectangle o = paint.getBounds();
     Graphics image = paint.getGraphics();
     Rectangle i = image.getClipBounds();
-    int offsetX = (o.x - i.x);
-    int offsetY = (o.x - i.x);
     image.setColor(Color.BLACK);
     image.fillRect(i.x, i.y, i.width, i.height);
     List<CommunityEdge> drawnEdges = new ArrayList<CommunityEdge>();

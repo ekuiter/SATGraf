@@ -66,13 +66,16 @@ public class GraphCanvasRenderer extends JPanel implements TableCellRenderer {
       }
     }
     if (image == null) {
-      image = new TiledImage((int) (FRAME_WIDTH / graph.getScale()), (int) (FRAME_HEIGHT / graph.getScale()), BufferedImage.TYPE_INT_ARGB, new Point(column * (int) (FRAME_WIDTH / graph.getScale()), row * (int) (FRAME_HEIGHT / graph.getScale())), new Dimension((int) (FRAME_WIDTH / graph.getScale()), (int) (FRAME_HEIGHT / graph.getScale())));
+      Point origin = new Point(column * (int) (FRAME_WIDTH / graph.getScale()), row * (int) (FRAME_HEIGHT / graph.getScale()));
+      
+      image = new TiledImage((int) (FRAME_WIDTH / graph.getScale()), (int) (FRAME_HEIGHT / graph.getScale()), BufferedImage.TYPE_INT_ARGB, origin, new Dimension((int) (FRAME_WIDTH / graph.getScale()), (int) (FRAME_HEIGHT / graph.getScale())));
       Graphics2D g1 = image.createGraphics();
       g1.setClip(0, 0, (int) (FRAME_WIDTH / graph.getScale()), (int) (FRAME_HEIGHT / graph.getScale()));
       image.setGraphics(g1);
       image.row = row;
       image.column = column;
       images.get(table).add(image);
+      
       PaintThread p = new PaintThread(canvas, new Rectangle(column * (int) (FRAME_WIDTH / graph.getScale()), row * (int) (FRAME_HEIGHT / graph.getScale()), (column + 1) * (int) (FRAME_WIDTH / graph.getScale()), (row + 1) * (int) (FRAME_HEIGHT / graph.getScale())), image, null);
       canvas.paintThread(p);
     }

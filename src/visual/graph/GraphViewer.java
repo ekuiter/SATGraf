@@ -8,6 +8,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -47,6 +48,7 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   private boolean simpleConnections = false;
   protected final ArrayList yOrderedNodes = new ArrayList<T>();
   private final Timer actionTimer = new Timer(100, this);
+  private boolean showAssignedVars = true;
   
   private Collection<Node> updatedNodes = null;
   
@@ -433,4 +435,11 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
 	    return xy;
 	  }
   
+	public void setShowAssignedVars(boolean show) {
+		this.showAssignedVars = show;
+	}
+	
+	public boolean getShowAssignedVars() {
+		return this.showAssignedVars;
+	}
 }
