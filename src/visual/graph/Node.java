@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -25,7 +26,7 @@ public class Node<T extends Edge> implements HasGraphPosition{
 	
   private final HashSet<String> groups = new HashSet<String>();
   //private final ArrayList<Node> conIndexes = new ArrayList<>();
-  private final ArrayList<T> connections = new ArrayList<T>();
+  private final HashMap<Node, T> connections = new HashMap<Node, T>();
   public static final NameComparator NAME_COMPARATOR =new NameComparator();
   private int id;
   private String name;
@@ -82,32 +83,20 @@ public class Node<T extends Edge> implements HasGraphPosition{
     return this.name == null ? String.format("noname (%d)", id) : this.name;
   }
   public Iterator<T> getEdges(){
-    return this.connections.iterator();
+    return this.connections.values().iterator();
   }
   public T getEdge(Node n){
-    Iterator<T> edges = getEdges();
-    while(edges.hasNext()){
-      T next = edges.next();
-      if((next.getStart() == this && next.getEnd() == n) || (next.getStart() == n && next.getEnd() == this)){
-        return next;
-      }
-    }
-    return null;
-    /*int index = conIndexes.indexOf(n);
-    if (index == -1){
-      return null;
-    }
-    return connections.get(index);*/
+    return connections.get(n);
   }
   public void addEdge(T e){
     //if(!connections.containsValue(e)){
       //conIndexes.add(e.getStart() == this ? e.getEnd() : e.getStart());
-      connections.add(e);
+      connections.put(e.getStart() == this ? e.getEnd() : e.getStart(), e);
     //}
   }
   
   public Iterator<T> getConnections(){
-    return this.connections.iterator();
+    return this.connections.values().iterator();
   }
   
   public int getId(){
@@ -151,7 +140,7 @@ public class Node<T extends Edge> implements HasGraphPosition{
   }
 
   public Collection<T> getEdgesList() {
-    return connections;
+    return connections.values();
   }
   public void removeEdge(T e){
     connections.remove(e);
