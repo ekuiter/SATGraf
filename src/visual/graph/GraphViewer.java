@@ -78,9 +78,8 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
 	if (canvas == null || panel == null)
 		return;
 	  
-    canvas.reset();
+	canvas.repaint();
     panel.update();
-    canvas.revalidate();
     actionTimer.stop();
   }
   
@@ -305,6 +304,7 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   public void setScale(double scale){
     this.scale = scale;
     setUpdatedNodes(this.graph.getNodesList());
+    canvas.reset();
   }
   public double getScale(){
     return scale;

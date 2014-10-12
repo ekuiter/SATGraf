@@ -65,7 +65,32 @@ public class GraphCanvasRenderer extends JPanel implements TableCellRenderer {
         break;
       }
     }
+    
+    // Check to see if it is necessary to redraw the image
+    boolean draw = image == null || isRedrawImageNecessary();
     if (image == null) {
+    	createNewImage(table, row, column, canvas);
+    } 
+    
+    if (draw) {
+    	PaintThread p = new PaintThread(canvas, new Rectangle(column * (int) (FRAME_WIDTH / graph.getScale()), row * (int) (FRAME_HEIGHT / graph.getScale()), (column + 1) * (int) (FRAME_WIDTH / graph.getScale()), (row + 1) * (int) (FRAME_HEIGHT / graph.getScale())), image, null);
+        canvas.paintThread(p);
+    }
+    
+    return this;
+  }
+
+  private boolean isRedrawImageNecessary() {
+	  if (image == null)
+		  return true;
+	  
+	  if (graph.getOrderedUpdatedNodes(image.getBounds()).size() != 0)
+		  return true;
+	  
+	  return false;
+  }
+  
+private void createNewImage(JTable table, int row, int column, GraphCanvas canvas) {
       Point origin = new Point(column * (int) (FRAME_WIDTH / graph.getScale()), row * (int) (FRAME_HEIGHT / graph.getScale()));
       
       image = new TiledImage((int) (FRAME_WIDTH / graph.getScale()), (int) (FRAME_HEIGHT / graph.getScale()), BufferedImage.TYPE_INT_ARGB, origin, new Dimension((int) (FRAME_WIDTH / graph.getScale()), (int) (FRAME_HEIGHT / graph.getScale())));
@@ -75,13 +100,8 @@ public class GraphCanvasRenderer extends JPanel implements TableCellRenderer {
       image.row = row;
       image.column = column;
       images.get(table).add(image);
-      
-      PaintThread p = new PaintThread(canvas, new Rectangle(column * (int) (FRAME_WIDTH / graph.getScale()), row * (int) (FRAME_HEIGHT / graph.getScale()), (column + 1) * (int) (FRAME_WIDTH / graph.getScale()), (row + 1) * (int) (FRAME_HEIGHT / graph.getScale())), image, null);
-      canvas.paintThread(p);
-    }
-    return this;
-  }
-
+}
+  
   @Override
   public void paintComponent(Graphics g) {
     Graphics2D g2 = (Graphics2D) g;
