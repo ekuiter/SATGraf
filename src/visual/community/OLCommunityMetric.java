@@ -231,7 +231,7 @@ public class OLCommunityMetric implements CommunityMetric{
 
   private boolean IsJoin(int deg)
   {
-      int p = 1;//(int)(Math.random() * deg);
+      int p =(int)(Math.random() * deg);
       if (p >= 1)
       {
           return true;
@@ -412,7 +412,8 @@ public class OLCommunityMetric implements CommunityMetric{
   
   public static void main(String[] args) throws IOException{
     if(args.length < 1){
-      args = new String[]{"formula/satcomp/dimacs/pb_300_06_lb_02.cnf"};
+      args = new String[]{"/media/SAT/sat2013/app/SATBench/satchal12-selected/Application_SAT+UNSAT/SATChallenge2012_Application/SAT_Competition_2009_unselected/application/SAT09/APPLICATIONS/crypto/desgen/gss-18-s100.cnf"};
     }
+    getQ(args[0], System.out);
   }
 }
