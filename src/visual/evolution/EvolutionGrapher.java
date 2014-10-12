@@ -26,21 +26,19 @@ import visual.community.CommunityNode;
 public class EvolutionGrapher extends CommunityGrapher{
   private File dumpFile;
   private int dumpFreq = 5;
-  /*public EvolutionGrapher(String dimacsFile, String mapFile, String dumpFile, HashMap<String, String> patterns) {
-    super(dimacsFile, mapFile, patterns);
-    this.dumpFile = new File(dimacsFile.concat(".dump"));
-    if(this.dumpFile.exists()){
-      this.dumpFile.delete();
-    }
-  }*/
+  protected final String minisat;
   
-  public EvolutionGrapher(String dimacsFile, String communityMetric, String placer, int dumpFreq, HashMap<String, String> patterns) {
+  public String getMinisat(){
+    return this.minisat;
+  }
+  public EvolutionGrapher(String dimacsFile, String communityMetric, String placer, int dumpFreq, HashMap<String, String> patterns, String minisat) {
     super(dimacsFile, communityMetric, placer, patterns);
     this.dumpFreq = dumpFreq;
     this.dumpFile = new File(dimacsFile.replaceFirst("[.][^.]+$", "").concat(".dump"));
     if(this.dumpFile.exists()){
       this.dumpFile.delete();
     }
+    this.minisat = minisat;
   }
       
   public void process(CommunityGraph cg){
@@ -95,15 +93,20 @@ public class EvolutionGrapher extends CommunityGrapher{
 	      "formula/satcomp/dimacs/fiasco.dimacs",
 	      "ol",
 	      "f",
-	      "5"
+	      "5",
+          System.getProperty("user.dir") + "/minisat/minisat"
 	    };
 	}
+    else if(args.length < 5){
+      System.out.println("Too few options. Please use:");
+      System.out.print(usage().concat("\n").concat(help()));
+    }
     HashMap<String, String> patterns = new HashMap<String, String>();
       
-    for(int i = 4; i < args.length; i+=2){
+    for(int i = 5; i < args.length; i+=2){
       patterns.put(args[i], args[i + 1]);
     }
-    EvolutionGrapher ag = new EvolutionGrapher(args[0], args[1], args[2], Integer.parseInt(args[3]), patterns);
+    EvolutionGrapher ag = new EvolutionGrapher(args[0], args[1], args[2], Integer.parseInt(args[3]), patterns, args[4]);
     try{
       ag.generateGraph();
       ag.init();
@@ -115,5 +118,15 @@ public class EvolutionGrapher extends CommunityGrapher{
     catch(IOException e){
       e.printStackTrace();
     }
+  }
+  
+      
+  public static String usage(){
+    return "[formula/path.cnf | saved/path.sb] [ol | cnm] [f | grid | kk] [dumpfreq] [/path/to/solver]";
+  }
+  
+  public static String help(){
+    return "\"formula\" \"community algorithm\" \"layout algorithm\" \"dump frequency\" \"path to modified solver + options\"\n"
+            + "View the evolution of the community VIG of a SAT formula while being solved, dumping after every [dumpfreq] conflict clauses";
   }
 }

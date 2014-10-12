@@ -61,13 +61,16 @@ public class ImplicationGrapher extends Grapher{
       args = new String[]{
        "formula/satcomp/dimacs/fiasco.dimacs",
        "ol",
-  	   "kk",
-  	   "5"
+  	   "kk"
       };
+    }
+    else if(args.length < 3){
+      System.out.println("Too few options. Please use:");
+      System.out.print(usage().concat("\n").concat(help()));
     }
     HashMap<String, String> patterns = new HashMap<String, String>();
   
-    for(int i = 4; i < args.length; i+=2){
+    for(int i = 3; i < args.length; i+=2){
       patterns.put(args[i], args[i + 1]);
     }
     ImplicationGrapher ag = new ImplicationGrapher(args[0], patterns);
@@ -82,5 +85,15 @@ public class ImplicationGrapher extends Grapher{
     catch(IOException e){
       e.printStackTrace();
     }
+  }
+
+  public static String usage(){
+    return "[formula/path.cnf | saved/path.sb] [ol | cnm] [f | grid | kk]";
+  }
+  
+  
+  public static String help(){
+    return "\"formula\" \"community algorithm\" \"layout algorithm\"\n"
+            + "Display the VIG of a SAT formula and view how assigning specific variables specific values forces the implied value of other variables";
   }
 }

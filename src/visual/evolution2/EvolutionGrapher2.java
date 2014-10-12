@@ -15,14 +15,13 @@ import visual.evolution.EvolutionGrapher;
 public class EvolutionGrapher2 extends EvolutionGrapher {
 	
 	  static EvolutionGrapher2 instance = null;
-	  
 	  static public EvolutionGrapher2 getInstance() {
 		  return instance;
 		  
 	  }
 	
-	  public EvolutionGrapher2(String dimacsFile, String communityMetric, String placer, int dumpFreq, HashMap<String, String> patterns) {
-	    super(dimacsFile, communityMetric, placer, 0, patterns);
+	  public EvolutionGrapher2(String dimacsFile, String communityMetric, String placer, int dumpFreq, HashMap<String, String> patterns, String minisat) {
+	    super(dimacsFile, communityMetric, placer, 0, patterns, minisat);
 	    instance = this;
 	  }
 	      
@@ -52,17 +51,22 @@ public class EvolutionGrapher2 extends EvolutionGrapher {
 		if (args.length == 0) {
 		    args = new String[]{
 		      "formula/satcomp/dimacs/fiasco.dimacs",
-		      "cnm",
+		      "ol",
 		      "f",
-		      "5"
+		      "5",
+              System.getProperty("user.dir") + "/minisat/minisat"
 		    };
 		}
+        else if(args.length < 5){
+          System.out.println("Too few options. Please use:");
+          System.out.print(usage().concat("\n").concat(help()));
+        }
 	    HashMap<String, String> patterns = new HashMap<String, String>();
 	      
-	    for(int i = 4; i < args.length; i+=2){
+	    for(int i = 5; i < args.length; i+=2){
 	      patterns.put(args[i], args[i + 1]);
 	    }
-	    EvolutionGrapher2 ag = new EvolutionGrapher2(args[0], args[1], args[2], Integer.parseInt(args[3]), patterns);
+	    EvolutionGrapher2 ag = new EvolutionGrapher2(args[0], args[1], args[2], Integer.parseInt(args[3]), patterns, args[4]);
 	    try{
 	      ag.generateGraph();
 	      ag.init();
@@ -75,4 +79,13 @@ public class EvolutionGrapher2 extends EvolutionGrapher {
 	      e.printStackTrace();
 	    }
 	  }
+      
+      public static String usage(){
+        return "[formula/path.cnf | saved/path.sb] [ol | cnm] [f | grid | kk] [dumpfreq] [/path/to/solver]";
+      }
+  
+  public static String help(){
+    return "\"formula\" \"community algorithm\" \"layout algorithm\" \"dump frequency\" \"path to modified solver + options\"\n"
+            + "View the evolution of the community VIG of a SAT formula while being solved, dumping after every [dumpfreq] variable assignments";
+  }
 }

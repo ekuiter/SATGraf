@@ -25,55 +25,55 @@ public class EvolutionGraphFrame2 extends CommunityGraphFrame {
 	static int maxLinesPerFile = 1000;
 	PrintWriter writer = null;
 	
-	  public EvolutionGraphFrame2(CommunityGraphViewer graphViewer, HashMap<String, Pattern> patterns, EvolutionGrapher2 grapher) {
-	    super(graphViewer, patterns);
-	    this.grapher = grapher;
-	    createOutputFolder();
-	  }
-	  
-	  public void init(){
-	    super.init();
-	  }
-	  
-	  public void show() {
-		  if(graphViewer != null) {
-			  canvasPanel = new GraphCanvasPanel(new CommunityCanvas(graphViewer));
-			  panel = new EvolutionOptionsPanel2(getGraphViewer(), patterns.keySet());
-			  super.show();
-			  buildEvolutionFile();
-		  } else {
-			  super.show();
-		  }
-	  }
-	  
-	  public void buildEvolutionFile() {
-		  Runnable r = new Runnable() {
+    public EvolutionGraphFrame2(CommunityGraphViewer graphViewer, HashMap<String, Pattern> patterns, EvolutionGrapher2 grapher) {
+      super(graphViewer, patterns);
+      this.grapher = grapher;
+      createOutputFolder();
+    }
 
-	          @Override
-	          public void run() {
-	        	  try {
-	        		  
-	        		  NamedFifo fifo = new NamedFifo(pipeFileName);
-	    			  fifo.create();
-	    			  
-	    			  Runtime.getRuntime().exec(String.format(System.getProperty("user.dir") + "/minisat/minisat %s", grapher.getDimacsFile().getAbsolutePath()));
-	    			  BufferedReader reader = new BufferedReader(new FileReader(pipeFileName));
-	        		  String line;
-	        		  
-		  			  while((line = reader.readLine()) != null) {
-		  				  outputLine(line);
-		  			  }
-		  			  
-		  			  closeWriter();
-		        	  reader.close();
-		        	  fifo.getFile().delete();
-	        	  } catch (Exception e) {
-	        		  e.printStackTrace();
-	        	  }
-	          }
-          };
-          Thread t = new Thread(r);
-          t.start();
+    public void init(){
+      super.init();
+    }
+
+    public void show() {
+        if(graphViewer != null) {
+            canvasPanel = new GraphCanvasPanel(new CommunityCanvas(graphViewer));
+            panel = new EvolutionOptionsPanel2(getGraphViewer(), patterns.keySet());
+            super.show();
+            buildEvolutionFile();
+        } else {
+            super.show();
+        }
+    }
+
+    public void buildEvolutionFile() {
+        Runnable r = new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+
+                    NamedFifo fifo = new NamedFifo(pipeFileName);
+                    fifo.create();
+
+                    Runtime.getRuntime().exec(String.format(grapher.getMinisat().concat(" %s"), grapher.getDimacsFile().getAbsolutePath()));
+                    BufferedReader reader = new BufferedReader(new FileReader(pipeFileName));
+                    String line;
+
+                    while((line = reader.readLine()) != null) {
+                        outputLine(line);
+                    }
+
+                    closeWriter();
+                    reader.close();
+                    fifo.getFile().delete();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        Thread t = new Thread(r);
+        t.start();
 	}
 	  
 	private void closeWriter() {

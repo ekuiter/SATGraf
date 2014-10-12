@@ -81,10 +81,13 @@ public class CommunityGrapher extends Grapher <CommunityNode, CommunityEdge, Cla
     if(args.length == 0){                     
       args = new String[]{
        "formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
-       "cnm",
-	   "f",
-	   "5"
+       "ol",
+	   "f"
       };
+    }
+    else if(args.length < 3){
+      System.out.println("Too few options. Please use:");
+      System.out.print(usage().concat("\n").concat(help()));
     }
     HashMap<String, String> patterns = new HashMap<String, String>();
   
@@ -104,5 +107,14 @@ public class CommunityGrapher extends Grapher <CommunityNode, CommunityEdge, Cla
     catch(IOException e){
       e.printStackTrace();
     }
+  }
+
+  public static String usage(){
+    return "[formula/path.cnf | saved/path.sb] [ol | cnm] [f | grid | kk]";
+  }
+  
+  public static String help(){
+    return "\"formula\" \"community algorithm\" \"layout algorithm\"\n"
+            + "View the VIG of a SAT formula";
   }
 }
