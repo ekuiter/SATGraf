@@ -43,17 +43,18 @@ public class GraphScaler extends JPanel implements ChangeListener{
     this.add(scale, BorderLayout.CENTER);
     this.add(fit, BorderLayout.EAST);
     scale.addChangeListener(this);
+    
     fit.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
         Rectangle gR = GraphScaler.this.graph.getBounds();
         Rectangle vR = GraphScaler.this.graph.getGraphCanvas().getVisibleRect();
-        if(vR.width < vR.height){
-          scale.setValue((int)(100.0 / (double)gR.width * (double)vR.width));
-        }
-        else{
-          scale.setValue((int)(100.0 / (double)gR.height * (double)vR.height));
-        }
+        
+        double widthRatio = (double)vR.width / (double)gR.width;
+        double heightRatio = (double)vR.height / (double)gR.height;
+        
+        double ratioCap = widthRatio < heightRatio ? widthRatio : heightRatio;
+        scale.setValue((int) (ratioCap * 100));
       }
     });
   }
