@@ -131,7 +131,6 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 	  private void updateGraph() {
 		  graphviewer.setUpdatedNodes(updatedNodes);
 		  graphviewer.setUpdatedEdges(updatedEdges);
-		  graphviewer.getGraphCanvas().repaint();
 	  }
 	  
 	  void setGraphViewer(GraphViewer graph){
@@ -153,12 +152,14 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 		  CommunityNode n = null;
 		  boolean stateFound = false;
 		  
-		  if (line.compareTo("v 1 23") == 0) {
-			  int o = 0;
-		  }
-		  
 		  for (String c : line.split(" ")) {
 			  if (c.compareTo("v") == 0) { // Start of line
+				  continue;
+			  } else if (c.compareTo("d") == 0) {
+				  // TODO
+				  continue;
+			  } else if (c.compareTo("p") == 0) {
+				  // TODO
 				  continue;
 			  } else if (!stateFound) { // Var state
 				  stateFound = true;

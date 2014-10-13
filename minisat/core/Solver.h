@@ -216,7 +216,7 @@ protected:
     void     insertVarOrder   (Var x);                                                 // Insert a variable in the decision order priority queue.
     Lit      pickBranchLit    ();                                                      // Return the next decision variable.
     void     newDecisionLevel ();                                                      // Begins a new decision level.
-    void     uncheckedEnqueue (Lit p, CRef from = CRef_Undef);                         // Enqueue a literal. Assumes value of literal is undefined.
+    void     uncheckedEnqueue (Lit p, bool isDecisionVariable, CRef from = CRef_Undef);                         // Enqueue a literal. Assumes value of literal is undefined.
     bool     enqueue          (Lit p, CRef from = CRef_Undef);                         // Test if fact 'p' contradicts current state, enqueue otherwise.
     CRef     propagate        ();                                                      // Perform unit propagation. Returns possibly conflicting clause.
     void     cancelUntil      (int level, bool done);                                             // Backtrack until a certain level.
@@ -275,7 +275,7 @@ private:
     enum CLAUSE_STATES { CLAUSE_ADDED, CLAUSE_REMOVED };
 
     void printClause(const Clause& c, int state);
-    void printVar(const int id, int state);
+    void printVar(const int id, int state, bool isDecisionVariable);
     
 };
 

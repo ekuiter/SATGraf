@@ -153,7 +153,7 @@ bool Solver::addClause_(vec<Lit>& ps)
     if (ps.size() == 0)
         return ok = false;
     else if (ps.size() == 1){
-        uncheckedEnqueue(ps[0]);
+        uncheckedEnqueue(ps[0], false);
         return ok = (propagate() == CRef_Undef);
     }else{
         CRef cr = ca.alloc(ps, false);
@@ -224,7 +224,7 @@ void Solver::cancelUntil(int level, bool done) {
             assigns [x] = l_Undef;
             
             if (!done)
-                printVar(x, VAR_UNASSIGNED);
+                printVar(x, VAR_UNASSIGNED, false);
             
             if (phase_saving > 1 || (phase_saving == 1) && c > trail_lim.last())
                 polarity[x] = sign(trail[c]);
@@ -443,14 +443,14 @@ void Solver::analyzeFinal(Lit p, vec<Lit>& out_conflict)
 }
 
 
-void Solver::uncheckedEnqueue(Lit p, CRef from)
+void Solver::uncheckedEnqueue(Lit p, bool isDecisionVariable, CRef from)
 {
     assert(value(p) == l_Undef);
     assigns[var(p)] = lbool(!sign(p));
     vardata[var(p)] = mkVarData(from, decisionLevel());
     trail.push_(p);
     
-    printVar(var(p), !sign(p) ? VAR_ASSIGNED_TRUE : VAR_ASSIGNED_FALSE);
+    printVar(var(p), !sign(p) ? VAR_ASSIGNED_TRUE : VAR_ASSIGNED_FALSE, isDecisionVariable);
 }
 
 
@@ -514,7 +514,7 @@ CRef Solver::propagate()
                 while (i < end)
                     *j++ = *i++;
             }else
-                uncheckedEnqueue(first, cr);
+                uncheckedEnqueue(first, false, cr);
 
         NextClause:;
         }
@@ -652,13 +652,13 @@ lbool Solver::search(int nof_conflicts)
             cancelUntil(backtrack_level, false);
 
             if (learnt_clause.size() == 1){
-                uncheckedEnqueue(learnt_clause[0]);
+                uncheckedEnqueue(learnt_clause[0], false);
             }else{
                 CRef cr = ca.alloc(learnt_clause, true);
                 learnts.push(cr);
                 attachClause(cr);
                 claBumpActivity(ca[cr]);
-                uncheckedEnqueue(learnt_clause[0], cr);
+                uncheckedEnqueue(learnt_clause[0], false, cr);
             }
 
             varDecayActivity();
@@ -720,7 +720,7 @@ lbool Solver::search(int nof_conflicts)
 
             // Increase decision level and enqueue 'next'
             newDecisionLevel();
-            uncheckedEnqueue(next);
+            uncheckedEnqueue(next, true);
         }
     }
 }
@@ -962,9 +962,15 @@ void Solver::printClause(const Clause& c, int state) {
     Pipe::getInstance()->writeToPipe(ss.str());
 }
 
-void Solver::printVar(const int id, int state) {
+void Solver::printVar(const int id, int state, bool isDecisionVariable) {
     std::ostringstream ss;
     ss << "v";
+    
+    if (isDecisionVariable) {
+        ss << " d"; // Decision variable
+    } else {
+        ss << " p"; // Propagated variable
+    }
     
     if (state == VAR_UNASSIGNED) {
         ss << " 2 ";
