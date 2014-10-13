@@ -6,12 +6,12 @@ import visual.UI.OptionsPanel;
 import visual.community.CommunityGraphViewer;
 import visual.community.CommunityOptionsPanel;
 
-public class EvolutionOptionsPanel2 extends CommunityOptionsPanel {
+public class Evolution2OptionsPanel extends CommunityOptionsPanel {
 	
-	private EvolutionScaler2 scaler;
+	private Evolution2Scaler scaler;
 	CommunityGraphViewer graph;
 	
-	public EvolutionOptionsPanel2(CommunityGraphViewer graph, Collection<String> groups) {
+	public Evolution2OptionsPanel(CommunityGraphViewer graph, Collection<String> groups) {
 		super(graph, groups, false);
 		setGraph(graph);
 		this.graph = graph;
@@ -20,7 +20,7 @@ public class EvolutionOptionsPanel2 extends CommunityOptionsPanel {
 	
 	private void buildLayout(CommunityGraphViewer graph) {
 		OptionsPanel op = getOptionsPanel();
-		scaler = new EvolutionScaler2(graph);
+		scaler = new Evolution2Scaler(graph);
 		op.setCustomComponent(scaler);
 	}
 	

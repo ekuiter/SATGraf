@@ -12,15 +12,15 @@ import visual.community.CommunityGraphViewer;
 import visual.community.CommunityNode;
 import visual.evolution.EvolutionGrapher;
 
-public class EvolutionGrapher2 extends EvolutionGrapher {
+public class Evolution2Grapher extends EvolutionGrapher {
 	
-	  static EvolutionGrapher2 instance = null;
-	  static public EvolutionGrapher2 getInstance() {
+	  static Evolution2Grapher instance = null;
+	  static public Evolution2Grapher getInstance() {
 		  return instance;
 		  
 	  }
 	
-	  public EvolutionGrapher2(String dimacsFile, String communityMetric, String placer, int dumpFreq, HashMap<String, String> patterns, String minisat) {
+	  public Evolution2Grapher(String dimacsFile, String communityMetric, String placer, int dumpFreq, HashMap<String, String> patterns, String minisat) {
 	    super(dimacsFile, communityMetric, placer, 0, patterns, minisat);
 	    instance = this;
 	  }
@@ -36,7 +36,7 @@ public class EvolutionGrapher2 extends EvolutionGrapher {
 	    }
 	    
 	    node_lists.put("All", list);
-	    ((EvolutionGraphFrame2)getFrame()).buildEvolutionFile();
+	    ((Evolution2GraphFrame)getFrame()).buildEvolutionFile();
         graph = cg;
 	    getFrame().show();
 	  }
@@ -44,7 +44,7 @@ public class EvolutionGrapher2 extends EvolutionGrapher {
 	  @Override
 	  public void init(){
 	    graphViewer = new CommunityGraphViewer((CommunityGraph)graph, node_lists, this.placer);
-	    frmMain = new EvolutionGraphFrame2((CommunityGraphViewer)graphViewer, patterns, this);
+	    frmMain = new Evolution2GraphFrame((CommunityGraphViewer)graphViewer, patterns, this);
 	  }
 	  
 	  public static void main(String[] args){
@@ -66,7 +66,7 @@ public class EvolutionGrapher2 extends EvolutionGrapher {
 	    for(int i = 5; i < args.length; i+=2){
 	      patterns.put(args[i], args[i + 1]);
 	    }
-	    EvolutionGrapher2 ag = new EvolutionGrapher2(args[0], args[1], args[2], Integer.parseInt(args[3]), patterns, args[4]);
+	    Evolution2Grapher ag = new Evolution2Grapher(args[0], args[1], args[2], Integer.parseInt(args[3]), patterns, args[4]);
 	    try{
 	      ag.generateGraph();
 	      ag.init();

@@ -15,15 +15,15 @@ import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import visual.community.CommunityGraphFrame;
-import visual.evolution2.EvolutionGraphFrame2;
+import visual.evolution2.Evolution2GraphFrame;
 
 /**
  *
  * @author zacknewsham
  */
-public class OpenAction extends visual.actions.OpenAction<EvolutionGraphFrame2>{
+public class OpenAction extends visual.actions.OpenAction<Evolution2GraphFrame>{
 
-  public OpenAction(EvolutionGraphFrame2 frame) {
+  public OpenAction(Evolution2GraphFrame frame) {
     super(frame);
   }
 

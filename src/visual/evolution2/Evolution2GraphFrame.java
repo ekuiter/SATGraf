@@ -19,19 +19,19 @@ import visual.community.CommunityGraphFrame;
 import visual.community.CommunityGraphViewer;
 import visual.community.CommunityGrapher;
 
-public class EvolutionGraphFrame2 extends CommunityGraphFrame {
+public class Evolution2GraphFrame extends CommunityGraphFrame {
 	
 	static String dumpFileDirectory = System.getProperty("user.dir") + "/minisat/piping/";
 	static String pipeFileName = dumpFileDirectory + "myPipe.txt";
 	static String outputDirectory = dumpFileDirectory + "output/";
 	
-	EvolutionGrapher2 grapher;
+	Evolution2Grapher grapher;
 	int fileNumber = 0;
 	int lineNumber = 0;
 	static int maxLinesPerFile = 1000;
 	PrintWriter writer = null;
 	
-    public EvolutionGraphFrame2(CommunityGraphViewer graphViewer, HashMap<String, Pattern> patterns, EvolutionGrapher2 grapher) {
+    public Evolution2GraphFrame(CommunityGraphViewer graphViewer, HashMap<String, Pattern> patterns, Evolution2Grapher grapher) {
       super(graphViewer, patterns);
       this.grapher = grapher;
       createOutputFolder();
@@ -78,7 +78,7 @@ public class EvolutionGraphFrame2 extends CommunityGraphFrame {
     public void show() {
         if(graphViewer != null) {
             canvasPanel = new GraphCanvasPanel(new CommunityCanvas(graphViewer));
-            panel = new EvolutionOptionsPanel2(getGraphViewer(), patterns.keySet());
+            panel = new Evolution2OptionsPanel(getGraphViewer(), patterns.keySet());
             super.show();
             buildEvolutionFile();
         } else {
@@ -117,7 +117,7 @@ public class EvolutionGraphFrame2 extends CommunityGraphFrame {
 	}
 	  
 	private void closeWriter() {
-		((EvolutionOptionsPanel2)panel).newFileReady(lineNumber);
+		((Evolution2OptionsPanel)panel).newFileReady(lineNumber);
 		writer.close();
 	}
 	

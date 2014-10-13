@@ -31,12 +31,12 @@ import visual.graph.GraphViewer;
 import visual.graph.Node;
 import visual.graph.Node.NodeAssignmentState;
 
-public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionListener {
+public class Evolution2Scaler extends JPanel implements ChangeListener, ActionListener {
 	  
 	  private final JSlider progress = new JSlider(0, 0, 0);
 	  private GraphViewer graphviewer;
-	  static String outputDirectory = EvolutionGraphFrame2.outputDirectory;
-	  static int linesPerFile = EvolutionGraphFrame2.maxLinesPerFile;
+	  static String outputDirectory = Evolution2GraphFrame.outputDirectory;
+	  static int linesPerFile = Evolution2GraphFrame.maxLinesPerFile;
 	  int totalFiles = 0;
 	  int currentFile = -1;
 	  int nextFile = -1;
@@ -53,7 +53,7 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 	  private Timer changeSlideTimer = new Timer(10, this);
 	  private final JButton play = new JButton("Play");
 	  
-	  public EvolutionScaler2(GraphViewer graphviewer){
+	  public Evolution2Scaler(GraphViewer graphviewer){
 	    this.graphviewer = graphviewer;
 	    
 	    progress.setSize(new Dimension(100, 20));
@@ -148,7 +148,7 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 		}
 	  
 	  private void parseNodeLine(String line, boolean forwards) {
-		  CommunityGraph graph = EvolutionGrapher2.getInstance().getGraph();
+		  CommunityGraph graph = Evolution2Grapher.getInstance().getGraph();
 		  NodeAssignmentState state = NodeAssignmentState.UNASSIGNED;
 		  CommunityNode n = null;
 		  boolean stateFound = false;
@@ -195,7 +195,7 @@ public class EvolutionScaler2 extends JPanel implements ChangeListener, ActionLi
 	  
 	  private void parseEdgeLine(String line, boolean forwards) {
 		  ArrayList<CommunityNode> nodes = new ArrayList<CommunityNode>();
-		  CommunityGraph graph = EvolutionGrapher2.getInstance().getGraph();
+		  CommunityGraph graph = Evolution2Grapher.getInstance().getGraph();
 		  boolean addEdge = true;
 		  
 		  for (String c : line.split(" ")) {

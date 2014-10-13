@@ -2,7 +2,7 @@
 import java.net.URISyntaxException;
 import visual.community.CommunityGrapher;
 import visual.evolution.EvolutionGrapher;
-import visual.evolution2.EvolutionGrapher2;
+import visual.evolution2.Evolution2Grapher;
 import visual.implication.ImplicationGrapher;
 
 /*
@@ -39,7 +39,7 @@ public class Main {
       EvolutionGrapher.main(newargs);
     }
     else if(args[0].equals("evo2")){
-      EvolutionGrapher2.main(newargs);
+      Evolution2Grapher.main(newargs);
     }
   }
   
@@ -49,7 +49,7 @@ public class Main {
     builder.append("com ").append(CommunityGrapher.usage()).append("\n").append(CommunityGrapher.help()).append("\n\n");
     builder.append("imp ").append(ImplicationGrapher.usage()).append("\n").append(ImplicationGrapher.help()).append("\n\n");
     builder.append("evo ").append(EvolutionGrapher.usage()).append("\n").append(EvolutionGrapher.help()).append("\n\n");
-    builder.append("evo2 ").append(EvolutionGrapher2.usage()).append("\n").append(EvolutionGrapher2.help()).append("\n\n");
+    builder.append("evo2 ").append(Evolution2Grapher.usage()).append("\n").append(Evolution2Grapher.help()).append("\n\n");
     
     return builder.toString();
   }
