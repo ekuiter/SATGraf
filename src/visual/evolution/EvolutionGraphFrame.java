@@ -86,35 +86,6 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     return json.toString();
   }
   
-  
-  public void open(File file){
-    try {
-      String[] parts = file.getAbsolutePath().split("\\.");
-      if(parts[parts.length - 1].equals("cnf")){
-        /*CommunityGrapher grapher = new CommunityGrapher(file.getAbsolutePath(), "ol", "f", new HashMap<String, String>());
-        grapher.generateGraph();
-        this.graphViewer = new CommunityGraphViewer(grapher.getGraph(), grapher.getNode_lists(), grapher.placer);
-        this.patterns = new HashMap<>();
-        init();
-        this.panel = null;
-        show();*/
-      }
-      else{
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        StringBuilder contents = new StringBuilder();
-        String line;
-        while((line = reader.readLine()) != null){
-          contents.append(line).append("\n");
-        }
-        JSONObject json = (JSONObject)JSONValue.parse(contents.toString());
-        this.fromJson(json);
-      }
-    } 
-    catch (IOException ex) {
-      Logger.getLogger(CommunityGraphFrame.class.getName()).log(Level.SEVERE, null, ex);
-    }
-  }
-  
   public void init(){
     super.init();
   }

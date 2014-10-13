@@ -3,15 +3,21 @@ package visual.evolution2;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import visual.NamedFifo;
 import visual.UI.GraphCanvasPanel;
 import visual.community.CommunityCanvas;
 import visual.community.CommunityGraphFrame;
 import visual.community.CommunityGraphViewer;
+import visual.community.CommunityGrapher;
 
 public class EvolutionGraphFrame2 extends CommunityGraphFrame {
 	
@@ -34,7 +40,41 @@ public class EvolutionGraphFrame2 extends CommunityGraphFrame {
     public void init(){
       super.init();
     }
+    
+    public String toJson(){
+      StringBuilder json = new StringBuilder(super.toJson());
 
+      return json.toString();
+    }
+
+    public void open(File file){
+      try {
+        String[] parts = file.getAbsolutePath().split("\\.");
+        if(parts[parts.length - 1].equals("cnf")){
+          CommunityGrapher grapher = new CommunityGrapher(file.getAbsolutePath(), "ol", "f", new HashMap<String, String>());
+          grapher.generateGraph();
+          this.graphViewer = new CommunityGraphViewer(grapher.getGraph(), grapher.getNode_lists(), grapher.placer);
+          this.patterns = new HashMap<>();
+          init();
+          this.panel = null;
+          show();
+        }
+        else{
+          BufferedReader reader = new BufferedReader(new FileReader(file));
+          StringBuilder contents = new StringBuilder();
+          String line;
+          while((line = reader.readLine()) != null){
+            contents.append(line).append("\n");
+          }
+          JSONObject json = (JSONObject)JSONValue.parse(contents.toString());
+          this.fromJson(json);
+        }
+      } 
+      catch (IOException ex) {
+        Logger.getLogger(CommunityGraphFrame.class.getName()).log(Level.SEVERE, null, ex);
+      }
+    }
+    
     public void show() {
         if(graphViewer != null) {
             canvasPanel = new GraphCanvasPanel(new CommunityCanvas(graphViewer));

@@ -30,7 +30,7 @@ import visual.graph.GraphViewer;
  *
  * @author zacknewsham
  */
-public class GraphFrame extends JFrame{
+public abstract class GraphFrame extends JFrame{
   protected JMenu menu = new JMenu("File");
   protected JMenuBar menuBar = new JMenuBar();
   
@@ -58,6 +58,9 @@ public class GraphFrame extends JFrame{
       Logger.getLogger(GraphFrame.class.getName()).log(Level.SEVERE, null, ex);
     }
   }
+  
+  public abstract OpenAction getOpenAction();
+  
   public void fromJson(JSONObject json){
     this.setLocation(new Point(
       ((Long)json.get("x")).intValue(),
@@ -86,10 +89,6 @@ public class GraphFrame extends JFrame{
     json.append(",\"graphViewer\":").append(graphViewer.toJson()).append("}");
     return json.toString();
   }
-  public void open(File file){
-    
-  }
-  
   
   public GraphViewer getGraphViewer(){
     return graphViewer;
@@ -116,7 +115,15 @@ public class GraphFrame extends JFrame{
       open.removeActionListener(open.getActionListeners()[i]);
     }
     save.addActionListener(new SaveAction(this));
-    open.addActionListener(new OpenAction(this));
+    open.addActionListener(this.getOpenAction());
+    
+  }
+  
+  public void setPanel(GraphOptionsPanel panel){
+    this.panel = panel;
+  }
+  public void setGraphViewer(GraphViewer viewer){
+    this.graphViewer = viewer;
   }
   
   public void show(){

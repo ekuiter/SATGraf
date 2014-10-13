@@ -8,6 +8,7 @@ package visual.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import visual.UI.GraphFrame;
@@ -16,9 +17,9 @@ import visual.UI.GraphFrame;
  *
  * @author zacknewsham
  */
-public class OpenAction implements ActionListener{
-  GraphFrame frame;
-  public OpenAction(GraphFrame frame){
+public abstract class OpenAction<T extends GraphFrame> implements ActionListener{
+  protected T frame;
+  public OpenAction(T frame){
     this.frame = frame;
   }
   @Override
@@ -29,8 +30,10 @@ public class OpenAction implements ActionListener{
     chooser.setFileFilter(filter);
     int returnVal = chooser.showOpenDialog(frame);
     if(returnVal == JFileChooser.APPROVE_OPTION) {
-      frame.open(chooser.getSelectedFile());
+      open(chooser.getSelectedFile());
     }
   }
+  
+  public abstract void open(File file);
   
 }

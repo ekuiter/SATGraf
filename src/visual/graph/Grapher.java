@@ -52,6 +52,7 @@ public abstract class Grapher <T extends Node, T1 extends Edge, T2 extends Claus
   public GraphFrame getFrame(){
     return frmMain;
   }
+  
   public Grapher(String dimacsFile, String mapFile, HashMap<String, String> patterns){
     initPatterns(patterns);
     this.patterns.put(s_named, Pattern.compile(".*"));
@@ -63,9 +64,6 @@ public abstract class Grapher <T extends Node, T1 extends Edge, T2 extends Claus
     initPatterns(patterns);
     this.dimacsFile = null;
     this.mapFile = null;
-  }
-  public void init(){
-    this.frmMain = new GraphFrame(graphViewer);
   }
   
   public Grapher(String dimacsFile, HashMap<String, String> patterns){

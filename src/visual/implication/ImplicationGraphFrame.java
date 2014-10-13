@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 import visual.UI.GraphCanvasPanel;
 import visual.UI.GraphFrame;
 import visual.UI.SimpleCanvas;
+import visual.actions.OpenAction;
+import visual.actions.UnopenableAction;
 import visual.graph.GraphViewer;
 
 /**
@@ -28,4 +30,8 @@ public class ImplicationGraphFrame extends GraphFrame{
     panel = new ImplicationOptionsPanel((ImplicationGraphViewer)graphViewer, patterns.keySet());
   }
   
+  @Override
+  public OpenAction getOpenAction(){
+    return new UnopenableAction(this);
+  }
 }
