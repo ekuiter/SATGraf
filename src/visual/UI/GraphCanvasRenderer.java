@@ -53,7 +53,7 @@ public class GraphCanvasRenderer extends JPanel implements TableCellRenderer {
 
   @Override
   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-    GraphCanvas canvas = (GraphCanvas) table;
+	GraphCanvas canvas = (GraphCanvas) table;
     image = null;
     if(images.get(table) == null){
       images.put(table, new ArrayList<TiledImage>());
@@ -67,14 +67,14 @@ public class GraphCanvasRenderer extends JPanel implements TableCellRenderer {
     }
     
     // Check to see if it is necessary to redraw the image
-    boolean draw = image == null || isRedrawImageNecessary();
+    boolean draw = isRedrawImageNecessary();
     if (image == null) {
     	createNewImage(table, row, column, canvas);
     } 
     
     if (draw) {
     	PaintThread p = new PaintThread(canvas, new Rectangle(column * (int) (FRAME_WIDTH / graph.getScale()), row * (int) (FRAME_HEIGHT / graph.getScale()), (column + 1) * (int) (FRAME_WIDTH / graph.getScale()), (row + 1) * (int) (FRAME_HEIGHT / graph.getScale())), image, null);
-        canvas.paintThread(p);
+		canvas.paintThread(p);
     }
     
     return this;
@@ -108,7 +108,26 @@ private void createNewImage(JTable table, int row, int column, GraphCanvas canva
     g2.drawImage(image, new AffineTransformOp(AffineTransform.getScaleInstance(FRAME_WIDTH / (double) image.getWidth(), FRAME_HEIGHT / (double) image.getHeight()), AffineTransformOp.TYPE_BICUBIC), 0, 0);//, 0, 0, image.getWidth(), image.getHeight(), this);
 
     drawNodeHighlight(g, g2);
+    
+    Node decisionVariable = graph.getDecisionVariable();
+    if (decisionVariable != null)
+    	drawDecisionVariable(decisionVariable, g);
   }
+  
+  private void drawDecisionVariable(Node n, Graphics g) {
+	    int scaled_diameter = (int) Math.ceil(DrawableNode.NODE_DIAMETER * 2 * graph.getScale());
+	    int radius = scaled_diameter / 2;
+	    
+	    g.setColor(HIGHLIGHT_COLOR);
+	    
+	    int x = (int) ((n.getX(graph) - image.origin.x) * graph.getScale()) - radius;
+	    int y = (int) ((n.getY(graph) - image.origin.y) * graph.getScale()) - radius;
+	    
+	    g.fillArc(x,
+	              y,
+	              scaled_diameter,
+	              scaled_diameter, 0, 360);
+	}
 
 	private void drawNodeHighlight(Graphics g, Graphics2D g2) {
 		Node n = graph.getSelectedNode();
@@ -122,7 +141,7 @@ private void createNewImage(JTable table, int row, int column, GraphCanvas canva
 	      Iterator<Edge> es = n.getEdges();
 	      while (es.hasNext()) {
 	        Edge e = es.next();
-	        if (!e.getStart().isVisible() || !e.getEnd().isVisible()) {
+	        if (!graph.showEdge(e)) {
 	          continue;
 	        }
 	        g2.setColor(HIGHLIGHT_COLOR);
@@ -153,8 +172,8 @@ private void createNewImage(JTable table, int row, int column, GraphCanvas canva
 	      }
 	      g2.setStroke(s);
 	      g.setColor(HIGHLIGHT_COLOR);
-	      int x = (int) (n.getX(graph) * graph.getScale()) - image.getBounds().x;
-	      int y = (int) (n.getY(graph) * graph.getScale()) - image.getBounds().y;
+	      int x = (int) ((n.getX(graph) - image.origin.x) * graph.getScale());
+	      int y = (int) ((n.getY(graph) - image.origin.y) * graph.getScale());
 	      g.fillArc(x,
 	              y,
 	              scaled_diameter,
