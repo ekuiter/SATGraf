@@ -12,8 +12,10 @@ import java.util.regex.Pattern;
 import visual.UI.GraphCanvasPanel;
 import visual.UI.GraphFrame;
 import visual.UI.SimpleCanvas;
+import visual.actions.ExportAction;
 import visual.actions.OpenAction;
-import visual.actions.UnopenableAction;
+import visual.actions.UnExportableAction;
+import visual.actions.UnOpenableAction;
 import visual.graph.GraphViewer;
 
 /**
@@ -32,6 +34,11 @@ public class ImplicationGraphFrame extends GraphFrame{
   
   @Override
   public OpenAction getOpenAction(){
-    return new UnopenableAction(this);
+    return new UnOpenableAction(this);
+  }
+  
+  @Override
+  public ExportAction getExportAction(){
+    return new UnExportableAction(this);
   }
 }

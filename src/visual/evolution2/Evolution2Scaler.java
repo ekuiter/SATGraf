@@ -120,6 +120,10 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 			}
 		  }
 	  }
+      
+      public int getMaxLine(){
+        return progress.getMaximum();
+      }
 	  
 	  private void updateProgress() {
 		  progress.removeChangeListener(this);
@@ -338,7 +342,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  return currentFileLines.get(lineInCurrentFile);
 	  }
 	  
-	  private void advanceEvolution(int startingLine, int endingLine) throws InterruptedException {
+	  public void advanceEvolution(int startingLine, int endingLine) throws InterruptedException {
 		  updatedNodes = new ArrayList<Node>();
 		  updatedEdges = new ArrayList<Edge>();
 		  

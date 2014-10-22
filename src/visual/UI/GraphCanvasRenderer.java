@@ -44,7 +44,7 @@ public class GraphCanvasRenderer extends JPanel implements TableCellRenderer {
   private TiledImage image = null;
   private GraphViewer graph;
   private GraphCanvas canvas;
-
+  public static int running = 0;
   public GraphCanvasRenderer(GraphCanvas canvas, GraphViewer graph) {
     this.graph = graph;
     this.setSize(new Dimension(FRAME_WIDTH, FRAME_HEIGHT));
@@ -73,8 +73,14 @@ public class GraphCanvasRenderer extends JPanel implements TableCellRenderer {
     } 
     
     if (draw) {
+      synchronized(this){
+        running++;
+      }
     	PaintThread p = new PaintThread(canvas, new Rectangle(column * (int) (FRAME_WIDTH / graph.getScale()), row * (int) (FRAME_HEIGHT / graph.getScale()), (column + 1) * (int) (FRAME_WIDTH / graph.getScale()), (row + 1) * (int) (FRAME_HEIGHT / graph.getScale())), image, null);
         canvas.paintThread(p);
+      synchronized(this){
+        running--;
+      }
     }
     
     return this;

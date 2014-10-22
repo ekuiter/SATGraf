@@ -73,6 +73,10 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
     return canvas;
   }
   
+  public GraphOptionsPanel getOptionsPanel(){
+    return panel;
+  }
+  
   @Override
   public void actionPerformed(ActionEvent e) {
 	if (canvas == null || panel == null)

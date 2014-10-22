@@ -9,6 +9,7 @@ package visual.UI;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.io.File;
@@ -22,6 +23,7 @@ import javax.swing.JSplitPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.json.simple.JSONObject;
+import visual.actions.ExportAction;
 import visual.actions.OpenAction;
 import visual.actions.SaveAction;
 import visual.graph.GraphViewer;
@@ -60,7 +62,11 @@ public abstract class GraphFrame extends JFrame{
   }
   
   public abstract OpenAction getOpenAction();
+  public abstract ExportAction getExportAction();
   
+  public GraphCanvasPanel getCanvasPanel(){
+    return canvasPanel;
+  }
   public void fromJson(JSONObject json){
     this.setLocation(new Point(
       ((Long)json.get("x")).intValue(),
@@ -116,9 +122,9 @@ public abstract class GraphFrame extends JFrame{
     }
     save.addActionListener(new SaveAction(this));
     open.addActionListener(this.getOpenAction());
+    export.addActionListener(this.getExportAction());
     
   }
-  
   public void setPanel(GraphOptionsPanel panel){
     this.panel = panel;
   }

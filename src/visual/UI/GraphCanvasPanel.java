@@ -9,6 +9,7 @@ package visual.UI;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Toolkit;
 
 import javax.swing.BorderFactory;
@@ -42,6 +43,27 @@ public class GraphCanvasPanel extends JPanel{
   }
   public int getVerticalScrollPosition(){
     return canvasPane.getVerticalScrollBar().getValue();
+  }
+  public void setVerticalScrollPosition(int pos){
+    canvasPane.getVerticalScrollBar().setValue(pos);
+    canvasPane.updateUI();
+    canvasPane.revalidate();
+    canvasPane.repaint();
+  }
+  public void setHorizontalScrollPosition(int pos){
+    canvasPane.getHorizontalScrollBar().setValue(pos);
+    canvasPane.updateUI();
+    canvasPane.revalidate();
+    canvasPane.repaint();
+  }
+  public int getFullWidth(){
+    return canvas.getWidth();
+  }
+  public int getFullHeight(){
+    return canvas.getHeight();
+  }
+  public void paintFull(Graphics g){
+    canvas.paint(g);
   }
   public void repaint(){
     super.repaint();

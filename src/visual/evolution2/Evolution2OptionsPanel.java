@@ -8,7 +8,7 @@ import visual.community.CommunityOptionsPanel;
 
 public class Evolution2OptionsPanel extends CommunityOptionsPanel {
 	
-	private Evolution2Scaler scaler;
+	Evolution2Scaler scaler;
 	CommunityGraphViewer graph;
 	
 	public Evolution2OptionsPanel(CommunityGraphViewer graph, Collection<String> groups) {

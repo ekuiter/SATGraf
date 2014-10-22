@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import visual.community.CommunityGraphFrame;
-import visual.evolution2.Evolution2GraphFrame;
 
 /**
  *

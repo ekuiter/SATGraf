@@ -6,16 +6,9 @@
 
 package visual.community;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import visual.UI.GraphCanvasPanel;
 import visual.UI.GraphFrame;
 import visual.evolution.EvolutionGraphFrame;
@@ -74,5 +67,10 @@ public class CommunityGraphFrame extends GraphFrame{
   @Override
   public visual.actions.OpenAction getOpenAction(){
     return new OpenAction(this);
+  }  
+  
+  @Override
+  public visual.actions.ExportAction getExportAction(){
+    return new ExportAction(this);
   }  
 }

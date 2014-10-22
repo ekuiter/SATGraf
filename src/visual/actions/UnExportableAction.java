@@ -13,14 +13,14 @@ import visual.UI.GraphFrame;
  *
  * @author zacknewsham
  */
-public class UnopenableAction extends OpenAction{
+public class UnExportableAction extends ExportAction<GraphFrame>{
 
-  public UnopenableAction(GraphFrame frame) {
+  public UnExportableAction(GraphFrame frame) {
     super(frame);
   }
 
   @Override
-  public void open(File file) {
+  public void export(File file) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
   
