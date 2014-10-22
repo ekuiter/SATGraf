@@ -50,6 +50,8 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   private final Timer actionTimer = new Timer(100, this);
   private boolean showAssignedVars = false;
   
+  private Node decisionVariable = null;
+  
   private Collection<Node> updatedNodes = null;
   
   public GraphViewer(Graph graph, HashMap<String, TIntObjectHashMap<String>> node_lists){
@@ -444,5 +446,27 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
 	
 	public boolean getShowAssignedVars() {
 		return this.showAssignedVars;
+	}
+	
+	public void setDecisionVariable(Node n) {
+		this.decisionVariable = n;
+	}
+	
+	public Node getDecisionVariable() {
+		return this.decisionVariable;
+	}
+	
+	public void clearDecisionVariable() {
+		this.decisionVariable = null;
+	}
+	
+	public boolean showEdge(Edge e) {
+		if (e.getAssignmentState() == EdgeState.HIDE || e.getState() == EdgeState.HIDE) {
+			return false;
+		} else if (!getShowAssignedVars() && (e.getStart().isAssigned() || e.getEnd().isAssigned())) {
+			return false;
+		}
+		
+		return true;
 	}
 }

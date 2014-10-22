@@ -86,23 +86,25 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
   }*/
   
   public void reset(){
-    //image = null;
-    //images.clear();
     renderer.reset();
     ((GraphTableModel)this.getModel()).reset();
   }
   
-  protected void drawNode(Node n, Rectangle o,Graphics image) {
+  protected void drawNode(Node n, Rectangle o, Graphics image) {	  
 	if (!graph.getShowAssignedVars() && n.isAssigned())
 		return;
-	  
-    Rectangle i = image.getClipBounds();
-    int x = n.getX(graph) - (o.x - i.x);
-    int y = n.getY(graph) - (o.y - i.y);
-    image.setColor(n.getColor(graph));
-    image.drawArc(x, y, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER, 0, 360);
-    image.setColor(n.getFillColor(graph));
-    image.fillArc(x, y, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER, 0, 360);
+	
+	drawNodeWithColor(n, o, image, n.getColor(graph), n.getFillColor(graph));
+  }
+  
+  public void drawNodeWithColor(Node n, Rectangle o, Graphics image, Color color, Color fillColor) {
+	  Rectangle i = image.getClipBounds();
+	  int x = n.getX(graph) - (o.x - i.x);
+	  int y = n.getY(graph) - (o.y - i.y);
+	  image.setColor(color);
+	  image.drawArc(x, y, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER, 0, 360);
+	  image.setColor(fillColor);
+	  image.fillArc(x, y, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER, 0, 360);
   }
   
   /*public void paintComponent(Graphics g){
@@ -132,11 +134,8 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
   }*/
 
   protected void drawConnection(Edge c, Rectangle o,Graphics image) {
-	if (c.getAssignmentState() == EdgeState.HIDE || c.getState() == EdgeState.HIDE) {
+	if (!graph.showEdge(c))
 		return;
-	} else if (!graph.getShowAssignedVars() && (c.getStart().isAssigned() || c.getEnd().isAssigned())) {
-		return;
-	}
 	  
     Rectangle i = image.getClipBounds();
     if(c.getStart().isVisible() && c.getEnd().isVisible()){
