@@ -22,7 +22,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame {
 	Evolution2Grapher grapher;
 	int fileNumber = 0;
 	int lineNumber = 0;
-	static int maxLinesPerFile = 1000;
+	static int maxLinesPerFile = 10000;
 	PrintWriter writer = null;
 	
     public Evolution2GraphFrame(CommunityGraphViewer graphViewer, HashMap<String, Pattern> patterns, Evolution2Grapher grapher) {

@@ -38,13 +38,14 @@ import visual.graph.Node;
  */
 public class GraphCanvasRenderer extends JPanel implements TableCellRenderer {
 
-  public static int FRAME_WIDTH = 1000;
-  public static int FRAME_HEIGHT = 500;
+  public static int FRAME_WIDTH = 500;
+  public static int FRAME_HEIGHT = 250;
   private static HashMap<JTable, ArrayList<TiledImage>> images = new HashMap<JTable, ArrayList<TiledImage>>();
   private TiledImage image = null;
   private GraphViewer graph;
   private GraphCanvas canvas;
   public static int running = 0;
+  
   public GraphCanvasRenderer(GraphCanvas canvas, GraphViewer graph) {
     this.graph = graph;
     this.setSize(new Dimension(FRAME_WIDTH, FRAME_HEIGHT));
@@ -66,28 +67,14 @@ public class GraphCanvasRenderer extends JPanel implements TableCellRenderer {
       }
     }
     
-    // Check to see if it is necessary to redraw the image
-    boolean draw = isRedrawImageNecessary();
     if (image == null) {
     	createNewImage(table, row, column, canvas);
     } 
     
-    if (draw) {
-    	PaintThread p = new PaintThread(canvas, new Rectangle(column * (int) (FRAME_WIDTH / graph.getScale()), row * (int) (FRAME_HEIGHT / graph.getScale()), (column + 1) * (int) (FRAME_WIDTH / graph.getScale()), (row + 1) * (int) (FRAME_HEIGHT / graph.getScale())), image, null);
-        canvas.paintThread(p);
-    }
-    
-    return this;
-  }
+	PaintThread p = new PaintThread(canvas, new Rectangle(column * (int) (FRAME_WIDTH / graph.getScale()), row * (int) (FRAME_HEIGHT / graph.getScale()), (column + 1) * (int) (FRAME_WIDTH / graph.getScale()), (row + 1) * (int) (FRAME_HEIGHT / graph.getScale())), image, null);
+    canvas.paintThread(p);
 
-  private boolean isRedrawImageNecessary() {
-	  if (image == null)
-		  return true;
-	  
-	  if (graph.getOrderedUpdatedNodes(image.getBounds()).size() != 0)
-		  return true;
-	  
-	  return false;
+    return this;
   }
   
 private void createNewImage(JTable table, int row, int column, GraphCanvas canvas) {

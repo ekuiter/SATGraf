@@ -56,6 +56,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	  private Timer changeSlideTimer = new Timer(10, this);
 	  private final JButton play = new JButton("Play");
 	  private boolean timerTriggered = false;
+	  private boolean progressClicked = false;
 	  
 	  public Evolution2Scaler(GraphViewer graphviewer){
 	    this.graphviewer = graphviewer;
@@ -89,6 +90,19 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	    });
 	    
 	    progress.addChangeListener(this);
+	    progress.addMouseListener(new MouseAdapter() {
+	    	@Override
+	    	public void mouseClicked(MouseEvent e) {
+	    		super.mouseClicked(e);
+	    		progressClicked = true;
+	    	}
+	    	
+	    	@Override
+	    	public void mouseReleased(MouseEvent e) {
+	    		super.mouseReleased(e);
+	    		progressClicked = false;
+	    	}
+		});
 	  }
 	  
 	  private void stopTimer() {
@@ -110,6 +124,9 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	  
 	  @Override
 	  public void stateChanged(ChangeEvent e) {
+		  if (progressClicked)
+			  return; // Wait until user is no longer dragging
+		  
 		  graphviewer.clearDecisionVariable();
 		  updatePosition(progress.getValue());
 		  timerTriggered = false;
@@ -217,6 +234,9 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 			  
 			  if (n.getAssignmentState() != prevState || isDecisionVariable) // Will redraw the node if it has changed at all
 				  updatedNodes.add(n);
+			  if (n.getAssignmentState() != prevState) { // Must add all connected nodes as well to redraw the edges
+				  updatedEdges.addAll(n.getEdgesList());
+			  }
 		  }
 	  }
 	  
@@ -433,7 +453,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  if (currentPosition == -1) {
 			  update = 1;
 		  } else {
-			  update = currentPosition+10;
+			  update = currentPosition+100;
 		  }
 		  
 		  timerTriggered = true;

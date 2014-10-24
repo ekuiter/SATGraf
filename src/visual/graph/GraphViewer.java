@@ -49,6 +49,8 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   protected final ArrayList yOrderedNodes = new ArrayList<T>();
   private final Timer actionTimer = new Timer(100, this);
   private boolean showAssignedVars = false;
+  private Rectangle bounds = null;
+  private boolean rectangleHasUpdate = false;
   
   private Node decisionVariable = null;
   
@@ -320,8 +322,10 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
 	  if (this.updatedNodes == null) {
 		  this.updatedNodes = updatedNodes;
 	  } else {
-		  for (Node n : updatedNodes) {
-			  this.updatedNodes.add(n);
+		  synchronized (this.updatedNodes) {
+			  for (Node n : updatedNodes) {
+				  this.updatedNodes.add(n);
+			  }
 		  }
 	  }
 	  updateCanvas();
@@ -333,7 +337,9 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
 	  if (this.updatedNodes == null)
 		  this.updatedNodes = new ArrayList<Node>();
 	  
-	  this.updatedNodes.add(n);
+	  synchronized (this.updatedNodes) {
+		  this.updatedNodes.add(n);
+	  }
 	  
 	  if (updateCanvas)
 		  updateCanvas();
@@ -357,13 +363,6 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
 	  e.setState(s);
   }
   
-  public Collection<Node> getUpdatedNodesAndSetToNull() {
-	  Collection<Node> updatedNodes = this.updatedNodes;
-	  this.updatedNodes = null;
-	  
-	  return updatedNodes;
-  }
-  
   public Iterator<Edge> getEdgeIterator() {
 	  return graph.getEdges();
   }
@@ -373,15 +372,19 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   }
   
   public Rectangle getBounds(){
-	//ensure we have an ordered list
-	getOrderedUpdatedNodes(new Rectangle(0, 0, 1000, 1000));
-	
-	int minX = ((T)xOrderedNodes.get(0)).getX(this) - 50;
-	int minY = ((T)yOrderedNodes.get(0)).getY(this) - 50;
-	int maxX = ((T)xOrderedNodes.get(xOrderedNodes.size() - 1)).getX(this) + 50;
-	int maxY = ((T)yOrderedNodes.get(yOrderedNodes.size() - 1)).getY(this) + 50;
-	
-	return new Rectangle(minX, minY, maxX, maxY);
+	  if (bounds == null) {
+		//ensure we have an ordered list
+		getOrderedUpdatedNodes(new Rectangle(0, 0, 2000, 2000), false);
+		
+		int minX = ((T)xOrderedNodes.get(0)).getX(this) - 50;
+		int minY = ((T)yOrderedNodes.get(0)).getY(this) - 50;
+		int maxX = ((T)xOrderedNodes.get(xOrderedNodes.size() - 1)).getX(this) + 50;
+		int maxY = ((T)yOrderedNodes.get(yOrderedNodes.size() - 1)).getY(this) + 50;
+		
+		bounds = new Rectangle(minX, minY, maxX, maxY);
+	  }
+	  
+	  return bounds;
   }	
   
 	public Iterator<T> getNodes(String group){
@@ -399,47 +402,56 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
 	    return nodeGroups.get(group).valueCollection().iterator();
 	}
 	
-	public ArrayList<Node> getOrderedUpdatedNodes(Rectangle bounds) {
-		 if(xOrderedNodes.isEmpty()){
+	public ArrayList<Node> getOrderedUpdatedNodes(Rectangle bounds, boolean removeUpdatedNodes) {
+		ArrayList<Node> xy = new ArrayList<Node>();
+		
+		synchronized (this.updatedNodes) {
+			boolean rectangleHasUpdate = false;
+			
+			 if(xOrderedNodes.isEmpty()){
 		        xOrderedNodes.clear();
 		        yOrderedNodes.clear();
-		        xOrderedNodes.addAll(updatedNodes);
+	        	xOrderedNodes.addAll(updatedNodes);
+	        	yOrderedNodes.addAll(updatedNodes);
 		        Collections.sort(xOrderedNodes, new Node.XComparator(this));
-		        yOrderedNodes.addAll(updatedNodes);
 		        Collections.sort(yOrderedNodes, new Node.YComparator(this));
 		      }
-		      
-		    ArrayList y = new ArrayList<Node>();
-		    
-		    ArrayList<Node> xy = new ArrayList<Node>();
-		    int firstX = findFirstXIndex(xOrderedNodes, bounds.x - OVERLAP);
-		    T prevNode = null;
-		    
-		    for(int i = firstX; i < xOrderedNodes.size(); i++){
-		      T xn = (T)xOrderedNodes.get(i);
-		      if(getX(xn) >= bounds.x && xn.getY(this) >= bounds.y - OVERLAP && xn.getY(this) <= bounds.y + bounds.height + OVERLAP){
-		        if(getX(xn) <= bounds.x + bounds.width + OVERLAP){
-		          if(xn.isVisible() && xn != prevNode){
-		            xy.add(xn);
-		            prevNode = xn;
-		          }
-		        }
-		        else{
-		          break;
-		        }
-		      }
-		    }
+			      
+			    ArrayList y = new ArrayList<Node>();
+			    
+			    int firstX = findFirstXIndex(xOrderedNodes, bounds.x - OVERLAP);
+			    T prevNode = null;
+			    
+			    
+		    	for(int i = firstX; i < xOrderedNodes.size(); i++){
+		    		T xn = (T)xOrderedNodes.get(i);
+		    		int xnx = xn.getX(this);
+		    		int xny = xn.getY(this);
+		    		
+		    		if(xnx >= bounds.x && xny >= bounds.y && xny <= bounds.height){
+		    			if(xnx <= bounds.width){
+		    				if(xn.isVisible() && xn != prevNode){
+		    					xy.add(xn);
+		    					prevNode = xn;
+		    					
+		    					if (removeUpdatedNodes && updatedNodes.contains(xn)) {
+		    						updatedNodes.remove(xn);
+		    						rectangleHasUpdate = true;
+		    					}
+		    				}
+		    			}
+		    			else{
+		    				break;
+		    			}
+		    		}
+			    }
+		    	
+		    	this.rectangleHasUpdate = rectangleHasUpdate;
+		}
 		    
 		    return xy;
 	}
 	
-	public ArrayList<Node> getOrderedUpdatedNodesAndSetToNull(Rectangle bounds){
-		ArrayList<Node> xy = getOrderedUpdatedNodes(bounds);
-	    
-	    updatedNodes = null;
-	    return xy;
-	  }
-  
 	public void setShowAssignedVars(boolean show) {
 		this.showAssignedVars = show;
 	}
@@ -468,5 +480,16 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
 		}
 		
 		return true;
+	}
+	
+	public boolean doesOrderedNodesHaveUpdate() {
+		return this.rectangleHasUpdate;
+	}
+	
+	public void clearUpdatedNodes() {
+		synchronized (this.updatedNodes) {
+			updatedNodes.clear();
+			updatedNodes = null;
+		}
 	}
 }
