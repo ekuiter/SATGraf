@@ -71,7 +71,7 @@ public class GraphCanvasRenderer extends JPanel implements TableCellRenderer {
     	createNewImage(table, row, column, canvas);
     } 
     
-	PaintThread p = new PaintThread(canvas, new Rectangle(column * (int) (FRAME_WIDTH / graph.getScale()), row * (int) (FRAME_HEIGHT / graph.getScale()), (column + 1) * (int) (FRAME_WIDTH / graph.getScale()), (row + 1) * (int) (FRAME_HEIGHT / graph.getScale())), image, null);
+	PaintThread p = new PaintThread(canvas, new Rectangle(column * (int) (FRAME_WIDTH / graph.getScale()), row * (int) (FRAME_HEIGHT / graph.getScale()), (int) (FRAME_WIDTH / graph.getScale()), (int) (FRAME_HEIGHT / graph.getScale())), image, null);
     canvas.paintThread(p);
 
     return this;

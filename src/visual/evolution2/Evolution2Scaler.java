@@ -42,8 +42,8 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	  int nextFile = -1;
 	  int currentPosition = -1;
 	  int totalLines = 0;
-	  List<Node> updatedNodes = null;
-	  List<Edge> updatedEdges = null;
+	  List<Node> updatedNodes = new ArrayList<Node>();
+	  List<Edge> updatedEdges = new ArrayList<Edge>();
 	  private JCheckBox showAssignedVarsBox = new JCheckBox("Show Assigned Variables");
 	  
 	  List<String> currentFileLines = null;
@@ -160,6 +160,9 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  graphviewer.setUpdatedNodes(updatedNodes);
 		  graphviewer.setUpdatedEdges(updatedEdges);
 		  graphviewer.getGraphCanvas().repaint();
+		  
+		  updatedEdges.clear();
+		  updatedNodes.clear();
 	  }
 	  
 	  void setGraphViewer(GraphViewer graph){
@@ -181,10 +184,6 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  CommunityNode n = null;
 		  boolean stateFound = false;
 		  boolean isDecisionVariable = false;
-		  
-		  if (line.compareTo("v 1 23") == 0) {
-			  int o = 0;
-		  }
 		  
 		  for (String c : line.split(" ")) {
 			  if (c.compareTo("v") == 0) { // Start of line
@@ -273,7 +272,11 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 				  if (e == null) {
 					  graph.connect(n1, n2, false);
 					  e = graph.getEdge(n1, n2);
-				  } 
+				  }
+				  
+				  if (e == null) {
+					  int o = 0;
+				  }
 				  
 				  prevState = e.getAssignmentState();
 				  
@@ -387,8 +390,6 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	  
 	  public void advanceEvolution(int startingLine, int endingLine) throws InterruptedException {
 		  int lastLine = endingLine;
-		  updatedNodes = new ArrayList<Node>();
-		  updatedEdges = new ArrayList<Edge>();
 		  
 		  if (startingLine < endingLine)
 			  lastLine = forwardsEvolution(startingLine, endingLine);
