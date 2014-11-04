@@ -29,33 +29,38 @@ public class CommunityCanvas extends GraphCanvas{
   @Override
   public void paintThread(PaintThread paint) {
     Rectangle o = paint.getBounds();
-    Graphics image = paint.getGraphics();
-    Rectangle i = image.getClipBounds();
-    image.setColor(Color.BLACK);
-    image.fillRect(i.x, i.y, i.width, i.height);
-    List<CommunityEdge> drawnEdges = new ArrayList<CommunityEdge>();
+    List<Node> nodes = graph.getOrderedUpdatedNodes(o, true);
+    boolean hashUpdatedNode = graph.doesRectangleHaveUpdate();
     
-    Iterator<Node> nodes = graph.getOrderedUpdatedNodesAndSetToNull(o).iterator();
-    while(nodes.hasNext()){
-      Node next = nodes.next();
-      drawNode(next, o, image);
-      
-      Iterator<CommunityEdge> eit = next.getEdges();
-      while(eit.hasNext()) {
-    	  CommunityEdge e = eit.next();
-    	  
-    	  if (drawnEdges.contains(e))
-    		  continue;
-    	  
-    	  if(e.getStart().getCommunity() == e.getEnd().getCommunity() && e.getStart().getCommunity() != -1) {
-    	    image.setColor(e.getColor(graph));
-    	  } else {
-    	    image.setColor(Color.WHITE);
-    	  }
-    	  drawConnection(e, o, image);
-    	  
-    	  drawnEdges.add(e);
-      }
+    if (hashUpdatedNode || nodes.isEmpty()) {
+    	Iterator<Node> nodIt = nodes.iterator();
+    	Graphics image = paint.getGraphics();
+        Rectangle i = image.getClipBounds();
+        image.setColor(Color.BLACK);
+        image.fillRect(i.x, i.y, i.width, i.height);
+        List<CommunityEdge> drawnEdges = new ArrayList<CommunityEdge>();
+        
+        while(nodIt.hasNext()){
+          Node next = nodIt.next();
+          drawNode(next, o, image);
+          
+          Iterator<CommunityEdge> eit = next.getEdges();
+          while(eit.hasNext()) {
+        	  CommunityEdge e = eit.next();
+        	  
+        	  if (drawnEdges.contains(e))
+        		  continue;
+        	  
+        	  if(e.getStart().getCommunity() == e.getEnd().getCommunity() && e.getStart().getCommunity() != -1) {
+        	    image.setColor(e.getColor(graph));
+        	  } else {
+        	    image.setColor(Color.WHITE);
+        	  }
+        	  drawConnection(e, o, image);
+        	  
+        	  drawnEdges.add(e);
+          }
+        }
     }
     
     paint.setFinished(true);
