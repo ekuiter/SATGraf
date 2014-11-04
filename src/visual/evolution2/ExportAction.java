@@ -39,7 +39,7 @@ public class ExportAction extends visual.actions.ExportAction<Evolution2GraphFra
     Evolution2OptionsPanel panel = (Evolution2OptionsPanel)frame.getGraphViewer().getOptionsPanel();
     GraphCanvasPanel canvas = frame.getCanvasPanel();
     double oldscale = frame.getGraphViewer().getScale();
-    frame.getGraphViewer().setScale(0.5);
+    //frame.getGraphViewer().setScale(0.5);
     frame.pack();
     File dir = new File("/tmp/satgraf");
     dir.mkdir();
@@ -56,20 +56,22 @@ public class ExportAction extends visual.actions.ExportAction<Evolution2GraphFra
       try {
         File tmp = new File(String.format("/tmp/satgraf/%d.jpg", i));
         panel.scaler.advanceEvolution(i - 1, i);
+        
         if(i % FRAMES == 0){
-          BufferedImage jpg = new BufferedImage(canvas.getFullWidth(), canvas.getFullHeight(), BufferedImage.TYPE_INT_RGB);
+          BufferedImage jpg = new BufferedImage(canvas.getFullWidth(), canvas.getFullHeight(), BufferedImage.TYPE_BYTE_INDEXED);
           canvas.paintFull(jpg.createGraphics());
           Iterator iter = ImageIO.getImageWritersByFormatName("jpeg");
           ImageWriter writer = (ImageWriter)iter.next();
           ImageWriteParam iwp = writer.getDefaultWriteParam();
           iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-          iwp.setCompressionQuality((float)0.50);   // an integer between 0 and 
+          iwp.setCompressionQuality((float)0.75);   // an integer between 0 and 
           FileImageOutputStream output = new FileImageOutputStream(tmp);
           writer.setOutput(output);
           IIOImage image = new IIOImage(jpg, null, null);
           writer.write(null, image, iwp);
           writer.dispose();
           gif.writeToSequence(jpg);
+          output.close();
         }
       } catch (InterruptedException ex) {
         System.err.println("Error exporting");
@@ -83,6 +85,11 @@ public class ExportAction extends visual.actions.ExportAction<Evolution2GraphFra
       Logger.getLogger(ExportAction.class.getName()).log(Level.SEVERE, null, ex);
     }
     frame.getGraphViewer().setScale(oldscale);
+    try {
+      panel.scaler.advanceEvolution(panel.scaler.getMaxLine() - 1, 0);
+    } catch (InterruptedException ex) {
+      Logger.getLogger(ExportAction.class.getName()).log(Level.SEVERE, null, ex);
+    }
   }
   
 }

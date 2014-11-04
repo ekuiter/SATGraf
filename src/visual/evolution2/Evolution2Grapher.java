@@ -50,7 +50,7 @@ public class Evolution2Grapher extends EvolutionGrapher {
 	  public static void main(String[] args){
 		if (args.length == 0) {
 		    args = new String[]{
-		      "formula/satcomp/dimacs/fiasco.dimacs",
+		      "formula/satcomp/dimacs/toybox.dimacs",
 		      "ol",
 		      "f",
 		      "5",

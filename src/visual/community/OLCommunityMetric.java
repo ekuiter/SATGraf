@@ -252,11 +252,11 @@ public class OLCommunityMetric implements CommunityMetric{
     Iterator<CommunityEdge> edges = graph.getEdges();
     while(edges.hasNext()){
       CommunityEdge e = edges.next();
-      m++;
       int olabel = e.getStart().getId();
       int dlabel = e.getEnd().getId();
       boolean isnewedge = AddEdge(olabel, dlabel);
       if(isnewedge){
+        m++;
         if (!IsExistNode(olabel) && !IsExistNode(dlabel)){
             NewEvent(olabel, dlabel);
         }
@@ -412,7 +412,7 @@ public class OLCommunityMetric implements CommunityMetric{
   
   public static void main(String[] args) throws IOException{
     if(args.length < 1){
-      args = new String[]{"/media/SAT/sat2013/app/SATBench/satchal12-selected/Application_SAT+UNSAT/SATChallenge2012_Application/SAT_Competition_2009_unselected/application/SAT09/APPLICATIONS/crypto/desgen/gss-18-s100.cnf"};
+      args = new String[]{"/media/SAT/sat2013/app/SATBench/SC13_submissions/heule_weaver--arc4/arcfour_initialPermutation_6_14.cnf"};
     }
     getQ(args[0], System.out);
   }

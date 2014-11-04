@@ -216,7 +216,8 @@ public class EvolutionGenerator extends javax.swing.JDialog {
     
     int a = 0;
     while(a == 0 || a > vars_count){
-      a = getLitBetween(1, cmtySize) * coms_count + cmty;
+      a = getLitBetween(1, cmtySize);
+      a = a < 0 ? 0 - (Math.abs(a) * coms_count + cmty) : Math.abs(a) * coms_count + cmty;
     }
     
     int b = 0;

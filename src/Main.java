@@ -1,7 +1,9 @@
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import visual.community.CommunityGrapher;
 import visual.evolution.EvolutionGrapher;
+import visual.evolution.RandomQVTime;
 import visual.evolution2.Evolution2Grapher;
 import visual.implication.ImplicationGrapher;
 
@@ -16,7 +18,7 @@ import visual.implication.ImplicationGrapher;
  * @author zacknewsham
  */
 public class Main {
-  public static void main(String[] args) throws URISyntaxException{
+  public static void main(String[] args) throws URISyntaxException, IOException{
     String[] newargs;
     if(args.length == 0){
       System.out.println("Too few options. Please use:");
@@ -40,6 +42,9 @@ public class Main {
     }
     else if(args[0].equals("evo2")){
       Evolution2Grapher.main(newargs);
+    }
+    else if(args[0].equals("random")){
+      RandomQVTime.main(newargs);
     }
   }
   
