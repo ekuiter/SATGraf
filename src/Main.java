@@ -1,11 +1,11 @@
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import visual.community.CommunityGrapher;
-import visual.evolution.EvolutionGrapher;
-import visual.evolution.RandomQVTime;
-import visual.evolution2.Evolution2Grapher;
-import visual.implication.ImplicationGrapher;
+import com.satgraf.community.UI.CommunityGrapher;
+import com.satgraf.evolution.UI.EvolutionGrapher;
+import com.satgraf.evolution.UI.RandomQVTime;
+import com.satgraf.evolution2.UI.Evolution2Grapher;
+import com.satgraf.implication.UI.ImplicationGrapher;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
