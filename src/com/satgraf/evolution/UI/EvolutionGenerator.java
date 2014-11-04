@@ -187,7 +187,7 @@ public class EvolutionGenerator extends javax.swing.JDialog {
       return;
     }
     CommunityGraph cg = makeCommunity(vars, clauses, coms, target_mod);
-    frame.process(cg);
+    //frame.process(cg);
     this.setVisible(false);
   }//GEN-LAST:event_btnGenerateActionPerformed
 

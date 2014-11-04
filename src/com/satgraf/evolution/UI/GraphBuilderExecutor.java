@@ -6,6 +6,7 @@
 
 package com.satgraf.evolution.UI;
 
+import com.satlib.evolution.EvolutionGraphFactory;
 import java.util.ArrayList;
 
 /**
@@ -14,8 +15,8 @@ import java.util.ArrayList;
  */
 public class GraphBuilderExecutor implements Runnable{
   private final ArrayList<GraphBuilderRunnable> runnables = new ArrayList<>();
-  private final EvolutionGraphFrame callback;
-  public GraphBuilderExecutor(EvolutionGraphFrame callback){
+  private final EvolutionGraphFactory callback;
+  public GraphBuilderExecutor(EvolutionGraphFactory callback){
     this.callback = callback;
   }
   @Override

@@ -6,14 +6,24 @@
 
 package com.satgraf.community.UI;
 
+import com.satgraf.community.placer.FruchPlacer;
+import com.satgraf.community.placer.GridKKPlacer;
+import com.satgraf.community.placer.GridPlacer;
+import com.satgraf.evolution.UI.EvolutionGraphFrame;
+import com.satgraf.graph.UI.GraphCanvasPanel;
+import com.satgraf.graph.UI.GraphFrame;
+import com.satlib.community.CommunityGraph;
+import com.satlib.community.CommunityGraphFactory;
+import com.satlib.community.CommunityGraphFactoryFactory;
 import com.satlib.community.CommunityGraphViewer;
+import com.satlib.community.CommunityMetric;
 import com.satlib.community.JSONCommunityGraph;
+import com.satlib.community.placer.CommunityPlacer;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 import org.json.simple.JSONObject;
-import com.satgraf.graph.UI.GraphCanvasPanel;
-import com.satgraf.graph.UI.GraphFrame;
-import com.satgraf.evolution.UI.EvolutionGraphFrame;
 
 /**
  *
@@ -22,9 +32,12 @@ import com.satgraf.evolution.UI.EvolutionGraphFrame;
 public class CommunityGraphFrame extends GraphFrame{
 
   protected HashMap<String, Pattern> patterns;
-  public CommunityGraphFrame(CommunityGraphViewer graphViewer, HashMap<String, Pattern> patterns) {
+  private CommunityMetric metric;
+  public CommunityGraphFrame(CommunityGraphViewer graphViewer, HashMap<String, Pattern> patterns, CommunityMetric metric) {
     super(graphViewer);
     this.patterns = patterns;
+    this.metric = metric;
+    
   }
   public CommunityGraphViewer getGraphViewer(){
     return (CommunityGraphViewer)graphViewer;
@@ -33,6 +46,7 @@ public class CommunityGraphFrame extends GraphFrame{
   public void setPatterns(HashMap<String, Pattern> patterns){
     this.patterns = patterns;
   }
+  
   
   public void show() {
     if(graphViewer != null && panel == null){
@@ -43,11 +57,24 @@ public class CommunityGraphFrame extends GraphFrame{
     super.show();
   }
   
-  public static void main(String args[]){
-    CommunityGraphFrame frame = new CommunityGraphFrame(null, null);
-    
-    frame.show();
+  public void init(){
+    super.init();
+    metric.getCommunities((CommunityGraph)graphViewer.getGraph());
   }
+  public static CommunityPlacer getPlacer(String placerName, CommunityGraph graph){
+    
+    if(placerName.equals("kk")){
+      return new GridKKPlacer(graph);
+    }
+    else if(placerName.equals("grid")){
+      return new GridPlacer(graph);
+    }
+    else if(placerName.equals("f")){
+      return new FruchPlacer(graph);
+    }
+    return null;
+  }
+  
   public void fromJson(JSONObject json){
     if(!(this instanceof EvolutionGraphFrame)){
       JSONCommunityGraph graph = new JSONCommunityGraph((JSONObject)json.get("graphViewer"));
@@ -75,4 +102,28 @@ public class CommunityGraphFrame extends GraphFrame{
   public com.satgraf.actions.ExportAction getExportAction(){
     return new ExportAction(this);
   }  
+  
+  public static void main(String args[]) throws IOException{
+    if(args.length < 3){
+      args = new String[]{
+        "formula/satcomp/dimacs/toybox.dimacs",
+        "ol",
+        "f"
+      };
+    }
+    
+    HashMap<String, String> patterns = new HashMap<String, String>();
+
+    for (int i = 5; i < args.length; i += 2) {
+      patterns.put(args[i], args[i + 1]);
+    }
+    CommunityGraphFactory factory = (new CommunityGraphFactoryFactory(args[1])).getFactory(new File(args[0]), patterns);
+    factory.makeGraph(new File(args[0]));
+    
+    CommunityGraphViewer graphViewer = new CommunityGraphViewer(factory.getGraph(), factory.getNodeLists(), CommunityGraphFrame.getPlacer(args[2], factory.getGraph()));
+    CommunityGraphFrame frmMain = new CommunityGraphFrame(graphViewer, factory.getPatterns(), factory.getMetric());
+    frmMain.init();
+    
+    frmMain.show();
+  }
 }

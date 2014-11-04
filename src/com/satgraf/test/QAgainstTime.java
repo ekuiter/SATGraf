@@ -20,7 +20,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.satlib.community.CNMCommunityMetric;
 import com.satlib.community.CommunityGraph;
-import com.satgraf.community.UI.CommunityGrapher;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.OLCommunityMetric;
 import com.satgraf.evolution.UI.EvolutionGenerator;
@@ -69,10 +68,10 @@ public class QAgainstTime {
   }
   public void run(double satCompTime) throws IOException{
     System.out.printf("\n%s,",f.getAbsolutePath());
-    CommunityGrapher cg = new CommunityGrapher(f.getAbsolutePath(), "ol","kk",new HashMap<String, String>());
+    /*CommunityGrapher cg = new CommunityGrapher(f.getAbsolutePath(), "ol","kk",new HashMap<String, String>());
     cg.generateGraph();
     CommunityGraph c = cg.getGraph();
-    run(c, satCompTime);
+    run(c, satCompTime);*/
     
     
   }

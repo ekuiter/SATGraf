@@ -6,6 +6,7 @@
 
 package com.satgraf.evolution.UI;
 
+import com.satlib.evolution.EvolutionGraphFactory;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -19,11 +20,11 @@ import com.satlib.graph.Node;
  */
 public class DimacsThread implements Runnable{
   Graph g;
-  EvolutionGrapher callback;
+  EvolutionGraphFactory callback;
   private boolean finished = false;
   private final ArrayList<String> ts = new ArrayList<String>();
   private TIntObjectHashMap<String> n;
-  public DimacsThread(Graph g, EvolutionGrapher callback, TIntObjectHashMap<String> n){
+  public DimacsThread(Graph g, EvolutionGraphFactory callback, TIntObjectHashMap<String> n){
     this.g = g;
     this.callback = callback;
     this.n = n;

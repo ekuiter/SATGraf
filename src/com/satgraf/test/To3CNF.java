@@ -13,7 +13,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import com.satlib.community.CommunityGraph;
-import com.satgraf.community.UI.CommunityGrapher;
 
 /**
  *
@@ -23,13 +22,13 @@ public class To3CNF {
     private QAgainstTime qt = new QAgainstTime();
     public void run(String fa) throws IOException{
         String name = fa.split("/")[fa.split("/").length - 1];
-        CommunityGrapher g = new CommunityGrapher(fa,"ol", "grid", new HashMap<String, String>());
+        /*CommunityGrapher g = new CommunityGrapher(fa,"ol", "grid", new HashMap<String, String>());
         g.generateGraph();
         CommunityGraph cnf3 = g.getGraph().to3CNF();
         double origCVR = (double)g.getGraph().getClausesCount() / (double)g.getGraph().getNodeCount();
         double newCVR = (double)cnf3.getClausesCount() / (double)cnf3.getNodeCount();
         System.out.printf("Orig: %f, 3CNF: %f\n", origCVR, newCVR);
-
+        
         File fOrig = new File("/home/zacknewsham/results/industrial/orig/".concat(name));
         File f3CNF = new File("/home/zacknewsham/results/industrial/3cnf/".concat(name));
         g.getGraph().writeDimacs(fOrig);
@@ -57,6 +56,7 @@ public class To3CNF {
         System.out.printf("3CNF, ");
         qt.f = f3CNF;
         qt.run(cnf3, 0.0);
+        */
     }
     
     public static void main(String[] args){

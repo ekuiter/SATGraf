@@ -7,8 +7,11 @@
 package com.satgraf.graph.UI;
 
 import com.satgraf.actions.ExportAction;
-import com.satgraf.actions.SaveAction;
 import com.satgraf.actions.OpenAction;
+import com.satgraf.actions.SaveAction;
+import com.satlib.community.CommunityGraphViewer;
+import com.satlib.graph.GraphFactory;
+import com.satlib.graph.GraphViewer;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -26,7 +29,6 @@ import javax.swing.JSplitPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.json.simple.JSONObject;
-import com.satlib.graph.GraphViewer;
 
 /**
  *
@@ -55,7 +57,6 @@ public abstract class GraphFrame extends JFrame{
     try {
       UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
       this.graphViewer = graphViewer;
-      init();
     } catch (ClassNotFoundException ex) {
       Logger.getLogger(GraphFrame.class.getName()).log(Level.SEVERE, null, ex);
     } catch (InstantiationException ex) {
@@ -105,9 +106,8 @@ public abstract class GraphFrame extends JFrame{
   public GraphViewer getGraphViewer(){
     return graphViewer;
   }
-  
   public void init(){
-	Toolkit tk = Toolkit.getDefaultToolkit();
+    Toolkit tk = Toolkit.getDefaultToolkit();
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setSize((int) tk.getScreenSize().getWidth(), (int) tk.getScreenSize().getHeight());
     setContentPane(mainPane);

@@ -25,6 +25,7 @@ import javax.swing.event.ChangeListener;
 import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityNode;
+import com.satlib.evolution.EvolutionGraphFactoryFactory;
 import com.satlib.graph.Edge;
 import com.satlib.graph.Edge.EdgeState;
 import com.satlib.graph.GraphViewer;
@@ -35,8 +36,8 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	  
 	  private final JSlider progress = new JSlider(0, 0, 0);
 	  private GraphViewer graphviewer;
-	  static String outputDirectory = Evolution2GraphFrame.outputDirectory;
-	  static int linesPerFile = Evolution2GraphFrame.maxLinesPerFile;
+	  static String outputDirectory = EvolutionGraphFactoryFactory.outputDirectory;
+	  static int linesPerFile = EvolutionGraphFactoryFactory.maxLinesPerFile;
 	  int totalFiles = 0;
 	  int currentFile = -1;
 	  int nextFile = -1;
@@ -176,7 +177,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		}
 	  
 	  private void parseNodeLine(String line, boolean forwards) {
-		  CommunityGraph graph = Evolution2Grapher.getInstance().getGraph();
+		  CommunityGraph graph = DimacsEvolutionGraphFactory.getInstance().getGraph();
 		  NodeAssignmentState state = NodeAssignmentState.UNASSIGNED;
 		  CommunityNode n = null;
 		  boolean stateFound = false;
@@ -223,7 +224,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	  
 	  private void parseEdgeLine(String line, boolean forwards) {
 		  ArrayList<CommunityNode> nodes = new ArrayList<CommunityNode>();
-		  CommunityGraph graph = Evolution2Grapher.getInstance().getGraph();
+		  CommunityGraph graph = DimacsEvolutionGraphFactory.getInstance().getGraph();
 		  boolean addEdge = true;
 		  
 		  for (String c : line.split(" ")) {

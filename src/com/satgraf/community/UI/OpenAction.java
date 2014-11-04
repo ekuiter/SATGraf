@@ -6,6 +6,7 @@
 
 package com.satgraf.community.UI;
 
+import com.satgraf.community.placer.FruchPlacer;
 import com.satlib.community.CommunityGraphViewer;
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,6 +19,8 @@ import java.util.regex.Pattern;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import com.satgraf.graph.UI.GraphFrame;
+import com.satlib.community.CommunityGraphFactory;
+import com.satlib.community.CommunityGraphFactoryFactory;
 
 /**
  *
@@ -36,9 +39,9 @@ public class OpenAction extends com.satgraf.actions.OpenAction<CommunityGraphFra
     try {
       String[] parts = file.getAbsolutePath().split("\\.");
       if(parts[parts.length - 1].equals("cnf")){
-        CommunityGrapher grapher = new CommunityGrapher(file.getAbsolutePath(), "ol", "f", new HashMap<String, String>());
-        grapher.generateGraph();
-        this.frame.setGraphViewer(new CommunityGraphViewer(grapher.getGraph(), grapher.getNode_lists(), grapher.placer));
+        CommunityGraphFactory factory = (new CommunityGraphFactoryFactory("ol")).getFactory(file,new HashMap<String, String>());
+        factory.makeGraph(file);
+        this.frame.setGraphViewer(new CommunityGraphViewer(factory.getGraph(), factory.getNodeLists(), new FruchPlacer(factory.getGraph())));
         this.frame.setPatterns(new HashMap<String, Pattern>());
         this.frame.init();
         this.frame.setPanel(null);
