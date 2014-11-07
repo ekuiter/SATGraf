@@ -318,6 +318,7 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   public void setScale(double scale){
     this.scale = scale;
     setUpdatedNodes(this.graph.getNodesList());
+    setUpdatedEdges(this.graph.getEdgesList());
     canvas.reset();
   }
   public double getScale(){
@@ -402,7 +403,7 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
 		bounds = new Rectangle(minX, minY, maxX, maxY);
 	  }
 	  
-	  return bounds;
+	  return (Rectangle) bounds.clone();
   }	
   
 	public Iterator<T> getNodes(String group){

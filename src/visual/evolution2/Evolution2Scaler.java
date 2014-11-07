@@ -49,6 +49,9 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	  List<String> currentFileLines = null;
 	  List<String> nextFileLines = null;
 	  Thread bufferThread = null;
+	  int lastDecisionVariable = -1;
+	  private int displayDecisionVariableFor = 100;
+	  private int displayDecisionVariableCount = 0;
 	  
 	  private Timer changeSlideTimer = new Timer(10, this);
 	  private final JButton play = new JButton("Play");
@@ -168,15 +171,15 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	    updateProgress();
 	  }
 	  
-	  private void parseLine(String line, boolean forwards) {
+	  private void parseLine(String line, boolean forwards, int lineNumber) {
 			if (line.charAt(0) == 'v') {
-		    	parseNodeLine(line, forwards);
+		    	parseNodeLine(line, forwards, lineNumber);
 		    } else if (line.charAt(0) == 'c') {
 		    	parseEdgeLine(line, forwards);
 		    }
 		}
 	  
-	  private void parseNodeLine(String line, boolean forwards) {
+	  private void parseNodeLine(String line, boolean forwards, int lineNumber) {
 		  CommunityGraph graph = Evolution2Grapher.getInstance().getGraph();
 		  NodeAssignmentState state = NodeAssignmentState.UNASSIGNED;
 		  CommunityNode n = null;
@@ -185,6 +188,13 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  
 		  for (String c : line.split(" ")) {
 			  if (c.compareTo("v") == 0) { // Start of line
+				  continue;
+			  } else if (c.compareTo("d") == 0) {
+				  if (forwards)
+					  isDecisionVariable = true;
+				  continue;
+			  } else if (c.compareTo("p") == 0) {
+				  // This is just a propagation variable. Do nothing with it at the moment.
 				  continue;
 			  } else if (!stateFound) { // Var state
 				  stateFound = true;
@@ -209,16 +219,21 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  if (n != null) {
 			  NodeAssignmentState prevState = n.getAssignmentState();
 			  
+			  if (isDecisionVariable && lastDecisionVariable != lineNumber) {
+				  graphviewer.setDecisionVariable(n);
+				  lastDecisionVariable = lineNumber;
+				  				  
+				  if (timerTriggered)
+					  return;
+			  }
+			  
 			  if (forwards)
 				  n.setAssignmentState(state);
 			  else
 				  n.revertToPreviousAssignmentState();
 			  
-			  if (n.getAssignmentState() != prevState) // Will redraw the node if it has changed at all
+			  if (n.getAssignmentState() != prevState || isDecisionVariable) // Will redraw the node if it has changed at all
 				  updatedNodes.add(n);
-			  if (n.getAssignmentState() != prevState) { // Must add all connected nodes as well to redraw the edges
-				  updatedEdges.addAll(n.getEdgesList());
-			  }
 		  }
 	  }
 	  
@@ -375,23 +390,28 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  int lastLine = endingLine;
 		  
 		  if (startingLine < endingLine)
-			  forwardsEvolution(startingLine, endingLine);
+			  lastLine = forwardsEvolution(startingLine, endingLine);
 		  else
 			  backwardsEvolution(startingLine, endingLine);
 		  
-		  currentPosition = endingLine;
+		  currentPosition = lastLine;
 		  updateGraph();
 	  }
 	  
-	  private void forwardsEvolution(int startingLine, int endingLine) throws InterruptedException {
+	  private int forwardsEvolution(int startingLine, int endingLine) throws InterruptedException {
 		  for (int i = startingLine+1; i <= endingLine; i++) {
-			  parseLine(getLine(i, true), true);
+			  parseLine(getLine(i, true), true, i);
+			  
+			  if (graphviewer.getDecisionVariable() != null && timerTriggered)
+				  return i-1;
 		  }
+		  
+		  return endingLine;
 	  }
 	  
 	  private void backwardsEvolution(int startingLine, int endingLine) throws InterruptedException {
 		  for (int i = startingLine; i > endingLine; i--) {
-			  parseLine(getLine(i, false), false);
+			  parseLine(getLine(i, false), false, i);
 		  }
 	  }
 	  
@@ -413,8 +433,21 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	  public void actionPerformed(ActionEvent arg0) {
 		  int update;
 		  
-		  if (currentPosition == totalLines)
+		  if (graphviewer.getDecisionVariable() != null) {
+			  displayDecisionVariableCount++;
+			  
+			  if (displayDecisionVariableCount == displayDecisionVariableFor) {
+				  graphviewer.clearDecisionVariable();
+				  displayDecisionVariableCount = 0;
+			  }
+			  
+			  return;
+		  }
+		  
+		  if (currentPosition >= totalLines) {
 			  stopTimer();
+			  currentPosition = totalLines;
+		  }
 		  
 		  if (currentPosition == -1) {
 			  update = 1;
@@ -422,6 +455,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 			  update = currentPosition+100;
 		  }
 		  
+		  timerTriggered = true;
 		  progress.setValue(update);
 	  }
 	  
