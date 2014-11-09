@@ -89,7 +89,6 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
   
   public void reset(){
     renderer.reset();
-    ((GraphTableModel)this.getModel()).reset();
   }
   
   protected void drawNode(Node n, Rectangle o, Graphics image) {	  

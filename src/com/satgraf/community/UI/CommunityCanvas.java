@@ -32,9 +32,9 @@ public class CommunityCanvas extends GraphCanvas{
   public void paintThread(PaintThread paint) {
     Rectangle o = paint.getBounds();
     List<Node> nodes = graph.getOrderedUpdatedNodes(o, true);
-    boolean hashUpdatedNode = graph.doesRectangleHaveUpdate();
+    boolean hasUpdatedNode = graph.doesRectangleHaveUpdate();
     
-    if (hashUpdatedNode || nodes.isEmpty()) {
+    if (hasUpdatedNode || nodes.isEmpty()) {
     	Iterator<Node> nodIt = nodes.iterator();
     	Graphics image = paint.getGraphics();
         Rectangle i = image.getClipBounds();
