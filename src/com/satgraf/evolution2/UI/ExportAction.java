@@ -68,8 +68,6 @@ public class ExportAction extends com.satgraf.actions.ExportAction<Evolution2Gra
           gif.writeToSequence(jpg);
           output.close();
         }
-      } catch (InterruptedException ex) {
-        System.err.println("Error exporting");
       } catch (IOException ex) {
         Logger.getLogger(ExportAction.class.getName()).log(Level.SEVERE, null, ex);
       }
@@ -80,11 +78,7 @@ public class ExportAction extends com.satgraf.actions.ExportAction<Evolution2Gra
       Logger.getLogger(ExportAction.class.getName()).log(Level.SEVERE, null, ex);
     }
     frame.getGraphViewer().setScale(oldscale);
-    try {
-      panel.scaler.advanceEvolution(panel.scaler.getMaxLine() - 1, 0);
-    } catch (InterruptedException ex) {
-      Logger.getLogger(ExportAction.class.getName()).log(Level.SEVERE, null, ex);
-    }
+    panel.scaler.advanceEvolution(panel.scaler.getMaxLine() - 1, 0);
   }
   
 }
