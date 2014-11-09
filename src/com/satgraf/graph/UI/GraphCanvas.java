@@ -213,6 +213,7 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
   public void notify(GraphViewer graph, GraphObserver.Action action){
     if(action == Action.setscale){
       reset();
+      revalidate();
     }
     else if(action == Action.updatedEdges || action == Action.updatedNodes){
       repaint();
