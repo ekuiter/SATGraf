@@ -320,6 +320,7 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
     setUpdatedNodes(this.graph.getNodesList());
     setUpdatedEdges(this.graph.getEdgesList());
     canvas.reset();
+    canvas.revalidate();
   }
   public double getScale(){
     return scale;
