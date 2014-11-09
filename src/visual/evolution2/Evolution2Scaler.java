@@ -53,6 +53,10 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	  private int displayDecisionVariableFor = 100;
 	  private int displayDecisionVariableCount = 0;
 	  
+	  private int currentLineAdvancingTo = 0;
+	  private int nextLineAdvancingTo = 0;
+	  private Thread evolutionThread = null;
+	  
 	  private Timer changeSlideTimer = new Timer(10, this);
 	  private final JButton play = new JButton("Play");
 	  private boolean timerTriggered = false;
@@ -136,13 +140,8 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	  }
 	  
 	  private void updatePosition(int position) {
-		  
 		  if (currentPosition != position && !(currentPosition == -1 && position == 0)) {
-			  try {
-				advanceEvolution(currentPosition, position);
-			} catch (InterruptedException e1) {
-				System.out.println("Error advancing the evolution.");
-			}
+			  advanceEvolution(currentPosition, position);
 		  }
 	  }
       
@@ -386,7 +385,37 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  return currentFileLines.get(lineInCurrentFile);
 	  }
 	  
-	  public void advanceEvolution(int startingLine, int endingLine) throws InterruptedException {
+	  public void advanceEvolution(final int startingLine, final int endingLine) {
+		  this.nextLineAdvancingTo = endingLine;
+		  
+		  if (this.evolutionThread == null || !this.evolutionThread.isAlive()) {
+			  Runnable r = new Runnable() {
+					
+				  @Override
+				  public void run() {
+					  boolean repeat = true;
+					  
+					  while (repeat) {
+						  int el = nextLineAdvancingTo;
+						  repeat = false;
+						  
+						  try {
+							advanceEvolutionThread(currentPosition, el);
+						  } catch (InterruptedException e1) {
+						  	System.out.println("Error advancing the evolution.");
+						  } finally {
+							  repeat = el != nextLineAdvancingTo;
+						  }
+					  }
+				  }
+			  };
+			  
+			  this.evolutionThread = new Thread(r);
+			  this.evolutionThread.run();
+		  }
+	  }
+	  
+	  private void advanceEvolutionThread(int startingLine, int endingLine) throws InterruptedException {
 		  int lastLine = endingLine;
 		  
 		  if (startingLine < endingLine)
