@@ -38,8 +38,11 @@ public class RandomQVTime {
               if(count < skip){
                 continue;
               }
-              CommunityGraph cg = EvolutionGenerator.makeCommunity(v, cl, co, q);
-              cg.writeDimacs(new File(String.format("/media/SAT/bucketing/%d.%d.%d.%d.%d.cnf",v,cl,co,Long.parseLong(String.valueOf(q).replace("0.","")), r)));
+              File f = new File(String.format("/media/SAT/bucketing/%d.%d.%d.%d.%d.cnf",v,cl,co,Long.parseLong(String.valueOf(q).replace("0.","")), r));
+              if(!f.exists()){
+                CommunityGraph cg = EvolutionGenerator.makeCommunity(v, cl, co, q);
+                cg.writeDimacs(f);
+              }
               if(count % 100 == 0){
                 System.out.printf("%d/%d\n", count, total);
               }
