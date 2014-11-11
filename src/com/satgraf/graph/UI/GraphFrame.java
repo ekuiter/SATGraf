@@ -108,7 +108,7 @@ public abstract class GraphFrame extends JFrame{
   }
   public void init(){
     Toolkit tk = Toolkit.getDefaultToolkit();
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setSize((int) tk.getScreenSize().getWidth(), (int) tk.getScreenSize().getHeight());
     setContentPane(mainPane);
     
