@@ -41,6 +41,12 @@ public class GridKKPlacer extends AbstractPlacer{
     communityKKPlacer = new KKPlacer(new FakeCommunityGraph(graph), dim, dim);
   }
   
+    public String getProgressionName(){
+      return "Placing Communities";
+    }
+    public double getProgress(){
+      return 0.0;
+    }
   public TIntArrayList getCommunitiesAtXY(int x, int y){
     TIntArrayList list = new TIntArrayList();
     Iterator<Community> comms = graph.getCommunities().iterator();

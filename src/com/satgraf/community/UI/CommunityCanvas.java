@@ -44,6 +44,9 @@ public class CommunityCanvas extends GraphCanvas{
         
         while(nodIt.hasNext()){
           Node next = nodIt.next();
+          if(!next.isVisible()){
+            continue;
+          }
           drawNode(next, o, image);
           
           Iterator<CommunityEdge> eit = next.getEdges();

@@ -49,7 +49,7 @@ public class CommunityGraphFrame extends GraphFrame{
   
   
   public void show() {
-    if(graphViewer != null && panel == null){
+    if(graphViewer != null && graphViewer.graph != null && panel == null){
       canvasPanel = new GraphCanvasPanel(new CommunityCanvas(getGraphViewer()));
 
       panel = new CommunityOptionsPanel(this, getGraphViewer(), patterns.keySet());
@@ -106,7 +106,9 @@ public class CommunityGraphFrame extends GraphFrame{
   public static void main(String args[]) throws IOException{
     if(args.length < 3){
       args = new String[]{
-        "formula/satcomp/dimacs/toybox.dimacs",
+        //"formula/satcomp/dimacs/toybox.dimacs",
+        "formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
+        //"/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "ol",
         "f"
       };
@@ -118,10 +120,18 @@ public class CommunityGraphFrame extends GraphFrame{
       patterns.put(args[i], args[i + 1]);
     }
     CommunityGraphFactory factory = (new CommunityGraphFactoryFactory(args[1])).getFactory(new File(args[0]), patterns);
-    factory.makeGraph(new File(args[0]));
     
-    CommunityGraphViewer graphViewer = new CommunityGraphViewer(factory.getGraph(), factory.getNodeLists(), CommunityGraphFrame.getPlacer(args[2], factory.getGraph()));
+    CommunityGraphViewer graphViewer = new CommunityGraphViewer(null, factory.getNodeLists(), null);
     CommunityGraphFrame frmMain = new CommunityGraphFrame(graphViewer, factory.getPatterns(), factory.getMetric());
+    frmMain.setProgressive(factory);
+    frmMain.preinit();
+    
+    frmMain.setVisible(true);
+    factory.makeGraph(new File(args[0]));
+    CommunityPlacer p = CommunityGraphFrame.getPlacer(args[2], factory.getGraph());
+    frmMain.setProgressive(p);
+    graphViewer.graph = factory.getGraph();
+    graphViewer.setPlacer(p);
     frmMain.init();
     
     frmMain.show();

@@ -99,7 +99,7 @@ public class FruchPlacer extends AbstractPlacer {
     
     //number of loops before cooling starts
     private int initialIter = 30;  
-
+    private double progress = 0;
     private int maxPasses = 500;    
     private double optDist = 100;    
     private int updates = 0;
@@ -116,6 +116,13 @@ public class FruchPlacer extends AbstractPlacer {
 
     private HashMap locations = new HashMap();
 
+    public String getProgressionName(){
+      return "Placing Communities";
+    }
+    public double getProgress(){
+      return progress;
+    }
+    
     public FruchPlacer(CommunityGraph g) {
       super(g);
       nodeList = g.getNodes();
@@ -326,6 +333,7 @@ public class FruchPlacer extends AbstractPlacer {
 	          //make sure nodes have random initial coord to begin with
 	          randomizeLayout();
 	          firstLayout = false;
+               progress = 0.1;
 		    }
 	
 		    Iterator<CommunityNode> it = nodeList.iterator();
@@ -455,6 +463,7 @@ public class FruchPlacer extends AbstractPlacer {
 					temp = coolTemp(temp);
 		
 				passes++;
+                progress += 0.001;
 				//System.out.println("passes: " + passes);
 		    }
 	
@@ -464,6 +473,7 @@ public class FruchPlacer extends AbstractPlacer {
 		    
 		    //removeOverlaps(nl, nNodes, xPos, yPos); // TODO: The problem is here
 		}
+        progress = 1.0;
 		done = true;
 	}
 

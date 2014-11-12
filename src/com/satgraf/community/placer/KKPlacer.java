@@ -92,6 +92,13 @@ public class KKPlacer extends AbstractPlacer {
     	maxPasses = passes;
     }
     
+  
+    public String getProgressionName(){
+      return "Placing Communities";
+    }
+    public double getProgress(){
+      return 0.0;
+    }
     /**
      * Will place each component as close together as possible on the graph
      * 

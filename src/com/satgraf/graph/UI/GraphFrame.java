@@ -6,25 +6,24 @@
 
 package com.satgraf.graph.UI;
 
+import com.satgraf.UI.ProgressionViewer;
 import com.satgraf.actions.ExportAction;
 import com.satgraf.actions.OpenAction;
 import com.satgraf.actions.SaveAction;
-import com.satlib.community.CommunityGraphViewer;
-import com.satlib.graph.GraphFactory;
+import com.satlib.Progressive;
 import com.satlib.graph.GraphViewer;
-import java.awt.Color;
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -42,6 +41,8 @@ public abstract class GraphFrame extends JFrame{
   private JMenuItem save = new JMenuItem("Save");
   private JMenuItem export = new JMenuItem("Export");
   
+  private final JPanel newMain = new JPanel();
+  private ProgressionViewer progress;
   protected final JSplitPane mainPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
   protected GraphCanvasPanel canvasPanel;
   protected GraphOptionsPanel panel;
@@ -106,12 +107,25 @@ public abstract class GraphFrame extends JFrame{
   public GraphViewer getGraphViewer(){
     return graphViewer;
   }
+  public void setProgressive(Progressive item){
+    if(progress == null){
+      progress = new ProgressionViewer();
+    }
+    progress.setProgressive(item);
+  }
+  public void preinit(){
+    if(getContentPane() != newMain){
+      Toolkit tk = Toolkit.getDefaultToolkit();
+      setSize((int) tk.getScreenSize().getWidth(), (int) tk.getScreenSize().getHeight());
+      newMain.setLayout(new BorderLayout());
+      newMain.add(progress, BorderLayout.NORTH);
+      newMain.add(mainPane, BorderLayout.CENTER);
+      setContentPane(newMain);
+    }
+  }
   public void init(){
-    Toolkit tk = Toolkit.getDefaultToolkit();
     //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    setSize((int) tk.getScreenSize().getWidth(), (int) tk.getScreenSize().getHeight());
-    setContentPane(mainPane);
-    
+    preinit();
     if(menu.getMenuComponentCount() == 0){
       //menu.add("File");
       menu.add(open);
@@ -139,7 +153,7 @@ public abstract class GraphFrame extends JFrame{
   }
   
   public void show(){
-    if(graphViewer != null){
+    if(graphViewer != null && canvasPanel != null){
       mainPane.setLeftComponent(canvasPanel);
       mainPane.setRightComponent(panel);
     }

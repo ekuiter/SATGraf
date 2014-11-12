@@ -107,32 +107,6 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
 	  image.setColor(fillColor);
 	  image.fillArc(x, y, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER, 0, 360);
   }
-  
-  /*public void paintComponent(Graphics g){
-    if(lastPaint.x < g.getClipBounds().x){
-      generateNewFrames(g, ThreadPaintablePanel.SCROLL_DIRECTION.EAST);
-    }
-    else if(lastPaint.y < g.getClipBounds().y){
-      generateNewFrames(g, ThreadPaintablePanel.SCROLL_DIRECTION.SOUTH);
-    }
-    lastPaint = new Point(g.getClipBounds().x, g.getClipBounds().y);
-    if(image == null){
-      callPaintThread(g);
-    }
-    ArrayList<TiledImage> required = getRequiredFrames(g);
-    for(int i = 0; i < required.size(); i++){
-      if(required.get(i) != null){
-        while(!required.get(i).getFinished()){
-          try {
-            Thread.sleep(1);
-          } catch (InterruptedException ex) {
-            Logger.getLogger(ThreadPaintablePanel.class.getName()).log(Level.SEVERE, null, ex);
-          }
-        }
-        g.drawImage(required.get(i), required.get(i).origin.x, required.get(i).origin.y, this);
-      }
-    }
-  }*/
 
   protected void drawConnection(Edge c, Rectangle o,Graphics image) {
 	if (!graph.shouldShowEdge(c))
@@ -216,6 +190,9 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
       revalidate();
     }
     else if(action == Action.updatedEdges || action == Action.updatedNodes){
+      repaint();
+    }
+    else{
       repaint();
     }
   }

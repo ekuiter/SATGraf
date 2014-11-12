@@ -72,6 +72,13 @@ public class GridPlacer extends AbstractPlacer {
   
   private HashMap<GridPoint, GridEntry> grid = new HashMap<GridPoint, GridEntry>();
   
+  
+    public String getProgressionName(){
+      return "Placing Communities";
+    }
+    public double getProgress(){
+      return 0.0;
+    }
   public GridPlacer(CommunityGraph graph){
     super(graph);
   }
