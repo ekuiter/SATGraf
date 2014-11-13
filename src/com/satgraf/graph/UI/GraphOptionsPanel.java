@@ -24,7 +24,7 @@ public abstract class GraphOptionsPanel extends JSplitPane implements GraphObser
   private GraphViewer graph;
   protected OptionsPanel optionsPanel;
   protected final JAccordianPanel checkBoxPanel = new JAccordianPanel();
-  private final HashMap<String, NodeCheckboxPanel> checkboxPanels = new HashMap<String, NodeCheckboxPanel>();
+  protected final HashMap<String, NodeCheckboxPanel> checkboxPanels = new HashMap<String, NodeCheckboxPanel>();
   protected final Collection<String> groups;
   protected GraphOptionsPanel(GraphViewer graph, Collection<String> groups, boolean callSet){
     this.groups = groups;

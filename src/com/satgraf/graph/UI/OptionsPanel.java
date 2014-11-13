@@ -99,7 +99,7 @@ public class OptionsPanel extends JPanel{
     nodePanel.update();
   }
 
-  void setGraph(GraphViewer graph) {
+  public void setGraph(GraphViewer graph) {
     scale.setGraph(graph);
   }
   public void setCustomComponent(Component c){

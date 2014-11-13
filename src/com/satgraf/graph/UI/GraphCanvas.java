@@ -33,7 +33,7 @@ import org.json.simple.JSONObject;
  */
 public abstract class GraphCanvas extends JTable implements MouseListener, MouseMotionListener, ThreadPaintable, GraphObserver{
   protected GraphViewer graph;
-  private GraphCanvasRenderer renderer;
+  protected GraphCanvasRenderer renderer;
   public static Color HIGHLIGHT_COLOR = new Color(0xe4, 0xfd, 0x03);
   
   public GraphCanvas(GraphViewer graph){

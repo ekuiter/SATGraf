@@ -1,21 +1,16 @@
 package com.satgraf.evolution2.UI;
 
-import com.satgraf.community.UI.CommunityCanvas;
-import com.satgraf.community.UI.CommunityGraphFrame;
-import com.satgraf.graph.UI.GraphCanvasPanel;
-import com.satlib.community.CommunityGraph;
-import com.satlib.community.CommunityGraphViewer;
-import com.satlib.community.CommunityMetric;
-import com.satlib.community.placer.CommunityPlacer;
-import com.satlib.evolution.EvolutionGraphFactory;
-import com.satlib.evolution.EvolutionGraphFactoryFactory;
-import com.satlib.evolution.EvolutionGraphFactoryObserver;
-import com.satlib.evolution.EvolutionGraphFactoryObserver.Action;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.regex.Pattern;
+
+import com.satgraf.community.UI.CommunityGraphFrame;
+import com.satgraf.graph.UI.GraphCanvasPanel;
+import com.satlib.community.CommunityMetric;
+import com.satlib.community.placer.CommunityPlacer;
+import com.satlib.evolution.EvolutionGraphFactory;
+import com.satlib.evolution.EvolutionGraphFactoryObserver;
 
 public class Evolution2GraphFrame extends CommunityGraphFrame implements EvolutionGraphFactoryObserver{
 
@@ -38,7 +33,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
 
   public void show() {
     if (graphViewer != null && graphViewer.graph != null && panel == null) {
-      canvasPanel = new GraphCanvasPanel(new CommunityCanvas(graphViewer));
+      canvasPanel = new GraphCanvasPanel(new Evolution2GraphCanvas(graphViewer));
       panel = new Evolution2OptionsPanel(this, getGraphViewer(), patterns.keySet());
       super.show();
       factory.buildEvolutionFile();
