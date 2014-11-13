@@ -1,9 +1,17 @@
 package com.satgraf.evolution2.UI;
 
+import com.satlib.evolution.EvolutionGraphFactoryObserver.Action;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.regex.Pattern;
+
+import com.satgraf.community.UI.CommunityGraphFrame;
+import com.satgraf.graph.UI.GraphCanvasPanel;
+import com.satlib.community.CommunityMetric;
+import com.satlib.community.placer.CommunityPlacer;
+import com.satlib.evolution.EvolutionGraphFactory;
+import com.satlib.evolution.EvolutionGraphFactoryObserver;
 
 import com.satgraf.community.UI.CommunityGraphFrame;
 import com.satgraf.graph.UI.GraphCanvasPanel;
@@ -77,7 +85,9 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     for (int i = 5; i < args.length; i += 2) {
       patterns.put(args[i], args[i + 1]);
     }
-    EvolutionGraphFactory factory = new DimacsEvolutionGraphFactory(args[4], args[1], patterns);
+    
+    Evolution2GraphFactoryFactory factoryfactory = new Evolution2GraphFactoryFactory(args[1], args[4]);
+    EvolutionGraphFactory factory = factoryfactory.getFactory(new File(args[4]), patterns);//new DimacsEvolutionGraphFactory(args[4], args[1], patterns);
     
     Evolution2GraphViewer graphViewer = new Evolution2GraphViewer(null, factory.getNodeLists(), null);
     Evolution2GraphFrame frmMain = new Evolution2GraphFrame(factory, graphViewer, factory.getPatterns(), factory.getMetric());

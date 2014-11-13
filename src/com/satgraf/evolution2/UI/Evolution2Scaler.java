@@ -178,7 +178,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		}
 	  
 	  private void parseNodeLine(String line, boolean forwards, int lineNumber) {
-		  CommunityGraph graph = DimacsEvolutionGraphFactory.getInstance().getGraph();
+		  CommunityGraph graph = Evolution2GraphFactoryFactory.getInstance().getGraph();
 		  NodeAssignmentState state = NodeAssignmentState.UNASSIGNED;
 		  CommunityNode n = null;
 		  boolean stateFound = false;
@@ -237,7 +237,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	  
 	  private void parseEdgeLine(String line, boolean forwards) {
 		  ArrayList<CommunityNode> nodes = new ArrayList<CommunityNode>();
-		  CommunityGraph graph = DimacsEvolutionGraphFactory.getInstance().getGraph();
+		  CommunityGraph graph = Evolution2GraphFactoryFactory.getInstance().getGraph();
 		  boolean addEdge = true;
 		  
 		  for (String c : line.split(" ")) {
