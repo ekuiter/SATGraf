@@ -13,6 +13,13 @@ import com.satlib.community.placer.CommunityPlacer;
 import com.satlib.evolution.EvolutionGraphFactory;
 import com.satlib.evolution.EvolutionGraphFactoryObserver;
 
+import com.satgraf.community.UI.CommunityGraphFrame;
+import com.satgraf.graph.UI.GraphCanvasPanel;
+import com.satlib.community.CommunityMetric;
+import com.satlib.community.placer.CommunityPlacer;
+import com.satlib.evolution.EvolutionGraphFactory;
+import com.satlib.evolution.EvolutionGraphFactoryObserver;
+
 public class Evolution2GraphFrame extends CommunityGraphFrame implements EvolutionGraphFactoryObserver{
 
   private EvolutionGraphFactory factory;
@@ -78,6 +85,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     for (int i = 5; i < args.length; i += 2) {
       patterns.put(args[i], args[i + 1]);
     }
+    
     Evolution2GraphFactoryFactory factoryfactory = new Evolution2GraphFactoryFactory(args[1], args[4]);
     EvolutionGraphFactory factory = factoryfactory.getFactory(new File(args[4]), patterns);//new DimacsEvolutionGraphFactory(args[4], args[1], patterns);
     
