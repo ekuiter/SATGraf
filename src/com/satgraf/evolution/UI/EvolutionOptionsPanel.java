@@ -49,7 +49,7 @@ public class EvolutionOptionsPanel extends CommunityOptionsPanel implements Acti
   }
   
   public void setGraph(CommunityGraphViewer graph){
-    super.setGraph(graph);
+    super.setGraph(graph, true);
   }
 
   @Override

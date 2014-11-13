@@ -32,7 +32,7 @@ public abstract class GraphOptionsPanel extends JSplitPane implements GraphObser
     this.setSize(200, 700);
     this.setPreferredSize(new Dimension(200, 700));
     if(callSet){
-      setGraph(graph);
+      setGraph(graph, true);
     }
     this.setBottomComponent(checkBoxPanel);
     this.setDividerLocation(0.5);
@@ -89,20 +89,24 @@ public abstract class GraphOptionsPanel extends JSplitPane implements GraphObser
     }            
   }
   
-  protected void setGraph(GraphViewer graph){
+  protected void setGraph(GraphViewer graph, boolean clearPanel){
     optionsPanel.setGraph(graph);
     synchronized(checkBoxPanel){
       this.graph = graph;
       this.graph.addObserver(this);
-      checkBoxPanel.removeBars();
-      checkboxPanels.clear();
+      
+      if (clearPanel) {
+    	  checkBoxPanel.removeBars();
+          checkboxPanels.clear();
+      }
+      
       Iterator<String> groupsI = groups.iterator();
       while(groupsI.hasNext()){
         String group = groupsI.next();
         NodeCheckboxPanel temp = new NodeCheckboxPanel(graph, group, graph.getNodes(group));
         checkboxPanels.put(group, temp);
         JScrollPane tempScroll = new JScrollPane(temp);
-        checkBoxPanel.addBar(group, tempScroll);
+        checkBoxPanel.addBar("Variables - " + group, tempScroll);
       }
       checkBoxPanel.setVisibleBar(0);
     }

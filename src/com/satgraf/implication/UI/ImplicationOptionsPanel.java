@@ -36,7 +36,7 @@ public class ImplicationOptionsPanel extends GraphOptionsPanel{
   }
   
   protected void setGraph(GraphViewer graph){
-    super.setGraph(graph);
+    super.setGraph(graph, true);
   }
 
   @Override

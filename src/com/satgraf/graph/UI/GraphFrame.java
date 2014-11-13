@@ -89,7 +89,7 @@ public abstract class GraphFrame extends JFrame{
       canvasPanel.canvasPane.getHorizontalScrollBar().setValue(((Long)json.get("scrollX")).intValue());
       canvasPanel.canvasPane.getVerticalScrollBar().setValue(((Long)json.get("scrollY")).intValue());
     }
-    panel.setGraph(graphViewer);
+    panel.setGraph(graphViewer, true);
   }
   public String toJson(){
     StringBuilder json = new StringBuilder();

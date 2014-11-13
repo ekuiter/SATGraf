@@ -44,7 +44,7 @@ public class CommunityOptionsPanel extends GraphOptionsPanel{
     NodePanel nodePanel = new CommunityNodePanel(graph);
     optionsPanel = new OptionsPanel(frame,graph,nodePanel);
     if(callSet){
-      setGraph(graph);
+      setGraph(graph, true);
     }
     this.setTopComponent(optionsPanel);
   }
@@ -75,8 +75,8 @@ public class CommunityOptionsPanel extends GraphOptionsPanel{
     return json.toString();
   }
   
-  protected void setGraph(CommunityGraphViewer graph){
-    super.setGraph(graph);
+  protected void setGraph(CommunityGraphViewer graph, boolean clearPanel){
+    super.setGraph(graph, clearPanel);
     synchronized(checkBoxPanel){
       communityPanel = new CommunityCheckBoxPanel(graph);
       communityScroll = new JScrollPane(communityPanel);

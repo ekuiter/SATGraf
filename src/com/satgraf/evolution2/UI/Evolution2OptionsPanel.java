@@ -23,6 +23,7 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel {
 		setGraph(graph);
 		this.graph = graph;
 		buildLayout(graph);
+		this.setTopComponent(checkBoxPanel);
 	}
 	
 	private void buildLayout(Evolution2GraphViewer graph) {
@@ -32,30 +33,13 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel {
 	}
 	
 	public void setGraph(Evolution2GraphViewer graph) {
-		super.setGraph(graph);
+		checkBoxPanel.removeBars();
+        checkboxPanels.clear();
+        checkBoxPanel.addBar("General Options", optionsPanel);
+		super.setGraph(graph, false);
 	}
 
 	public void newFileReady(int numLinesInFile) {
 		scaler.newFileReady(numLinesInFile);
-	}
-	
-	@Override
-	protected void setGraph(GraphViewer graph){
-	    optionsPanel.setGraph(graph);
-	    synchronized(checkBoxPanel){
-	      this.graph = (Evolution2GraphViewer)graph;
-	      this.graph.addObserver(this);
-	      checkBoxPanel.removeBars();
-	      checkboxPanels.clear();
-	      Iterator<String> groupsI = groups.iterator();
-	      while(groupsI.hasNext()){
-	        String group = groupsI.next();
-	        NodeCheckboxPanel temp = new NodeCheckboxPanel(graph, group, graph.getNodes(group));
-	        checkboxPanels.put(group, temp);
-	        JScrollPane tempScroll = new JScrollPane(temp);
-	        checkBoxPanel.addBar(group, tempScroll);
-	      }
-	      checkBoxPanel.setVisibleBar(0);
-	    }
 	}
 }
