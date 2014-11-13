@@ -1,22 +1,22 @@
 package com.satgraf.evolution2.UI;
 
-import com.satgraf.community.UI.CommunityCanvas;
-import com.satgraf.community.UI.CommunityGraphFrame;
-import com.satgraf.graph.UI.GraphCanvasPanel;
-import com.satlib.community.CommunityGraphViewer;
-import com.satlib.community.CommunityMetric;
-import com.satlib.evolution.EvolutionGraphFactory;
-import com.satlib.evolution.EvolutionGraphFactoryObserver;
 import com.satlib.evolution.EvolutionGraphFactoryObserver.Action;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
+import com.satgraf.community.UI.CommunityGraphFrame;
+import com.satgraf.graph.UI.GraphCanvasPanel;
+import com.satlib.community.CommunityMetric;
+import com.satlib.community.placer.CommunityPlacer;
+import com.satlib.evolution.EvolutionGraphFactory;
+import com.satlib.evolution.EvolutionGraphFactoryObserver;
+
 public class Evolution2GraphFrame extends CommunityGraphFrame implements EvolutionGraphFactoryObserver{
 
   private EvolutionGraphFactory factory;
-  public Evolution2GraphFrame(EvolutionGraphFactory factory, CommunityGraphViewer viewer, HashMap<String, Pattern> patterns, CommunityMetric metric) {
+  public Evolution2GraphFrame(EvolutionGraphFactory factory, Evolution2GraphViewer viewer, HashMap<String, Pattern> patterns, CommunityMetric metric) {
     super(viewer, patterns, metric);
     this.factory = factory;
     factory.addObserver(this);
@@ -27,10 +27,14 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
 
     return json.toString();
   }
+  
+  public Evolution2GraphViewer getGraphViewer(){
+	 return (Evolution2GraphViewer)graphViewer;
+  }
 
   public void show() {
-    if (graphViewer != null) {
-      canvasPanel = new GraphCanvasPanel(new CommunityCanvas(graphViewer));
+    if (graphViewer != null && graphViewer.graph != null && panel == null) {
+      canvasPanel = new GraphCanvasPanel(new Evolution2GraphCanvas(graphViewer));
       panel = new Evolution2OptionsPanel(this, getGraphViewer(), patterns.keySet());
       super.show();
       factory.buildEvolutionFile();
@@ -74,12 +78,22 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     for (int i = 5; i < args.length; i += 2) {
       patterns.put(args[i], args[i + 1]);
     }
-    EvolutionGraphFactory factory = new DimacsEvolutionGraphFactory(args[4], args[1], patterns);
-    factory.makeGraph(new File(args[0]));
+    Evolution2GraphFactoryFactory factoryfactory = new Evolution2GraphFactoryFactory(args[1], args[4]);
+    EvolutionGraphFactory factory = factoryfactory.getFactory(new File(args[4]), patterns);//new DimacsEvolutionGraphFactory(args[4], args[1], patterns);
     
-    CommunityGraphViewer graphViewer = new CommunityGraphViewer(factory.getGraph(), factory.getNodeLists(), CommunityGraphFrame.getPlacer(args[2], factory.getGraph()));
+    Evolution2GraphViewer graphViewer = new Evolution2GraphViewer(null, factory.getNodeLists(), null);
     Evolution2GraphFrame frmMain = new Evolution2GraphFrame(factory, graphViewer, factory.getPatterns(), factory.getMetric());
+    frmMain.setProgressive(factory);
+    frmMain.preinit();
+    
+    frmMain.setVisible(true);
+    factory.makeGraph(new File(args[0]));
+    CommunityPlacer p = CommunityGraphFrame.getPlacer(args[2], factory.getGraph());
+    frmMain.setProgressive(p);
+    graphViewer.graph = factory.getGraph();
+    graphViewer.setPlacer(p);
     frmMain.init();
+    
     frmMain.show();
   }
 

@@ -33,7 +33,7 @@ import org.json.simple.JSONObject;
  */
 public abstract class GraphCanvas extends JTable implements MouseListener, MouseMotionListener, ThreadPaintable, GraphObserver{
   protected GraphViewer graph;
-  private GraphCanvasRenderer renderer;
+  protected GraphCanvasRenderer renderer;
   public static Color HIGHLIGHT_COLOR = new Color(0xe4, 0xfd, 0x03);
   
   public GraphCanvas(GraphViewer graph){
@@ -120,6 +120,7 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
       int endX = c.getEnd().getX(graph) + DrawableNode.NODE_DIAMETER / 2;
       int endY = c.getEnd().getY(graph) + DrawableNode.NODE_DIAMETER / 2;
       
+      //g2d.setColor(c.getColor(graph));
       g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       g2d.setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
       g2d.drawLine(

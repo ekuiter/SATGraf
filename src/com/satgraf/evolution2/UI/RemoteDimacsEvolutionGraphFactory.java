@@ -24,12 +24,12 @@ import java.util.Iterator;
  *
  * @author zacknewsham
  */
-public class DimacsEvolutionGraphFactory extends com.satlib.evolution.DimacsEvolutionGraphFactory{
-  public DimacsEvolutionGraphFactory(String minisat, String metricName, HashMap<String, String> patterns) {
-    super(minisat, metricName, patterns);
+public class RemoteDimacsEvolutionGraphFactory  extends com.satlib.evolution.DimacsEvolutionGraphFactory{
+
+  public RemoteDimacsEvolutionGraphFactory(String metricName, HashMap<String, String> patterns) {
+    super(null, metricName, patterns);
   }
 
-  
   public void process(CommunityGraph cg) {
     node_lists = new HashMap<>();
     TIntObjectHashMap<String> list = new TIntObjectHashMap<>();
@@ -85,4 +85,5 @@ public class DimacsEvolutionGraphFactory extends com.satlib.evolution.DimacsEvol
   public void addGraph(CommunityGraphViewer cg) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
+  
 }

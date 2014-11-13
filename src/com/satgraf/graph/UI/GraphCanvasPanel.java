@@ -77,8 +77,8 @@ public class GraphCanvasPanel extends JPanel{
   
   static public Dimension getCanvasDimensions() {
 	  Toolkit tk = Toolkit.getDefaultToolkit();
-	  int width = ((int) tk.getScreenSize().getWidth()) - 400;
-	  int height = ((int) tk.getScreenSize().getHeight()) - 47;
+	  int width = ((int) tk.getScreenSize().getWidth()) - 410;
+	  int height = ((int) tk.getScreenSize().getHeight()) - 68;
 	  
 	  return new Dimension(width, height);
   }

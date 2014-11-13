@@ -35,7 +35,7 @@ import com.satlib.graph.Node.NodeAssignmentState;
 public class Evolution2Scaler extends JPanel implements ChangeListener, ActionListener {
 	  
 	  private final JSlider progress = new JSlider(0, 0, 0);
-	  private GraphViewer graphviewer;
+	  private Evolution2GraphViewer graphviewer;
 	  static String outputDirectory = EvolutionGraphFactoryFactory.outputDirectory;
 	  static int linesPerFile = EvolutionGraphFactoryFactory.maxLinesPerFile;
 	  int totalFiles = 0;
@@ -62,7 +62,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	  private boolean timerTriggered = false;
 	  private boolean progressClicked = false;
 	  
-	  public Evolution2Scaler(GraphViewer graphviewer){
+	  public Evolution2Scaler(Evolution2GraphViewer graphviewer){
 	    this.graphviewer = graphviewer;
 	    
 	    progress.setSize(new Dimension(100, 20));
@@ -164,7 +164,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  updatedNodes.clear();
 	  }
 	  
-	  void setGraphViewer(GraphViewer graph){
+	  void setGraphViewer(Evolution2GraphViewer graph){
 	    this.graphviewer = graph;
 	    updateProgress();
 	  }
@@ -178,7 +178,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		}
 	  
 	  private void parseNodeLine(String line, boolean forwards, int lineNumber) {
-		  CommunityGraph graph = DimacsEvolutionGraphFactory.getInstance().getGraph();
+		  CommunityGraph graph = Evolution2GraphFactoryFactory.getInstance().getGraph();
 		  NodeAssignmentState state = NodeAssignmentState.UNASSIGNED;
 		  CommunityNode n = null;
 		  boolean stateFound = false;
@@ -237,7 +237,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	  
 	  private void parseEdgeLine(String line, boolean forwards) {
 		  ArrayList<CommunityNode> nodes = new ArrayList<CommunityNode>();
-		  CommunityGraph graph = DimacsEvolutionGraphFactory.getInstance().getGraph();
+		  CommunityGraph graph = Evolution2GraphFactoryFactory.getInstance().getGraph();
 		  boolean addEdge = true;
 		  
 		  for (String c : line.split(" ")) {
