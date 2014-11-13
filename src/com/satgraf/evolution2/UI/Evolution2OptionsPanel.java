@@ -11,14 +11,14 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel {
 	Evolution2Scaler scaler;
 	CommunityGraphViewer graph;
 	
-	public Evolution2OptionsPanel(GraphFrame frame, CommunityGraphViewer graph, Collection<String> groups) {
+	public Evolution2OptionsPanel(GraphFrame frame, Evolution2GraphViewer graph, Collection<String> groups) {
 		super(frame, graph, groups, false);
 		setGraph(graph);
 		this.graph = graph;
 		buildLayout(graph);
 	}
 	
-	private void buildLayout(CommunityGraphViewer graph) {
+	private void buildLayout(Evolution2GraphViewer graph) {
 		OptionsPanel op = getOptionsPanel();
 		scaler = new Evolution2Scaler(graph);
 		op.setCustomComponent(scaler);

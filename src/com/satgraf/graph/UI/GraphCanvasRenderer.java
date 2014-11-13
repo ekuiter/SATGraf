@@ -42,8 +42,8 @@ public class GraphCanvasRenderer extends JPanel implements TableCellRenderer {
   public static int FRAME_WIDTH = 500;
   public static int FRAME_HEIGHT = 250;
   private static HashMap<JTable, ArrayList<TiledImage>> images = new HashMap<JTable, ArrayList<TiledImage>>();
-  private TiledImage image = null;
-  private GraphViewer graph;
+  protected TiledImage image = null;
+  protected GraphViewer graph;
   private GraphCanvas canvas;
   public static int running = 0;
 
@@ -96,26 +96,6 @@ public class GraphCanvasRenderer extends JPanel implements TableCellRenderer {
     g2.drawImage(image, new AffineTransformOp(AffineTransform.getScaleInstance(FRAME_WIDTH / (double) image.getWidth(), FRAME_HEIGHT / (double) image.getHeight()), AffineTransformOp.TYPE_BICUBIC), 0, 0);//, 0, 0, image.getWidth(), image.getHeight(), this);
 
     drawNodeHighlight(g, g2);
-
-    Node decisionVariable = graph.getDecisionVariable();
-    if (decisionVariable != null) {
-      drawDecisionVariable(decisionVariable, g);
-    }
-  }
-
-  private void drawDecisionVariable(Node n, Graphics g) {
-    int scaled_diameter = (int) Math.ceil(DrawableNode.NODE_DIAMETER * 2 * graph.getScale());
-    int radius = scaled_diameter / 2;
-
-    g.setColor(HIGHLIGHT_COLOR);
-
-    int x = (int) ((n.getX(graph) - image.origin.x) * graph.getScale()) - radius;
-    int y = (int) ((n.getY(graph) - image.origin.y) * graph.getScale()) - radius;
-
-    g.fillArc(x,
-            y,
-            scaled_diameter,
-            scaled_diameter, 0, 360);
   }
 
   private void drawNodeHighlight(Graphics g, Graphics2D g2) {
