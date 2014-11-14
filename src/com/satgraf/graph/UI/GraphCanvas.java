@@ -176,7 +176,7 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
   
   @Override 
   public String toJson(){
-    return "";
+    return "null";
   } 
   
   @Override

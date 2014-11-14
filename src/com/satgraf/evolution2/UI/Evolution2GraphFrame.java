@@ -6,12 +6,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-import com.satgraf.community.UI.CommunityGraphFrame;
-import com.satgraf.graph.UI.GraphCanvasPanel;
-import com.satlib.community.CommunityMetric;
-import com.satlib.community.placer.CommunityPlacer;
-import com.satlib.evolution.EvolutionGraphFactory;
-import com.satlib.evolution.EvolutionGraphFactoryObserver;
 
 import com.satgraf.community.UI.CommunityGraphFrame;
 import com.satgraf.graph.UI.GraphCanvasPanel;
