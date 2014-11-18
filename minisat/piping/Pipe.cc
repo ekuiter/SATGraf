@@ -20,7 +20,6 @@ Pipe::~Pipe() {
 
 void Pipe::openPipe(const string& filename) {
     this->filename = filename;
-   mkfifo(filename.c_str(), 0666);
     this->pipe = open(filename.c_str(), O_WRONLY);
 }
 

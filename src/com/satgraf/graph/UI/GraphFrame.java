@@ -124,7 +124,7 @@ public abstract class GraphFrame extends JFrame{
     }
   }
   public void init(){
-    //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     preinit();
     if(menu.getMenuComponentCount() == 0){
       //menu.add("File");

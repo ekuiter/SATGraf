@@ -267,9 +267,11 @@ public class GridKKPlacer extends AbstractPlacer{
       }
     }
     @Override
-    public void connect(CommunityNode a, CommunityNode b, boolean dummy) {
-      createEdge(a, b, dummy);
+    public CommunityEdge connect(CommunityNode a, CommunityNode b, boolean dummy) {
+      CommunityEdge e = createEdge(a, b, dummy);
       union(a, b);
+      
+      return e;
     }
 
     @Override

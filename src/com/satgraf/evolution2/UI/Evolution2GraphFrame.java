@@ -1,17 +1,9 @@
 package com.satgraf.evolution2.UI;
 
-import com.satlib.evolution.EvolutionGraphFactoryObserver.Action;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.regex.Pattern;
-
-import com.satgraf.community.UI.CommunityGraphFrame;
-import com.satgraf.graph.UI.GraphCanvasPanel;
-import com.satlib.community.CommunityMetric;
-import com.satlib.community.placer.CommunityPlacer;
-import com.satlib.evolution.EvolutionGraphFactory;
-import com.satlib.evolution.EvolutionGraphFactoryObserver;
 
 import com.satgraf.community.UI.CommunityGraphFrame;
 import com.satgraf.graph.UI.GraphCanvasPanel;
@@ -43,8 +35,8 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     if (graphViewer != null && graphViewer.graph != null && panel == null) {
       canvasPanel = new GraphCanvasPanel(new Evolution2GraphCanvas(graphViewer));
       panel = new Evolution2OptionsPanel(this, getGraphViewer(), patterns.keySet());
-      super.show();
       factory.buildEvolutionFile();
+      super.show();
     } else {
       super.show();
     }

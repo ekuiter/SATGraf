@@ -4,6 +4,9 @@
  */
 package com.satgraf.graph.UI;
 
+import static com.satgraf.graph.UI.GraphCanvas.HIGHLIGHT_COLOR;
+
+import com.satgraf.UI.PaintThread;
 import com.satgraf.UI.ThreadPaintable;
 import com.satlib.graph.DrawableNode;
 import com.satlib.graph.Edge;
@@ -19,13 +22,21 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.BorderFactory;
 import javax.swing.JTable;
 import org.json.simple.JSONObject;
+
+import sun.java2d.pipe.DrawImage;
 
 /**
  *
@@ -33,15 +44,17 @@ import org.json.simple.JSONObject;
  */
 public abstract class GraphCanvas extends JTable implements MouseListener, MouseMotionListener, ThreadPaintable, GraphObserver{
   protected GraphViewer graph;
-  protected GraphCanvasRenderer renderer;
   public static Color HIGHLIGHT_COLOR = new Color(0xe4, 0xfd, 0x03);
+  public static int FRAME_WIDTH = 500;
+  public static int FRAME_HEIGHT = 250;
+  private static ArrayList<TiledImage> images = new ArrayList<TiledImage>();
+  private boolean forceDraw = true;
   
   public GraphCanvas(GraphViewer graph){
     super(new GraphTableModel(graph));
-    renderer = new GraphCanvasRenderer(this, graph);
-    this.setRowHeight(GraphCanvasRenderer.FRAME_HEIGHT);
+    this.setRowHeight(FRAME_HEIGHT);
     for(int i = 0; i < this.getModel().getColumnCount(); i++){
-      this.getColumnModel().getColumn(i).setMinWidth(GraphCanvasRenderer.FRAME_WIDTH);
+      this.getColumnModel().getColumn(i).setMinWidth(FRAME_WIDTH);
     }
     this.setPreferredSize(graph.getBounds().getSize());
     this.setSize(graph.getBounds().getSize());
@@ -51,7 +64,6 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
     graph.addObserver(this);
     this.addMouseListener(this);
     this.addMouseMotionListener(this);
-    this.setDefaultRenderer(Object.class, renderer);
   }
   
   public Dimension getPreferredSize() {
@@ -73,22 +85,9 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
 
   boolean drawnAll = false;
   
-  /*@Override
-  public void paintComponent(Graphics g) {
-    if(drawnAll == false){
-      Rectangle bounds = graph.getBounds();
-      this.setSize(bounds.getSize());
-      this.setPreferredSize(bounds.getSize());
-      //this.setScale(graph.getScale());
-      drawnAll = true;
-    }
-    super.paintComponent(g);
-    //overlay for selection.
-    
-  }*/
-  
   public void reset(){
-    renderer.reset();
+    images = null;
+    forceDraw = true;
   }
   
   protected void drawNode(Node n, Rectangle o, Graphics image) {	  
@@ -166,7 +165,6 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
 
   }
   public void mouseMoved(MouseEvent e){
-    repaint(new Rectangle(0,0,this.getWidth(), this.getHeight()));
   }
   
   @Override
@@ -195,6 +193,154 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
     }
     else{
       repaint();
+    }
+  }
+  
+  protected TiledImage getImageFromTable(int row, int column) {	
+	if (images == null) {
+		images = new ArrayList<TiledImage>();
+		return null;
+	}
+	  
+    for (int i = 0; i < images.size(); i++) {
+      TiledImage aImage = images.get(i);
+      if (aImage.row == row && aImage.column == column) {
+        return aImage;
+      }
+    }
+    
+    return null;
+  }
+  
+  private int getNumRows() {
+	  return (int) Math.ceil(this.getSize().height / FRAME_HEIGHT) + 1; 
+  }
+  
+  private int getNumColumns() {
+	  return (int) Math.ceil(this.getSize().width / FRAME_WIDTH) + 1; 
+  }
+
+  private TiledImage createNewImage(int row, int column, GraphCanvas canvas) {
+	TiledImage image = null;
+    Point origin = new Point(column * (int) (FRAME_WIDTH / graph.getScale()), row * (int) (FRAME_HEIGHT / graph.getScale()));
+
+    image = new TiledImage((int) (FRAME_WIDTH / graph.getScale()), (int) (FRAME_HEIGHT / graph.getScale()), BufferedImage.TYPE_INT_ARGB, origin, new Dimension((int) (FRAME_WIDTH / graph.getScale()), (int) (FRAME_HEIGHT / graph.getScale())));
+    Graphics2D g1 = image.createGraphics();
+    g1.setClip(0, 0, (int) (FRAME_WIDTH / graph.getScale()), (int) (FRAME_HEIGHT / graph.getScale()));
+    image.setGraphics(g1);
+    image.row = row;
+    image.column = column;
+    images.add(image);
+    
+    return image;
+  }
+  
+  @Override
+  public void paintComponent(Graphics g) {
+	  int numRows = getNumRows();
+	  int numColumns = getNumColumns();
+	  int numThreads = numRows * numColumns;
+	  PaintThread[] threads = new PaintThread[numThreads];
+	  
+	  // Build images asynchronously
+	  for (int i = 0; i < numThreads; i++) {
+		  int row = i / numColumns;
+		  int column = i % numColumns;
+		  
+		  TiledImage image = getImageFromTable(row, column);
+
+		  if (image == null) {
+		    image = createNewImage(row, column, this);
+		  }
+		  
+		  threads[i] = new PaintThread(this, new Rectangle(column * (int) (FRAME_WIDTH / graph.getScale()), row * (int) (FRAME_HEIGHT / graph.getScale()), (int) (FRAME_WIDTH / graph.getScale()), (int) (FRAME_HEIGHT / graph.getScale())), image, forceDraw);
+		  threads[i].start();
+	  }
+	  
+	  // Draw the images built
+	  for (int i = 0; i < numThreads; i++) {
+		  int row = i / numColumns;
+		  int column = i % numColumns;
+		  
+		  // Wait for thread first
+		  try {
+			threads[i].join();
+		  } catch (InterruptedException e) {
+			e.printStackTrace();
+		  }
+		  
+		  TiledImage image = getImageFromTable(row, column);
+		  drawGraphics(g, image, row, column);
+	  }
+	  
+	  forceDraw = false;
+  }
+  
+  public void drawGraphics(Graphics g, TiledImage image, int row, int column) {
+	  Graphics2D g2 = (Graphics2D) g;
+	  g2.drawImage(image, new AffineTransformOp(AffineTransform.getScaleInstance(FRAME_WIDTH / (double) image.getWidth(), FRAME_HEIGHT / (double) image.getHeight()), AffineTransformOp.TYPE_BICUBIC), column * FRAME_WIDTH, row * FRAME_HEIGHT);
+	  drawNodeHighlight(g, g2, image);
+  }
+
+  private void drawNodeHighlight(Graphics g, Graphics2D g2, TiledImage image) {
+    Node n = graph.getSelectedNode();
+    Point pos = getMousePosition();
+    if ((n == null || !n.isVisible()) && pos != null) {
+      n = graph.getNodeAtXY(pos.x, pos.y);
+    }
+    int scaled_diameter = (int) Math.ceil(DrawableNode.NODE_DIAMETER * graph.getScale());
+    while (n != null && (n.isVisible() || n == graph.getSelectedNode())) {
+      Stroke s = g2.getStroke();
+      Iterator<Edge> es = n.getEdges();
+      while (es.hasNext()) {
+        Edge e = es.next();
+        if (!graph.shouldShowEdge(e)) {
+          continue;
+        }
+        g2.setColor(HIGHLIGHT_COLOR);
+        Rectangle bounds = g.getClipBounds();
+        g2.setStroke(new BasicStroke(5));
+        int x1 = (int) ((e.getStart().getX(graph) - image.origin.x) * graph.getScale());
+        int y1 = (int) ((e.getStart().getY(graph) - image.origin.y) * graph.getScale());
+        int x2 = (int) ((e.getEnd().getX(graph) - image.origin.x) * graph.getScale());
+        int y2 = (int) ((e.getEnd().getY(graph) - image.origin.y) * graph.getScale());
+        if ((x1 >= 0 && y1 >= 0 && x1 <= bounds.width && y1 <= bounds.height)
+                || (x2 >= 0 && y2 >= 0 && x2 <= bounds.width && y2 <= bounds.height)) {
+          /*x1 -= image.getBounds().x;
+           x2 -= image.getBounds().x;
+           y1 -= image.getBounds().y;
+           y2 -= image.getBounds().y;*/
+          g.drawLine(x1 + scaled_diameter / 2,
+                  y1 + scaled_diameter / 2,
+                  x2 + scaled_diameter / 2,
+                  y2 + scaled_diameter / 2);
+          g2.setColor(Color.BLACK);
+
+          g2.setStroke(new BasicStroke(3));
+          g.drawLine(x1 + scaled_diameter / 2,
+                  y1 + scaled_diameter / 2,
+                  x2 + scaled_diameter / 2,
+                  y2 + scaled_diameter / 2);
+        }
+      }
+      g2.setStroke(s);
+      g.setColor(HIGHLIGHT_COLOR);
+      int x = (int) ((n.getX(graph) - image.origin.x) * graph.getScale());
+      int y = (int) ((n.getY(graph) - image.origin.y) * graph.getScale());
+      g.fillArc(x,
+              y,
+              scaled_diameter,
+              scaled_diameter, 0, 360);
+      g.setColor(Color.BLACK);
+      g.drawArc(x,
+              y,
+              scaled_diameter,
+              scaled_diameter, 0, 360);
+      if (getMousePosition() == null || n == graph.getNodeAtXY(getMousePosition().x, getMousePosition().y)) {
+        n = null;
+      } else {
+        n = graph.getNodeAtXY(getMousePosition().x, getMousePosition().y);
+      }
     }
   }
 }
