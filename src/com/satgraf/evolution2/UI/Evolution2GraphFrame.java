@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
+import javax.swing.JFrame;
+
 import com.satgraf.community.UI.CommunityGraphFrame;
 import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satlib.community.CommunityMetric;
@@ -93,7 +95,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     graphViewer.graph = factory.getGraph();
     graphViewer.setPlacer(p);
     frmMain.init();
-    
+    frmMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frmMain.show();
   }
 

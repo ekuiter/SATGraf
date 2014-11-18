@@ -23,6 +23,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.regex.Pattern;
+
+import javax.swing.JFrame;
+
 import org.json.simple.JSONObject;
 
 /**
@@ -133,7 +136,7 @@ public class CommunityGraphFrame extends GraphFrame{
     graphViewer.graph = factory.getGraph();
     graphViewer.setPlacer(p);
     frmMain.init();
-    
+    frmMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frmMain.show();
   }
 }
