@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.regex.Pattern;
-
 import javax.swing.JFrame;
 
 import com.satgraf.community.UI.CommunityGraphFrame;

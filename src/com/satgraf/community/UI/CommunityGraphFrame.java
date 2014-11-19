@@ -110,7 +110,8 @@ public class CommunityGraphFrame extends GraphFrame{
     if(args.length < 3){
       args = new String[]{
         //"formula/satcomp/dimacs/toybox.dimacs",
-        "formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
+        //"formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
+        "/home/zacknewsham/aes.sb",
         //"/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "ol",
         "f"
@@ -131,7 +132,13 @@ public class CommunityGraphFrame extends GraphFrame{
     
     frmMain.setVisible(true);
     factory.makeGraph(new File(args[0]));
-    CommunityPlacer p = CommunityGraphFrame.getPlacer(args[2], factory.getGraph());
+    CommunityPlacer p = null;
+    if(factory.getGraph() instanceof CommunityPlacer){
+      p = (CommunityPlacer)factory.getGraph();
+    }
+    else{
+      p = CommunityGraphFrame.getPlacer(args[2], factory.getGraph());
+    }
     frmMain.setProgressive(p);
     graphViewer.graph = factory.getGraph();
     graphViewer.setPlacer(p);

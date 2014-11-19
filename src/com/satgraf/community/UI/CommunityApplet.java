@@ -10,6 +10,7 @@ import com.satlib.community.CommunityGraphFactory;
 import com.satlib.community.CommunityGraphFactoryFactory;
 import com.satlib.community.CommunityGraphViewer;
 import com.satlib.community.placer.CommunityPlacer;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import javax.swing.JApplet;
@@ -25,8 +26,25 @@ public class CommunityApplet extends JApplet{
         //Execute a job on the event-dispatching thread; creating this applet's GUI.
         try {
             final HashMap<String, String> patterns = new HashMap<String, String>();
-            final int formula_id = Integer.valueOf(getParameter("formula_id"));
-            final URL file = new URL(String.format("http://satbench.uwaterloo.ca/formula/%d.cnf", formula_id));
+            
+            
+            final int formula_id;
+            if(getParameter("formula_id") != null){
+              formula_id = Integer.valueOf(getParameter("formula_id"));
+            }
+            else{
+              formula_id = 3256;
+            }
+            final URL file;
+            URL temp  = new URL(String.format("http://satbench.uwaterloo.ca/json/%d.sb", formula_id));
+            HttpURLConnection huc =  (HttpURLConnection)  temp.openConnection(); 
+            if(huc.getResponseCode() == 200){
+              file = temp;
+            }
+            else{
+              file = new URL(String.format("http://satbench.uwaterloo.ca/formula/%d.cnf", formula_id));
+            }
+            
             final CommunityGraphFactory factory = (new CommunityGraphFactoryFactory("ol")).getFactory(file, patterns);
 
             final CommunityGraphViewer graphViewer = new CommunityGraphViewer(null, factory.getNodeLists(), null);
@@ -39,7 +57,13 @@ public class CommunityApplet extends JApplet{
                 }
             });
             factory.makeGraph(file);
-            CommunityPlacer p = CommunityGraphFrame.getPlacer("f", factory.getGraph());
+            CommunityPlacer p = null;
+            if(factory.getGraph() instanceof CommunityPlacer){
+              p = (CommunityPlacer)factory.getGraph();
+            }
+            else{
+              p = CommunityGraphFrame.getPlacer("f", factory.getGraph());
+            }
             frmMain.setProgressive(p);
             graphViewer.graph = factory.getGraph();
             graphViewer.setPlacer(p);

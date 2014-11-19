@@ -106,14 +106,14 @@ public class FruchPlacer extends AbstractPlacer {
     private boolean rescaleLayout = true; 
     private boolean firstLayout = true;
     private boolean noBreak = true;
-    private int seed;
+    private int seed = 123712382;
     private boolean isSeedSet = false;
 
     private Collection<CommunityNode> nodeList;
     private int width = 2500;
     private int height = 2500;
     private boolean update = true;
-
+    private Random rand = new Random(this.seed);
     private HashMap locations = new HashMap();
 
     public String getProgressionName(){
@@ -185,12 +185,13 @@ public class FruchPlacer extends AbstractPlacer {
      */
     public void setRandomSeed(int seed) {
 	this.seed = seed;
+    this.rand = new Random(this.seed);
 	isSeedSet = true;
     }
 
     
     public double getRandomBelow(int max){
-      return Math.random() * max;
+      return rand.nextDouble() * max;
     }
     
     /**
