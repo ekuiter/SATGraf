@@ -101,6 +101,8 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  play.setText("Play");
 		  changeSlideTimer.stop();
 		  updateInProgress = false;
+		  displayDecisionVariableCount = 0;
+		  graphviewer.clearDecisionVariable();
 	  }
 
 	  private void buildLayout() {
