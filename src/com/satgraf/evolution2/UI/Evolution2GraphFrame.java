@@ -1,11 +1,10 @@
 package com.satgraf.evolution2.UI;
 
-import com.satlib.evolution.EvolutionGraphFactoryObserver.Action;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.regex.Pattern;
-
+import javax.swing.JFrame;
 
 import com.satgraf.community.UI.CommunityGraphFrame;
 import com.satgraf.graph.UI.GraphCanvasPanel;
@@ -37,8 +36,8 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     if (graphViewer != null && graphViewer.graph != null && panel == null) {
       canvasPanel = new GraphCanvasPanel(new Evolution2GraphCanvas(graphViewer));
       panel = new Evolution2OptionsPanel(this, getGraphViewer(), patterns.keySet());
-      super.show();
       factory.buildEvolutionFile();
+      super.show();
     } else {
       super.show();
     }
@@ -95,7 +94,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     graphViewer.graph = factory.getGraph();
     graphViewer.setPlacer(p);
     frmMain.init();
-    
+    frmMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frmMain.show();
   }
 

@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -148,7 +150,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame implements Evolutio
     CommunityGraphViewer graphViewer = new CommunityGraphViewer(factory.getGraph(), factory.getNodeLists(), CommunityGraphFrame.getPlacer(args[2], factory.getGraph()));
     EvolutionGraphFrame frmMain = new EvolutionGraphFrame(factory, graphViewer, factory.getPatterns(), factory.getMetric());
     frmMain.init();
-    
+    frmMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frmMain.show();
   }
   

@@ -28,7 +28,7 @@ public class GraphTableModel extends AbstractTableModel{
     }
     Rectangle r = graph.getBounds();
     while(r.height > 0){
-      r.height -= GraphCanvasRenderer.FRAME_HEIGHT;
+      r.height -= GraphCanvas.FRAME_HEIGHT;
       rows++;
     }
     return rows;
@@ -41,7 +41,7 @@ public class GraphTableModel extends AbstractTableModel{
     }
     Rectangle r = graph.getBounds();
     while(r.width > 0){
-      r.width -= GraphCanvasRenderer.FRAME_WIDTH;
+      r.width -= GraphCanvas.FRAME_WIDTH;
       cols++;
     }
     return cols;

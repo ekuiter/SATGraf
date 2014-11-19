@@ -6,9 +6,10 @@
 
 package com.satgraf.UI;
 
-import com.satgraf.graph.UI.TiledImage;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+
+import com.satgraf.graph.UI.TiledImage;
 
 /**
  *
@@ -18,22 +19,26 @@ public class PaintThread extends Thread{
   private final ThreadPaintable panel;
   private final Rectangle bounds;
   private final TiledImage image;
-  private final Thread notify;
   private boolean finished = false;
-  public PaintThread(ThreadPaintable panel, Rectangle bounds, TiledImage image, Thread notify){
+  private boolean forceDraw = false;
+  
+  public PaintThread(ThreadPaintable panel, Rectangle bounds, TiledImage image, boolean forceDraw){
     this.panel = panel;
     this.bounds = bounds;
     this.image = image;
-    this.notify = notify;
+    this.forceDraw = forceDraw;
+    setFinished(false);
   }
+  
   @Override
   public void run() {
-    panel.paintThread(this);
+	panel.paintThread(this);
   }
   
   public Graphics getGraphics(){
     return image.getGraphics();
   }
+  
   public Rectangle getBounds(){
     return bounds;
   }
@@ -42,8 +47,12 @@ public class PaintThread extends Thread{
     this.finished = finished;
     image.setFinished(finished);
   }
+  
   public boolean getFinished(){
     return finished;
   }
   
+  public boolean getForceDraw() {
+	  return forceDraw;
+  }
 }

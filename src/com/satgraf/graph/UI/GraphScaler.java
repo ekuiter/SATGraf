@@ -25,7 +25,6 @@ import com.satlib.graph.GraphViewer;
 public class GraphScaler extends JPanel implements ChangeListener{
   private final JSlider scale = new JSlider(1, 100);
   private GraphViewer graph;
-  private GraphFrame frame;
   private final JButton fit = new JButton("Fit");
   public void setScale(int pos){
     scale.setValue(pos);
@@ -34,7 +33,7 @@ public class GraphScaler extends JPanel implements ChangeListener{
     return scale.getValue();
   }
   
-  public GraphScaler(GraphFrame frame, GraphViewer graph){
+  public GraphScaler(final GraphFrame frame, GraphViewer graph){
     this.graph = graph;
     scale.setValue((int)(graph.getScale() * 100));
     scale.setSize(new Dimension(100, 20));
@@ -49,7 +48,7 @@ public class GraphScaler extends JPanel implements ChangeListener{
       @Override
       public void mouseClicked(MouseEvent e) {
         Rectangle gR = GraphScaler.this.graph.getBounds();
-        Rectangle vR = GraphScaler.this.frame.getGraphCanvas().getVisibleRect();
+        Rectangle vR = frame.getGraphCanvas().getVisibleRect();
         
         double widthRatio = (double)vR.width / (double)gR.width;
         double heightRatio = (double)vR.height / (double)gR.height;

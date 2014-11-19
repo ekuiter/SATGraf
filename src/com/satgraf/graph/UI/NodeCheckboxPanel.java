@@ -56,15 +56,12 @@ public class NodeCheckboxPanel extends JPanel{
     while(nodes.hasNext()){
       Node next = nodes.next();
       JCheckBox jc = checkBoxes.get(next);
-      ItemListener l = jc.getItemListeners()[0];
-      jc.removeItemListener(l);
       if(next.isVisible()){
         jc.setSelected(true);
       }
       else{
         jc.setSelected(false);
       }
-      jc.addItemListener(l);
     }
   }
   

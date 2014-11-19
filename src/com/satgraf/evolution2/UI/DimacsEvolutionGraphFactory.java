@@ -6,19 +6,21 @@
 
 package com.satgraf.evolution2.UI;
 
-import com.satlib.NamedFifo;
-import com.satlib.community.CommunityGraph;
-import com.satlib.community.CommunityGraphViewer;
-import com.satlib.community.CommunityNode;
 import static com.satlib.evolution.EvolutionGraphFactoryFactory.pipeFileName;
-import com.satlib.evolution.EvolutionGraphFactoryObserver;
 import gnu.trove.map.hash.TIntObjectHashMap;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import com.satlib.NamedFifo;
+import com.satlib.community.CommunityGraph;
+import com.satlib.community.CommunityGraphViewer;
+import com.satlib.community.CommunityNode;
+import com.satlib.evolution.EvolutionGraphFactoryObserver;
 
 /**
  *
@@ -54,10 +56,13 @@ public class DimacsEvolutionGraphFactory extends com.satlib.evolution.DimacsEvol
         try {
 
           NamedFifo fifo = new NamedFifo(pipeFileName);
-          fifo.create();
+          
+          if (fifo.getFile().exists())
+        	  fifo.getFile().delete();
+    	  fifo.create();
 
           Runtime.getRuntime().exec(String.format(getMinisat().concat(" %s"), input.getAbsolutePath()));
-          BufferedReader reader = new BufferedReader(new FileReader(pipeFileName));
+          BufferedReader reader = openPipedFile();
           String line;
 
           while ((line = reader.readLine()) != null) {
@@ -74,6 +79,14 @@ public class DimacsEvolutionGraphFactory extends com.satlib.evolution.DimacsEvol
     };
     Thread t = new Thread(r);
     t.start();
+  }
+  
+  private BufferedReader openPipedFile() {
+	try {
+		return new BufferedReader(new FileReader(pipeFileName));
+	} catch (Exception e) {
+		return openPipedFile();
+	}
   }
 
   @Override

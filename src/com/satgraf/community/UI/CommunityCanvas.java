@@ -24,17 +24,23 @@ import com.satlib.community.CommunityEdge;
  * @author zacknewsham
  */
 public class CommunityCanvas extends GraphCanvas{
+	
+  private Thread thread = null;
+	
   public CommunityCanvas(GraphViewer graph){
     super(graph);
   }
   
+  public void start() {
+	  
+  }
+  
   @Override
   public void paintThread(PaintThread paint) {
-    Rectangle o = paint.getBounds();
+	Rectangle o = paint.getBounds();
     List<Node> nodes = graph.getOrderedUpdatedNodes(o, true);
-    boolean hasUpdatedNode = graph.doesRectangleHaveUpdate();
     
-    if (hasUpdatedNode || nodes.isEmpty()) {
+    if (!nodes.isEmpty() || paint.getForceDraw()) {
     	Iterator<Node> nodIt = nodes.iterator();
     	Graphics image = paint.getGraphics();
         Rectangle i = image.getClipBounds();
@@ -69,5 +75,10 @@ public class CommunityCanvas extends GraphCanvas{
     }
     
     paint.setFinished(true);
+  }
+  
+  @Override
+  public void paint(Graphics arg0) {
+	super.paint(arg0);
   }
 }
