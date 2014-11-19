@@ -29,8 +29,8 @@ public abstract class GraphOptionsPanel extends JSplitPane implements GraphObser
   protected GraphOptionsPanel(GraphViewer graph, Collection<String> groups, boolean callSet){
     this.groups = groups;
     this.setOrientation(JSplitPane.VERTICAL_SPLIT);
-    this.setSize(200, 700);
-    this.setPreferredSize(new Dimension(200, 700));
+    this.setSize(100, 700);
+    this.setPreferredSize(new Dimension(100, 700));
     if(callSet){
       setGraph(graph, true);
     }

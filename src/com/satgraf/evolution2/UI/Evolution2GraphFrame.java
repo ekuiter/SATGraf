@@ -35,7 +35,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
 
   public void show() {
     if (graphViewer != null && graphViewer.graph != null && panel == null) {
-      canvasPanel = new GraphCanvasPanel(new Evolution2GraphCanvas(graphViewer));
+      canvasPanel = new GraphCanvasPanel(new Evolution2GraphCanvas((Evolution2GraphViewer)graphViewer));
       panel = new Evolution2OptionsPanel(this, getGraphViewer(), patterns.keySet());
       factory.buildEvolutionFile();
       super.show();

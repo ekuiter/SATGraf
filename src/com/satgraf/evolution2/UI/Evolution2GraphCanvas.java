@@ -8,16 +8,19 @@ import com.satlib.graph.GraphViewer;
 import com.satlib.graph.Node;
 
 public class Evolution2GraphCanvas extends CommunityCanvas {
+	
+	private Evolution2GraphViewer graph;
 
-	public Evolution2GraphCanvas(GraphViewer graph) {
+	public Evolution2GraphCanvas(Evolution2GraphViewer graph) {
 		super(graph);
+		this.graph = graph;
 	}
 	
 	@Override
 	public void paintComponent(Graphics g) {
 	    super.paintComponent(g);
 
-	    Node decisionVariable = ((Evolution2GraphViewer)graph).getDecisionVariable();
+	    Node decisionVariable = graph.getDecisionVariable();
 	    if (decisionVariable != null && decisionVariable.isVisible()) {
 	      drawDecisionVariable(decisionVariable, g);
 	    }

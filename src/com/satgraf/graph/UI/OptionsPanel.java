@@ -8,8 +8,11 @@ package com.satgraf.graph.UI;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
@@ -57,19 +60,21 @@ public class OptionsPanel extends JPanel{
     });
     
     scale = new GraphScaler(frame, graph);
-    options.setLayout(new GridLayout(4, 1));
+    options.setLayout(new BoxLayout(options, BoxLayout.Y_AXIS));
+    options.setPreferredSize(new Dimension(300, 700));
     
     JPanel neOptions = new JPanel();
-    neOptions.setLayout(new GridLayout(1, 2));
+    neOptions.setLayout(new GridLayout(1, 2, 10, 0));
     neOptions.add(hideAllNodes);
     neOptions.add(hideAllEdges);
 
     this.options.add(scale);
     this.options.add(neOptions);
+    this.options.add(Box.createRigidArea(new Dimension(0,10)));
     
     this.setLayout(new BorderLayout());
-    this.add(nodePanel, BorderLayout.CENTER);
-    this.add(options, BorderLayout.NORTH);
+    this.add(options, BorderLayout.CENTER);
+    this.add(nodePanel, BorderLayout.SOUTH);
   }
   
   public void fromJson(JSONObject json){

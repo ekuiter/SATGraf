@@ -12,6 +12,7 @@ import com.satlib.graph.GraphViewer;
 import com.satlib.community.CommunityNode;
 import com.satlib.community.CommunityEdge;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -70,6 +71,7 @@ public class CommunityNodePanel extends NodePanel<CommunityNode>{
     panel.add(intraPanel, c);
     
     this.setLayout(new BorderLayout());
+    this.setPreferredSize(new Dimension(100, 300));
     this.add(scroll, BorderLayout.CENTER);
   }
   

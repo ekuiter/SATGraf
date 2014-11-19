@@ -36,8 +36,8 @@ public class GraphScaler extends JPanel implements ChangeListener{
   public GraphScaler(final GraphFrame frame, GraphViewer graph){
     this.graph = graph;
     scale.setValue((int)(graph.getScale() * 100));
-    scale.setSize(new Dimension(100, 20));
-    scale.setPreferredSize(new Dimension(100, 20));
+    scale.setPreferredSize(new Dimension(225, 20));
+    fit.setPreferredSize(new Dimension(50, 40));
     
     this.setLayout(new BorderLayout());
     this.add(scale, BorderLayout.CENTER);

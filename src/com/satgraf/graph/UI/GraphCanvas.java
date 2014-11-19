@@ -237,6 +237,7 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
   
   @Override
   public void paintComponent(Graphics g) {
+	  Graphics2D g2 = (Graphics2D) g;
 	  int numRows = getNumRows();
 	  int numColumns = getNumColumns();
 	  int numThreads = numRows * numColumns;
@@ -270,19 +271,18 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
 		  }
 		  
 		  TiledImage image = getImageFromTable(row, column);
-		  drawGraphics(g, image, row, column);
+		  drawGraphics(g2, image, row, column);
 	  }
 	  
+	  drawNodeHighlight(g, g2);
 	  forceDraw = false;
   }
   
-  public void drawGraphics(Graphics g, TiledImage image, int row, int column) {
-	  Graphics2D g2 = (Graphics2D) g;
+  public void drawGraphics(Graphics2D g2, TiledImage image, int row, int column) {
 	  g2.drawImage(image, new AffineTransformOp(AffineTransform.getScaleInstance(FRAME_WIDTH / (double) image.getWidth(), FRAME_HEIGHT / (double) image.getHeight()), AffineTransformOp.TYPE_BICUBIC), column * FRAME_WIDTH, row * FRAME_HEIGHT);
-	  drawNodeHighlight(g, g2, image);
   }
 
-  private void drawNodeHighlight(Graphics g, Graphics2D g2, TiledImage image) {
+  private void drawNodeHighlight(Graphics g, Graphics2D g2) {
     Node n = graph.getSelectedNode();
     Point pos = getMousePosition();
     if ((n == null || !n.isVisible()) && pos != null) {
@@ -300,16 +300,12 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
         g2.setColor(HIGHLIGHT_COLOR);
         Rectangle bounds = g.getClipBounds();
         g2.setStroke(new BasicStroke(5));
-        int x1 = (int) ((e.getStart().getX(graph) - image.origin.x) * graph.getScale());
-        int y1 = (int) ((e.getStart().getY(graph) - image.origin.y) * graph.getScale());
-        int x2 = (int) ((e.getEnd().getX(graph) - image.origin.x) * graph.getScale());
-        int y2 = (int) ((e.getEnd().getY(graph) - image.origin.y) * graph.getScale());
+        int x1 = (int) ((e.getStart().getX(graph)) * graph.getScale());
+        int y1 = (int) ((e.getStart().getY(graph)) * graph.getScale());
+        int x2 = (int) ((e.getEnd().getX(graph)) * graph.getScale());
+        int y2 = (int) ((e.getEnd().getY(graph)) * graph.getScale());
         if ((x1 >= 0 && y1 >= 0 && x1 <= bounds.width && y1 <= bounds.height)
                 || (x2 >= 0 && y2 >= 0 && x2 <= bounds.width && y2 <= bounds.height)) {
-          /*x1 -= image.getBounds().x;
-           x2 -= image.getBounds().x;
-           y1 -= image.getBounds().y;
-           y2 -= image.getBounds().y;*/
           g.drawLine(x1 + scaled_diameter / 2,
                   y1 + scaled_diameter / 2,
                   x2 + scaled_diameter / 2,
@@ -325,8 +321,8 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
       }
       g2.setStroke(s);
       g.setColor(HIGHLIGHT_COLOR);
-      int x = (int) ((n.getX(graph) - image.origin.x) * graph.getScale());
-      int y = (int) ((n.getY(graph) - image.origin.y) * graph.getScale());
+      int x = (int) ((n.getX(graph)) * graph.getScale());
+      int y = (int) ((n.getY(graph)) * graph.getScale());
       g.fillArc(x,
               y,
               scaled_diameter,

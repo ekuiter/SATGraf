@@ -12,6 +12,8 @@ import com.satlib.graph.Node;
 public class Evolution2GraphViewer extends CommunityGraphViewer {
 	
 	private Node decisionVariable = null;
+	private boolean showDecisionVariable = true;
+	private int displayDecisionVariableFor = 100;
 
 	public Evolution2GraphViewer(CommunityGraph graph, HashMap<String, TIntObjectHashMap<String>> node_lists, CommunityPlacer pl) {
 		super(graph, node_lists, pl);
@@ -27,5 +29,21 @@ public class Evolution2GraphViewer extends CommunityGraphViewer {
 
 	public void clearDecisionVariable() {
 	    this.decisionVariable = null;
+	}
+	
+	public void setShowDecisionVariable(boolean showDecisionVariable) {
+		this.showDecisionVariable = showDecisionVariable;
+	}
+	
+	public boolean getShowDecisionVariable() {
+		return this.showDecisionVariable;
+	}
+	
+	public int getDisplayDecisionVariableFor() {
+		return this.displayDecisionVariableFor;
+	}
+	
+	public void setDisplayDecisionVariableFor(int length) {
+		this.displayDecisionVariableFor = length;
 	}
 }
