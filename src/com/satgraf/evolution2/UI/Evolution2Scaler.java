@@ -169,6 +169,9 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	  }
 	  
 	  public void scanToConflict(int conflictNumber) {
+		  if (timerTriggered)
+			  stopTimer();
+		  
 		  this.isScanningForConflict = true;
 		  this.desiredConflict = conflictNumber;
 		  
@@ -485,6 +488,9 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 				  }
 			  }
 		  }
+		  
+		  if (endingLine == 0)
+			  this.currentConflict = 0;
 		  
 		  return endingLine;
 	  }

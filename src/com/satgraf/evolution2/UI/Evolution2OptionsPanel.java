@@ -111,7 +111,9 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 	
 	private void updateConflictDescription(int value) {
 		String conflict = String.valueOf((int) Math.ceil((double)value / 2));
-		if (value % 2 == 0) {
+		if (value == 0) {
+			conflictDescription.setText("Conflict Description");
+		} else if (value % 2 == 0) {
 			conflictDescription.setText("Post Conflict " + conflict + " Analysis");
 		} else {
 			conflictDescription.setText("Pre Conflict " + conflict + " Analysis");

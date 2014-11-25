@@ -50,6 +50,8 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
 
   @Override
   public com.satgraf.actions.ExportAction getExportAction() {
+	if(graphViewer != null)
+		graphViewer.selectNode(null);
     return new ExportAction(this);
   }
   
