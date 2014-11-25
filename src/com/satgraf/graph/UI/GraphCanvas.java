@@ -135,18 +135,25 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
       hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       return hints;
   }
-
-  @Override
-  public void mouseClicked(MouseEvent e) {
-    Node n = graph.getNodeAtXY(e.getX(), e.getY());
+  
+  private void mouseHighlight(MouseEvent e) {
+	Node n = graph.getNodeAtXY(e.getX(), e.getY());
     if(n != null){
     	if (graph.getSelectedNode() == n) {
     		graph.selectNode(null);
     	} else {
     		graph.selectNode(n);
     	}
+    	this.repaint();
+    } else if (graph.getSelectedNode() != null) {
+    	graph.selectNode(null);
+    	this.repaint();
     }
-    this.repaint();
+  }
+
+  @Override
+  public void mouseClicked(MouseEvent e) {
+    mouseHighlight(e);
   }
 
   @Override
@@ -163,13 +170,13 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
 
   @Override
   public void mouseExited(MouseEvent e) {
-    
   }
      
   public void mouseDragged(MouseEvent e){
-
   }
+  
   public void mouseMoved(MouseEvent e){
+	  mouseHighlight(e);
   }
   
   @Override

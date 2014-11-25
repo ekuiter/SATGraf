@@ -1,6 +1,5 @@
 package com.satgraf.evolution2.UI;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -65,7 +64,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	  private boolean timerTriggered = false;
 	  private boolean updateInProgress = false;
 	  
-	  public Evolution2Scaler(Evolution2GraphViewer graphviewer){
+	  public Evolution2Scaler(final Evolution2GraphViewer graphviewer){
 	    this.graphviewer = graphviewer;
 	    
 	    progress.setPreferredSize(new Dimension(100, 20));
@@ -92,6 +91,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	    	@Override
 	    	public void mouseClicked(MouseEvent e) {
 	    		updateShowAssignedVars(showAssignedVarsBox.isSelected());
+	    		updatedNodes.addAll(graphviewer.getGraph().getNodes());
 	    		updateGraph();
 	    	}
 	    });
