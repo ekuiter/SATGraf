@@ -4,7 +4,9 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.Collection;
 
+import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -22,13 +24,15 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 	
 	// Options
 	private JCheckBox hideDecisionVariable = new JCheckBox("Decision Variable", true);
+	private TextRocker evolutionSpeed;
 	private TextRocker decisionVisibleLength;
+	private TextRocker conflictRocker;
+	private JLabel conflictDescription = new JLabel("Conflict Description");
 	
 	public Evolution2OptionsPanel(GraphFrame frame, Evolution2GraphViewer graph, Collection<String> groups) {
 		super(frame, graph, groups, false);
 		setGraph(graph);
 		this.graph = graph;
-		this.decisionVisibleLength = new TextRocker(0, "Decision Variable Display Length", graph.getDisplayDecisionVariableFor());
 		
 		buildLayout(graph);
 		this.setTopComponent(checkBoxPanel);
@@ -37,12 +41,27 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 	private void buildLayout(Evolution2GraphViewer graph) {
 		OptionsPanel op = getOptionsPanel();
 		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(4, 1));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		panel.setPreferredSize(new Dimension(250, 500));
 		
 		// Scaler
 		scaler = new Evolution2Scaler(graph);
 		panel.add(scaler);
+		
+		// Evolution speed
+		this.evolutionSpeed = new TextRocker(0, "Speed of Evolution", graph.getEvolutionSpeed(), 1, Integer.MAX_VALUE);
+		panel.add(evolutionSpeed);
+		evolutionSpeed.registerListener(this);
+		
+		// Conflict scanning
+		this.conflictRocker = new TextRocker(2, "Conflict Scan", 0, 0, Integer.MAX_VALUE);
+		panel.add(conflictRocker);
+		JPanel panel1 = new JPanel();
+		panel1.setLayout(new GridLayout(1, 1));
+		conflictDescription.setHorizontalAlignment(JLabel.CENTER);
+		panel1.add(conflictDescription);
+		panel.add(panel1);
+		conflictRocker.registerListener(this);
 		
 		// Decision Variables
 		hideDecisionVariable.addChangeListener(new ChangeListener() {
@@ -54,9 +73,13 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 	        }
 	      }
 	    });
-		panel.add(hideDecisionVariable);
+		JPanel panel2 = new JPanel();
+		panel2.setLayout(new GridLayout(1, 1));
+		panel2.add(hideDecisionVariable);
+		panel.add(panel2);
 		
 		// Decision Visible length
+		this.decisionVisibleLength = new TextRocker(1, "Decision Variable Display Length", graph.getDisplayDecisionVariableFor(), 0, 10000);
 		panel.add(decisionVisibleLength);
 		decisionVisibleLength.registerListener(this);
 		
@@ -76,7 +99,22 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 
 	@Override
 	public void stateChanged(int id, int value) {
-		if (id == decisionVisibleLength.getId())
+		if (id == evolutionSpeed.getId())
+			graph.setEvolutionSpeed(value);
+		else if (id == decisionVisibleLength.getId())
 			graph.setDisplayDecisionVariableFor(value);
+		else if (id == conflictRocker.getId()) {
+			scaler.scanToConflict(value);
+			updateConflictDescription(value);
+		}
+	}
+	
+	private void updateConflictDescription(int value) {
+		String conflict = String.valueOf((int) Math.ceil((double)value / 2));
+		if (value % 2 == 0) {
+			conflictDescription.setText("Post Conflict " + conflict + " Analysis");
+		} else {
+			conflictDescription.setText("Pre Conflict " + conflict + " Analysis");
+		}
 	}
 }

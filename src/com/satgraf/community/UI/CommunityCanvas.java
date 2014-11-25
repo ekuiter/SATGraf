@@ -11,13 +11,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.satgraf.graph.UI.GraphCanvas;
 import com.satgraf.UI.PaintThread;
-import com.satlib.graph.Edge;
+import com.satgraf.graph.UI.GraphCanvas;
+import com.satlib.community.CommunityEdge;
 import com.satlib.graph.GraphViewer;
 import com.satlib.graph.Node;
-import com.satlib.community.CommunityNode;
-import com.satlib.community.CommunityEdge;
 
 /**
  *
@@ -62,7 +60,9 @@ public class CommunityCanvas extends GraphCanvas{
         	  if (drawnEdges.contains(e))
         		  continue;
         	  
-        	  if(e.getStart().getCommunity() == e.getEnd().getCommunity() && e.getStart().getCommunity() != -1) {
+        	  if (e.isConflictEdge()) {
+        		image.setColor(Color.RED);
+        	  } else if(e.getStart().getCommunity() == e.getEnd().getCommunity() && e.getStart().getCommunity() != -1) {
         	    image.setColor(e.getColor(graph));
         	  } else {
         	    image.setColor(Color.WHITE);

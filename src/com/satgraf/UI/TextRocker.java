@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.plaf.basic.BasicArrowButton;
@@ -22,10 +23,14 @@ public class TextRocker extends JPanel {
 	private int id;
 	private ArrayList<TextRockerListener> listeners = new ArrayList<TextRockerListener>();
 	private int lastUpdate;
+	private int min, max, prevValue;
 	
-	public TextRocker(int id, String title, int initialValue) {
+	public TextRocker(int id, String title, int initialValue, int min, int max) {
 		this.id = id;
 		this.setLayout(new GridLayout(2, 1));
+		this.min = min;
+		this.max = max;
+		this.prevValue = initialValue;
 		
 		// Title
 		JLabel titleLabel = new JLabel(title);
@@ -50,7 +55,9 @@ public class TextRocker extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				int value = Integer.parseInt(textField.getText()) - 1;
-				textField.setText(String.valueOf(value));
+				
+				if (value >= TextRocker.this.min)
+					textField.setText(String.valueOf(value));
 			}
 		});
 		
@@ -59,7 +66,9 @@ public class TextRocker extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				int value = Integer.parseInt(textField.getText()) + 1;
-				textField.setText(String.valueOf(value));
+				
+				if (value <= TextRocker.this.max)
+					textField.setText(String.valueOf(value));
 			}
 		});
 		
@@ -98,11 +107,33 @@ public class TextRocker extends JPanel {
        String text = textField.getText();
        if (text == null || text.isEmpty())
     	   return;
-    	   
-       int value = Integer.parseInt(text);
        
-       for (TextRockerListener ob : listeners) {
-          ob.stateChanged(this.id, value);
+       try {
+	       int value = Integer.parseInt(text);
+	       
+	       if (value < this.min || value > this.max) {
+	    	   revertValue();
+	       } else {
+	    	   this.prevValue = value;
+		       
+		       for (TextRockerListener ob : listeners) {
+		          ob.stateChanged(this.id, value);
+		       }
+	       }
+       } catch (NumberFormatException e) {
+    	   revertValue();
        }
+    }
+    
+    private void revertValue() {
+    	Runnable doRevert = new Runnable() {
+			
+			@Override
+			public void run() {
+				textField.setText(String.valueOf(prevValue));
+			}
+		};
+    	
+		SwingUtilities.invokeLater(doRevert);
     }
 }

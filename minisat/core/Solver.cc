@@ -100,6 +100,7 @@ Solver::Solver() :
   , asynch_interrupt   (false)
 {
     Pipe::getInstance()->openPipe("minisat/piping/myPipe.txt");
+    conflictNumber = 0;
 }
 
 
@@ -224,7 +225,7 @@ void Solver::cancelUntil(int level, bool done) {
             assigns [x] = l_Undef;
             
             if (!done)
-                printVar(x, VAR_UNASSIGNED, false);
+                printVar(x, VAR_UNASSIGNED, false, 0);
             
             if (phase_saving > 1 || (phase_saving == 1) && c > trail_lim.last())
                 polarity[x] = sign(trail[c]);
@@ -450,7 +451,7 @@ void Solver::uncheckedEnqueue(Lit p, bool isDecisionVariable, CRef from)
     vardata[var(p)] = mkVarData(from, decisionLevel());
     trail.push_(p);
     
-    printVar(var(p), !sign(p) ? VAR_ASSIGNED_TRUE : VAR_ASSIGNED_FALSE, isDecisionVariable);
+    printVar(var(p), !sign(p) ? VAR_ASSIGNED_TRUE : VAR_ASSIGNED_FALSE, isDecisionVariable, activity[var(p)]);
 }
 
 
@@ -644,6 +645,7 @@ lbool Solver::search(int nof_conflicts)
         CRef confl = propagate();
         if (confl != CRef_Undef){
             // CONFLICT
+            printConflict();
             conflicts++; conflictC++;
             if (decisionLevel() == 0) return l_False;
 
@@ -675,6 +677,8 @@ lbool Solver::search(int nof_conflicts)
                            (int)dec_vars - (trail_lim.size() == 0 ? trail.size() : trail_lim[0]), nClauses(), (int)clauses_literals, 
                            (int)max_learnts, nLearnts(), (double)learnts_literals/nLearnts(), progressEstimate()*100);
             }
+            
+            printConflict();
 
         }else{
             // NO CONFLICT
@@ -962,7 +966,7 @@ void Solver::printClause(const Clause& c, int state) {
     Pipe::getInstance()->writeToPipe(ss.str());
 }
 
-void Solver::printVar(const int id, int state, bool isDecisionVariable) {
+void Solver::printVar(const int id, int state, bool isDecisionVariable, int activity) {
     std::ostringstream ss;
     ss << "v";
     
@@ -980,7 +984,16 @@ void Solver::printVar(const int id, int state, bool isDecisionVariable) {
         ss << " 0 ";
     }
     
+    ss << activity << " ";
     ss << id+1 << "\n";
     
+    Pipe::getInstance()->writeToPipe(ss.str());
+}
+
+void Solver::printConflict() {
+    conflictNumber++;
+
+    std::ostringstream ss;
+    ss << "! " << conflictNumber << "\n";
     Pipe::getInstance()->writeToPipe(ss.str());
 }

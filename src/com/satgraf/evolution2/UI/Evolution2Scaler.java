@@ -2,6 +2,7 @@ package com.satgraf.evolution2.UI;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -13,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -28,7 +30,6 @@ import com.satlib.community.CommunityNode;
 import com.satlib.evolution.EvolutionGraphFactoryFactory;
 import com.satlib.graph.Edge;
 import com.satlib.graph.Edge.EdgeState;
-import com.satlib.graph.GraphViewer;
 import com.satlib.graph.Node;
 import com.satlib.graph.Node.NodeAssignmentState;
 
@@ -38,15 +39,18 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	  private Evolution2GraphViewer graphviewer;
 	  static String outputDirectory = EvolutionGraphFactoryFactory.outputDirectory;
 	  static int linesPerFile = EvolutionGraphFactoryFactory.maxLinesPerFile;
-	  int totalFiles = 0;
-	  int currentFile = -1;
-	  int nextFile = -1;
-	  int currentPosition = -1;
-	  int totalLines = 0;
+	  private int totalFiles = 0;
+	  private int currentFile = -1;
+	  private int nextFile = -1;
+	  private int currentPosition = -1;
+	  private int totalLines = 0;
+	  private int currentConflict = 0;
+	  private int desiredConflict = 0;
+	  private boolean isScanningForConflict = false;
 	  List<Node> updatedNodes = new ArrayList<Node>();
 	  List<Edge> updatedEdges = new ArrayList<Edge>();
 	  private JCheckBox showAssignedVarsBox = new JCheckBox("Show Assigned Variables");
-	  
+
 	  List<String> currentFileLines = null;
 	  List<String> nextFileLines = null;
 	  Thread bufferThread = null;
@@ -64,11 +68,9 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	  public Evolution2Scaler(Evolution2GraphViewer graphviewer){
 	    this.graphviewer = graphviewer;
 	    
-	    progress.setSize(new Dimension(100, 20));
 	    progress.setPreferredSize(new Dimension(100, 20));
 	    progress.setEnabled(false);
 	    
-	    play.setSize(new Dimension(70, 30));
 	    play.setPreferredSize(new Dimension(70, 30));
 	    play.setEnabled(false);
 	    
@@ -106,15 +108,18 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	  }
 
 	  private void buildLayout() {
-		  this.setLayout(new BorderLayout());
+		  this.setLayout(new GridLayout(3, 1));
 		  
 		  JLabel title = new JLabel("<html><b>Evolution</b></html>", JLabel.CENTER);
-		  this.add(title, BorderLayout.NORTH);
+		  this.add(title);
 		  
-		  this.add(progress, BorderLayout.CENTER);
-		  this.add(play, BorderLayout.EAST);
+		  JPanel panel = new JPanel();
+		  panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		  panel.add(progress);
+		  panel.add(play);
+		  this.add(panel);
 		  
-		  this.add(showAssignedVarsBox, BorderLayout.SOUTH);
+		  this.add(showAssignedVarsBox);
 	  }
 	  
 	  @Override
@@ -151,6 +156,9 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  graphviewer.setUpdatedNodes(new ArrayList<Node>(updatedNodes));
 		  graphviewer.setUpdatedEdges(new ArrayList<Edge>(updatedEdges));
 		  
+		  if (progress.getValue() != currentPosition)
+			  progress.setValue(currentPosition);
+		  
 		  updatedEdges.clear();
 		  updatedNodes.clear();
 	  }
@@ -160,20 +168,38 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	    updateProgress();
 	  }
 	  
+	  public void scanToConflict(int conflictNumber) {
+		  this.isScanningForConflict = true;
+		  this.desiredConflict = conflictNumber;
+		  
+		  if (conflictNumber > currentConflict)
+			  updatePosition(totalLines);
+		  else if (conflictNumber < currentConflict)
+			  updatePosition(0);
+	  }
+	  
 	  private void parseLine(String line, boolean forwards, int lineNumber) {
 			if (line.charAt(0) == 'v') {
 		    	parseNodeLine(line, forwards, lineNumber);
 		    } else if (line.charAt(0) == 'c') {
 		    	parseEdgeLine(line, forwards);
+		    } else if (line.charAt(0) == '!') {
+		    	foundConflict(line);
 		    }
-		}
+	  }
+	  
+	  private void foundConflict(String line) {
+			this.currentConflict = Integer.parseInt(line.split(" ")[1]);
+	  }
 	  
 	  private void parseNodeLine(String line, boolean forwards, int lineNumber) {
 		  CommunityGraph graph = Evolution2GraphFactoryFactory.getInstance().getGraph();
 		  NodeAssignmentState state = NodeAssignmentState.UNASSIGNED;
 		  CommunityNode n = null;
+		  int activity = 0;
 		  boolean stateFound = false;
 		  boolean isDecisionVariable = false;
+		  boolean activityFound = false;
 		  
 		  for (String c : line.split(" ")) {
 			  if (c.compareTo("v") == 0) { // Start of line
@@ -200,6 +226,9 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 					  		state = NodeAssignmentState.UNASSIGNED;
 					  }
 				  }
+			  } else if (!activityFound) {
+				  activity = Integer.parseInt(c);
+				  activityFound = true;
 			  } else {
 				  n = graph.getNode(Integer.parseInt(c));
 			  }
@@ -207,6 +236,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  
 		  if (n != null) {
 			  NodeAssignmentState prevState = n.getAssignmentState();
+			  n.setActivity(activity);
 			  
 			  if (isDecisionVariable && graphviewer.getShowDecisionVariable() && lastDecisionVariable != lineNumber) {
 				  graphviewer.setDecisionVariable(n);
@@ -226,9 +256,6 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 			  if (n.getAssignmentState() != prevState)
 				  updatedEdges.addAll(n.getEdgesList());
 		  }
-//		  System.out.print(n.getId());
-//		  System.out.print(state);
-//		  System.out.println();
 	  }
 	  
 	  private void parseEdgeLine(String line, boolean forwards) {
@@ -263,10 +290,9 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 				  
 				  if (e == null) {
 					  e = graph.connect(n1, n2, false);
-				  }
-				  
-				  if (e == null) {
-					  int o = 0;
+					  
+					  if (addEdge)
+						  e.setEdgeAsConflict();
 				  }
 				  
 				  prevState = e.getAssignmentState();
@@ -377,10 +403,6 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  int lineInCurrentFile = adjustOverallLineToCurrentFileLine(lineNumber);
 		  updateBufferedLines(lineInCurrentFile, forwards);
 		  
-		  if (currentFileLines == null) {
-			  int p = 0;
-		  }
-		  
 		  // Must have the proper lines in the buffer
 		  return currentFileLines.get(lineInCurrentFile);
 	  }
@@ -428,7 +450,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  if (startingLine < endingLine)
 			  lastLine = forwardsEvolution(startingLine, endingLine);
 		  else
-			  backwardsEvolution(startingLine, endingLine);
+			  lastLine = backwardsEvolution(startingLine, endingLine);
 		  
 		  currentPosition = lastLine;
 		  updateGraph();
@@ -438,17 +460,33 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  for (int i = startingLine+1; i <= endingLine; i++) {
 			  parseLine(getLine(i, true), true, i);
 			  			  
-			  if (graphviewer.getDecisionVariable() != null && timerTriggered)
+			  if (this.isScanningForConflict) {
+				  if (this.currentConflict >= this.desiredConflict) {
+					  this.isScanningForConflict = false;
+					  graphviewer.clearDecisionVariable();
+					  return i;
+				  }
+			  } else if (graphviewer.getDecisionVariable() != null && timerTriggered)
 			      return i-1;
 		  }
 		  
 		  return endingLine;
 	  }
 	  
-	  private void backwardsEvolution(int startingLine, int endingLine) throws InterruptedException {
+	  private int backwardsEvolution(int startingLine, int endingLine) throws InterruptedException {
 		  for (int i = startingLine; i > endingLine; i--) {
 			  parseLine(getLine(i, false), false, i);
+			  
+			  if (this.isScanningForConflict) {
+				  if (this.currentConflict <= this.desiredConflict) {
+					  this.isScanningForConflict = false;
+					  graphviewer.clearDecisionVariable();
+					  return i;
+				  }
+			  }
 		  }
+		  
+		  return endingLine;
 	  }
 	  
 	  private int adjustOverallLineToCurrentFileLine(int lineNumber) {
@@ -487,7 +525,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  if (currentPosition == -1) {
 			  update = 1;
 		  } else {
-			  update = currentPosition + 100;
+			  update = currentPosition + graphviewer.getEvolutionSpeed();
 		  }
 			  		  
 		  if (update >= totalLines) {
@@ -496,7 +534,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  }
 		  
 		  timerTriggered = true;
-		  progress.setValue(update);
+		  updatePosition(update);
 	  }
 	  
 	  private void updateShowAssignedVars(boolean show) {

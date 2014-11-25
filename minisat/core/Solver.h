@@ -273,9 +273,11 @@ protected:
 private:
     enum VAR_STATES { VAR_ASSIGNED_TRUE, VAR_ASSIGNED_FALSE, VAR_UNASSIGNED };
     enum CLAUSE_STATES { CLAUSE_ADDED, CLAUSE_REMOVED };
+    int conflictNumber;
 
     void printClause(const Clause& c, int state);
-    void printVar(const int id, int state, bool isDecisionVariable);
+    void printVar(const int id, int state, bool isDecisionVariable, int activity);
+    void printConflict();
     
 };
 

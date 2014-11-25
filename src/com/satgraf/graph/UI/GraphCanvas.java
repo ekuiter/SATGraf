@@ -119,9 +119,8 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
       int endX = c.getEnd().getX(graph) + DrawableNode.NODE_DIAMETER / 2;
       int endY = c.getEnd().getY(graph) + DrawableNode.NODE_DIAMETER / 2;
       
-      //g2d.setColor(c.getColor(graph));
-      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      g2d.setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+      g2d.setRenderingHints(getRenderingHints());
+      g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
       g2d.drawLine(
           startX - (o.x - i.x) , 
           startY - (o.y - i.y),
@@ -129,6 +128,12 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
           endY - (o.y - i.y)
       );
     }
+  }
+  
+  private RenderingHints getRenderingHints() {
+      RenderingHints hints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+      hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      return hints;
   }
 
   @Override
@@ -238,6 +243,8 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
   @Override
   public void paintComponent(Graphics g) {
 	  Graphics2D g2 = (Graphics2D) g;
+	  g2.setRenderingHints(getRenderingHints());
+	  
 	  int numRows = getNumRows();
 	  int numColumns = getNumColumns();
 	  int numThreads = numRows * numColumns;
