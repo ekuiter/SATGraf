@@ -6,6 +6,7 @@
 
 package com.satgraf.community.UI;
 
+import com.satgraf.community.placer.FruchGPUPlacer;
 import com.satgraf.community.placer.FruchPlacer;
 import com.satgraf.community.placer.GridKKPlacer;
 import com.satgraf.community.placer.GridPlacer;
@@ -23,9 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.regex.Pattern;
-
 import javax.swing.JFrame;
-
 import org.json.simple.JSONObject;
 
 /**
@@ -110,8 +109,8 @@ public class CommunityGraphFrame extends GraphFrame{
     if(args.length < 3){
       args = new String[]{
         //"formula/satcomp/dimacs/toybox.dimacs",
-        //"formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
-        "/home/zacknewsham/aes.sb",
+        "formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
+        //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
         //"/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "ol",
         "f"

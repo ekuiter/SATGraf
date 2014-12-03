@@ -431,7 +431,9 @@ public class FruchPlacer extends AbstractPlacer {
 				    	deltaLength = 0.001;
 				    
 				    force = calcAttraction(deltaLength);
-				    
+				    if(vIndex == 1167){
+                      int test = 1;
+                    }
 				    xDisp[vIndex] -= (xDelta / deltaLength) * force;
 				    yDisp[vIndex] -= (yDelta / deltaLength) * force;
 				    
