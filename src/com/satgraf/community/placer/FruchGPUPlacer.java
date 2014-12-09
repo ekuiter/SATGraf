@@ -136,33 +136,33 @@ public class FruchGPUPlacer extends AbstractPlacer {
         "      __global const float *xPos,"+
         "      __global const float *yPos,"+
         "      __global float *xDisp,"+
-        "      __global float *yDisp){"+
-        "         int nodes = 1168;" +
-        "         int sub = nodes - 1;"+
-        "         int z = get_global_id(0);"+
-        "         int i = z;"+
-        "         int vi,ui;"+
-        "         vi = ui = 0;"+
-        "         while(i > sub - 1){"+
-        "           vi ++;"+
-        "           i -= sub;"+
-        "           sub--;"+
+        "      __global float *yDisp,"+
+        "      __global int *nodes," +
+        "      __global int *pairs," +
+        "      __global int *startIndexes){"+
+        "         int sub = nodes[0] - 1;"+
+        "         int gid = get_global_id(0);"+
+        "         int v,u,i;"+
+        "         v = u = i = 0;"+
+        "         for(i = 0; i < nodes[0]; i++){"+
+        "           if(gid < startIndexes[i]){"+
+        "             v = i - 1;"+
+        "             u = (gid - startIndexes[i - 1]) + 1;"+
+        "             break;"+
+        "           }"+
         "         }"+
-        "         ui = i + 1 + vi;"+
-        "         int v = vi;"+
-        "         int u = ui;"+
         "         float xDelta = xPos[v] - xPos[u];" +
         "         float yDelta = yPos[v] - yPos[u];"+
         "         if ((xDelta == 0) && (yDelta == 0)) {"+
-        "           xDisp[z] = 0;"+
-        "           yDisp[z] = 0;"+
+        "           xDisp[gid] = 0;"+
+        "           yDisp[gid] = 0;"+
         "           return;"+
         "         }"+
         "         float deltaLength = sqrt((xDelta * xDelta) + (yDelta * yDelta));"+
         "         float force = optDist[0] / deltaLength;"+
   
-        "         xDisp[z] = (xDelta / deltaLength) * force;"+
-        "         yDisp[z] = (yDelta / deltaLength) * force;"+
+        "         xDisp[gid] = (xDelta / deltaLength) * force;"+
+        "         yDisp[gid] = (yDelta / deltaLength) * force;"+
         "}" +
         "__kernel void "+
         "attract(__global const float *optDist,"+
@@ -231,7 +231,58 @@ public class FruchGPUPlacer extends AbstractPlacer {
         "                   yDispOut[n] -= yDispIn[e];"+
         "                 }"+
         "               }"+  
-        "}";
+        "}" +
+          "__kernel void attractAggregate1(__global int* edges_start,"
+          + "__global int* edges_end,"
+          + "__global float* xDispIn,"
+          + "__global float* yDispIn,"
+          + "__global float* xDispOut,"
+          + "__global float* yDispOut,"
+          + "__global int* chunks,"
+          + "__global int* edges){"
+          + "int gid = get_global_id(0);"
+          + "int chunk = gid % chunks[0];"
+            + "int start = gid * chunks[0];"
+            + "int end = min((gid + 1) * chunks[0],edges[0]);"
+            + "for(int i = start; i < end; i++){"
+            + "   int vStart = edges_start[i];"
+            + "   int vEnd = edges_end[i];"
+            + "   xDispOut[((vStart)* chunks[0]) + chunk] -= xDispIn[i];"
+            + "   yDispOut[((vStart)* chunks[0]) + chunk] -= yDispIn[i];"
+            + "   xDispOut[((vEnd)* chunks[0]) + chunk] += xDispIn[i];"
+            + "   yDispOut[((vEnd)* chunks[0]) + chunk] += yDispIn[i];"
+            + "}"
+          + "}"
+          +"__kernel void attractAggregate2(__global float* xDispIn,"
+          + "__global float* yDispIn,"
+          + "__global float* xDispOut,"
+          + "__global float* yDispOut,"
+          + "__global int* chunks){"
+          + "int gid = get_global_id(0);"
+            + "int start = gid * chunks[0];"
+            + "int end = start + chunks[0];"
+            + "for(int i = start; i < end; i++){"
+            + "   xDispOut[gid] += xDispIn[i];"
+            + "   yDispOut[gid] += yDispIn[i];"
+            + "}"
+          + "}"
+          +"__kernel void repelAggregate1("
+          + "__global float* xDispIn,"
+          + "__global float* yDispIn,"
+          + "__global float* xDispOut,"
+          + "__global float* yDispOut,"
+          + "__global int* nodes,"
+          + "__global int* startIndexes){"
+          + " int gid = get_global_id(0);"
+          + " xDispOut[gid] = 0;"
+          + " yDispOut[gid] = 0;"
+          + " int i = startIndexes[gid];"
+          + " for(int ui = gid + 1; ui < nodes[0]; ui++){"
+          + "   xDispOut[gid] += xDispIn[i];"
+          + "   yDispOut[gid] += yDispIn[i];"
+          + "   i++;"
+          + " }"
+          + "}";
   Pointer srcNodes;
   //Pointer srcPairsStart;
   //Pointer srcPairsEnd;
@@ -252,7 +303,17 @@ public class FruchGPUPlacer extends AbstractPlacer {
   cl_mem memNEdges;
   cl_mem memAttractOd;
   cl_mem memRepelOd;
-  private void init(int[] nodes, int[][] edges){
+  cl_mem cl_xPos, cl_yPos,cl_xDisp,cl_yDisp, cl_xInterAttract, cl_yInterAttract, cl_xInter2Attract, cl_yInter2Attract, cl_xInterRepel, cl_yInterRepel,cl_startIndexes,cl_chunks;
+  Pointer dstX, dstY,srcX,srcY;
+  int work;
+  int[] chunks;
+  float[] tmpRepelXDisp;
+  float[] tmpRepelYDisp;
+  float[] tmpAttractXDisp; 
+  float[] tmpAttractYDisp; 
+  float[] x;
+  float[] y;
+  private void init(int[] nodes, int[][] edges, float[] xPos, float[] yPos, float[] xDisp, float[] yDisp, int[] startIndexes){
     int[] nnodes = new int[]{nodes.length};
     //int[] npairs = new int[]{pairs[0].length};
     int[] nedges = new int[]{edges[0].length};
@@ -269,6 +330,10 @@ public class FruchGPUPlacer extends AbstractPlacer {
     srcNEdges = Pointer.to(nedges);
     srcAttractOd = Pointer.to(attractod);
     srcRepelOd = Pointer.to(repelod);
+    srcX = Pointer.to(xPos);
+    srcY = Pointer.to(yPos);
+    dstX = Pointer.to(xDisp);
+    dstY = Pointer.to(yDisp);
     
     memNodes = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_uint * nodes.length, srcNodes, null);
     //memPairsStart = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_uint * pairs[0].length, srcPairsStart, null);
@@ -280,239 +345,121 @@ public class FruchGPUPlacer extends AbstractPlacer {
     memNEdges = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_uint * 1, srcNEdges, null);
     memAttractOd = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * 1, srcAttractOd, null);
     memRepelOd = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * 1, srcRepelOd, null);
-  }
-  
-  private void oneRound(float[] xPos, float[] yPos, float[] xDisp, float[] yDisp){
-    long local_work_size[] = new long[]{maxWorkItemSizes[0]};
-    int work = (int)((Math.pow(xPos.length,2)/2) - (xPos.length/2));
-    long repel_global_work_size[] = new long[]{work};
-    long agg_global_work_size[] = new long[]{xPos.length};
-    long attract_global_work_size[] = new long[]{edges[0].length};
-    int status;
     
+    work = (int)((Math.pow(xPos.length,2)/2) - (xPos.length/2));
     int[] err = new int[1];
-    float[] tmpRepelXDisp = new float[work];
-    float[] tmpRepelYDisp = new float[work];
-    float[] tmpAttractXDisp = new float[graph.getEdgesList().size()]; 
-    float[] tmpAttractYDisp = new float[graph.getEdgesList().size()]; 
-    Pointer srcX,srcY,dstX,dstY,tmpRepelDstXDisp,tmpRepelDstYDisp,tmpAttractDstXDisp,tmpAttractDstYDisp;
-    cl_mem memObjects[] = new cl_mem[8];
-    srcX = Pointer.to(xPos);
-    srcY = Pointer.to(yPos);
-    dstX = Pointer.to(tmpRepelXDisp);
-    dstY = Pointer.to(tmpRepelYDisp);
-    tmpRepelDstXDisp = Pointer.to(tmpRepelXDisp);
-    tmpRepelDstYDisp = Pointer.to(tmpRepelYDisp);
-    tmpAttractDstXDisp = Pointer.to(tmpAttractXDisp);
-    tmpAttractDstYDisp = Pointer.to(tmpAttractYDisp);
     
-    memObjects[0] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * xPos.length, srcX, err);
-    memObjects[1] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * yPos.length, srcY, err);
-    memObjects[2] = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * tmpRepelXDisp.length, tmpRepelDstXDisp, err);
-    memObjects[3] = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * tmpRepelYDisp.length, tmpRepelDstYDisp, err);
-    memObjects[4] = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * xDisp.length, dstX, err);
-    memObjects[5] = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * yDisp.length, dstY, err);
-    memObjects[6] = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * tmpAttractXDisp.length, tmpAttractDstXDisp, null);
-    memObjects[7] = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * tmpAttractYDisp.length, tmpAttractDstYDisp, null);
+    chunks = new int[]{100};
     
-    status = clSetKernelArg(repel, 0, Sizeof.cl_mem, Pointer.to(memNNodes));
-    status = clSetKernelArg(repel, 1, Sizeof.cl_mem, Pointer.to(memRepelOd));
-    status = clSetKernelArg(repel, 2, Sizeof.cl_mem, Pointer.to(memNodes));
-    status = clSetKernelArg(repel, 3, Sizeof.cl_mem, Pointer.to(memObjects[0]));
-    status = clSetKernelArg(repel, 4, Sizeof.cl_mem, Pointer.to(memObjects[1]));
-    status = clSetKernelArg(repel, 5, Sizeof.cl_mem, Pointer.to(memObjects[2]));
-    status = clSetKernelArg(repel, 6, Sizeof.cl_mem, Pointer.to(memObjects[3]));
-    long start = System.currentTimeMillis();
-    status = clEnqueueNDRangeKernel(queue, repel, 1, null, repel_global_work_size, local_work_size, 0, null, null);
-    clFinish(queue);
+    tmpRepelXDisp = new float[work];
+    tmpRepelYDisp = new float[work];
+    tmpAttractXDisp = new float[graph.getEdgesList().size()]; 
+    tmpAttractYDisp = new float[graph.getEdgesList().size()]; 
+    x = new float[chunks[0] * nodeList.size()];
+    y = new float[chunks[0] * nodeList.size()];
     
-    
-    /*status = clSetKernelArg(repelAggregate, 0, Sizeof.cl_mem, Pointer.to(memNPairs));
-    status = clSetKernelArg(repelAggregate, 1, Sizeof.cl_mem, Pointer.to(memPairsStart));
-    status = clSetKernelArg(repelAggregate, 2, Sizeof.cl_mem, Pointer.to(memPairsEnd));
-    status = clSetKernelArg(repelAggregate, 3, Sizeof.cl_mem, Pointer.to(memNNodes));
-    status = clSetKernelArg(repelAggregate, 4, Sizeof.cl_mem, Pointer.to(memObjects[2]));
-    status = clSetKernelArg(repelAggregate, 5, Sizeof.cl_mem, Pointer.to(memObjects[3]));
-    status = clSetKernelArg(repelAggregate, 6, Sizeof.cl_mem, Pointer.to(memObjects[4]));
-    status = clSetKernelArg(repelAggregate, 7, Sizeof.cl_mem, Pointer.to(memObjects[5]));
-    status = clEnqueueNDRangeKernel(queue, repelAggregate, 1, null, agg_global_work_size, local_work_size, 0, null, null);
-    clFinish(queue);*/
-        
-    status = clSetKernelArg(attract, 0, Sizeof.cl_mem, Pointer.to(memAttractOd));
-    status = clSetKernelArg(attract, 1, Sizeof.cl_mem, Pointer.to(memEdgesStart));
-    status = clSetKernelArg(attract, 2, Sizeof.cl_mem, Pointer.to(memEdgesEnd));
-    status = clSetKernelArg(attract, 3, Sizeof.cl_mem, Pointer.to(memObjects[0]));
-    status = clSetKernelArg(attract, 4, Sizeof.cl_mem, Pointer.to(memObjects[1]));
-    status = clSetKernelArg(attract, 5, Sizeof.cl_mem, Pointer.to(memObjects[6]));
-    status = clSetKernelArg(attract, 6, Sizeof.cl_mem, Pointer.to(memObjects[7]));
-    status = clEnqueueNDRangeKernel(queue, attract, 1, null, attract_global_work_size, local_work_size, 0, null, null);
-    clFinish(queue);
-    
-    
-    /*status = clSetKernelArg(attractAggregate, 0, Sizeof.cl_mem, Pointer.to(memNEdges));
-    status = clSetKernelArg(attractAggregate, 1, Sizeof.cl_mem, Pointer.to(memEdgesStart));
-    status = clSetKernelArg(attractAggregate, 2, Sizeof.cl_mem, Pointer.to(memEdgesEnd));
-    status = clSetKernelArg(attractAggregate, 3, Sizeof.cl_mem, Pointer.to(memNNodes));
-    status = clSetKernelArg(attractAggregate, 4, Sizeof.cl_mem, Pointer.to(memObjects[6]));
-    status = clSetKernelArg(attractAggregate, 5, Sizeof.cl_mem, Pointer.to(memObjects[7]));
-    status = clSetKernelArg(attractAggregate, 6, Sizeof.cl_mem, Pointer.to(memObjects[4]));
-    status = clSetKernelArg(attractAggregate, 7, Sizeof.cl_mem, Pointer.to(memObjects[5]));
-    status = clEnqueueNDRangeKernel(queue, attractAggregate, 1, null, agg_global_work_size, local_work_size, 0, null, null);
-    clFinish(queue);*/
-    
-    
-    status = clEnqueueReadBuffer(queue, memObjects[6], CL_TRUE, 0, Sizeof.cl_float * xDisp.length, dstX, 0, null, null);
-    clFinish(queue);
-    status = clEnqueueReadBuffer(queue, memObjects[7], CL_TRUE, 0, Sizeof.cl_float * yDisp.length, dstY, 0, null, null);
-    clFinish(queue);
-    long end = System.currentTimeMillis();
-    System.out.printf("%f seconds\n", ((double)end - (double)start) / (double)1000);
   }
   
-  /*private void repelAggregate(int[][] pairs, int[]nodes, float[] repelXDisp, float[] repelYDisp, float[] xDisp, float[] yDisp){
-  long global_work_size[] = new long[]{nodes.length};
-    long local_work_size[] = new long[]{maxWorkItemSizes[0]};
-    cl_mem memObjects[] = new cl_mem[8];
-    int[] od = new int[]{pairs[0].length};
+  
+  private void oneRound2(float[] xPos, float[] yPos, int[] startIndexes, float[] xDisp, float[] yDisp){
+    int[] err = new int[1];
     
-    Pointer srcOpt = Pointer.to(od);
-    Pointer srcVNodes = Pointer.to(pairs[0]);
-    Pointer srcUNodes = Pointer.to(pairs[1]);
-    Pointer srcNodes = Pointer.to(nodes);
-    Pointer srcX = Pointer.to(repelXDisp);
-    Pointer srcY = Pointer.to(repelYDisp);
-    Pointer dstX = Pointer.to(xDisp);
-    Pointer dstY = Pointer.to(yDisp);
-    memObjects[0] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_uint * 1, srcOpt, null);
-    memObjects[1] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_uint * pairs[0].length, srcVNodes, null);
-    memObjects[2] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_uint * pairs[1].length, srcUNodes, null);
-    memObjects[3] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_uint * nodes.length, srcNodes, null);
-    memObjects[4] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * repelXDisp.length, srcX, null);
-    memObjects[5] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * repelYDisp.length, srcY, null);
-    memObjects[6] = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * xDisp.length, dstX, null);
-    memObjects[7] = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * yDisp.length, dstY, null);
+    cl_xPos = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * xPos.length, Pointer.to(xPos), err);
+    cl_yPos = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * xPos.length, Pointer.to(yPos), err);
+    cl_xInterRepel = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * tmpRepelXDisp.length, Pointer.to(tmpRepelXDisp), err);
+    cl_yInterRepel = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * tmpRepelYDisp.length, Pointer.to(tmpRepelYDisp), err);
+    cl_xDisp = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * xDisp.length, dstX, err);
+    cl_yDisp = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * yDisp.length, dstY, err);
+    cl_xInterAttract = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * tmpAttractXDisp.length, Pointer.to(tmpAttractXDisp), err);
+    cl_yInterAttract = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * tmpAttractYDisp.length, Pointer.to(tmpAttractYDisp), err);
+    cl_xInter2Attract = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * x.length, Pointer.to(x), err);
+    cl_yInter2Attract = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * y.length, Pointer.to(y), err);
+    cl_chunks = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_int * 1, Pointer.to(chunks), err);
+    cl_startIndexes = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * xPos.length, Pointer.to(startIndexes), err);
     
-    clSetKernelArg(repelAggregate, 0, Sizeof.cl_mem, Pointer.to(memObjects[0]));
-    clSetKernelArg(repelAggregate, 1, Sizeof.cl_mem, Pointer.to(memObjects[1]));
-    clSetKernelArg(repelAggregate, 2, Sizeof.cl_mem, Pointer.to(memObjects[2]));
-    clSetKernelArg(repelAggregate, 3, Sizeof.cl_mem, Pointer.to(memObjects[3]));
-    clSetKernelArg(repelAggregate, 4, Sizeof.cl_mem, Pointer.to(memObjects[4]));
-    clSetKernelArg(repelAggregate, 5, Sizeof.cl_mem, Pointer.to(memObjects[5]));
-    clSetKernelArg(repelAggregate, 6, Sizeof.cl_mem, Pointer.to(memObjects[6]));
-    clSetKernelArg(repelAggregate, 7, Sizeof.cl_mem, Pointer.to(memObjects[7]));
-    long start = System.currentTimeMillis();
-    clEnqueueNDRangeKernel(queue, repelAggregate, 1, null, global_work_size, local_work_size, 0, null, null);
-    int status = clEnqueueReadBuffer(queue, memObjects[6], CL_TRUE, 0, Sizeof.cl_float * xDisp.length, dstX, 0, null, null);
+    
+    repel(cl_xPos, cl_yPos, cl_xInterRepel, cl_yInterRepel, work);
+    clEnqueueReadBuffer(queue, cl_xInterRepel, CL_TRUE, 0, Sizeof.cl_float * tmpRepelXDisp.length, Pointer.to(tmpRepelXDisp), 0, null, null);
+    clEnqueueReadBuffer(queue, cl_yInterRepel, CL_TRUE, 0, Sizeof.cl_float * tmpRepelYDisp.length, Pointer.to(tmpRepelYDisp), 0, null, null);
     clFinish(queue);
-    status = clEnqueueReadBuffer(queue, memObjects[7], CL_TRUE, 0, Sizeof.cl_float * yDisp.length, dstY, 0, null, null);
+    repelAggregate(cl_xDisp, cl_yDisp, cl_xInterRepel, cl_yInterRepel, cl_startIndexes, memNNodes);
     clFinish(queue);
-    long end = System.currentTimeMillis();
-    System.out.printf("%d Seconds\n", (end - start) / 1000);
-    clReleaseMemObject(memObjects[0]);
-    clReleaseMemObject(memObjects[1]);
-    clReleaseMemObject(memObjects[2]);
-    clReleaseMemObject(memObjects[3]);
-    clReleaseMemObject(memObjects[4]);
-    clReleaseMemObject(memObjects[5]);
-    clReleaseMemObject(memObjects[6]);
+    attract(cl_xPos, cl_yPos, cl_xInterAttract, cl_yInterAttract);
+    clFinish(queue);
+    
+    
+    attractAggregate(cl_xDisp, cl_yDisp, cl_xInter2Attract, cl_yInter2Attract, cl_xInterAttract, cl_yInterAttract, cl_chunks, memNEdges, (long)Math.ceil((double)edges[0].length / (double)chunks[0]));
+    clFinish(queue);
+    clEnqueueReadBuffer(queue, cl_xDisp, CL_TRUE, 0, Sizeof.cl_float * xDisp.length, dstX, 0, null, null);
+    clEnqueueReadBuffer(queue, cl_yDisp, CL_TRUE, 0, Sizeof.cl_float * yDisp.length, dstY, 0, null, null);
+    clReleaseMemObject(cl_xPos);
+    clReleaseMemObject(cl_yPos);
+    clReleaseMemObject(cl_xInterRepel);
+    clReleaseMemObject(cl_yInterRepel);
+    clReleaseMemObject(cl_xDisp);
+    clReleaseMemObject(cl_yDisp);
+    clReleaseMemObject(cl_xInterAttract);
+    clReleaseMemObject(cl_yInterAttract);
+    clReleaseMemObject(cl_xInter2Attract);
+    clReleaseMemObject(cl_yInter2Attract);
+    clReleaseMemObject(cl_chunks);
+    clReleaseMemObject(cl_startIndexes);
   }
-  private void attractAggregate(int[][] edges, int[]nodes, float[] attractXDisp, float[] attractYDisp, float[] xDisp, float[] yDisp){
-  long global_work_size[] = new long[]{nodes.length};
-    long local_work_size[] = new long[]{maxWorkItemSizes[0]};
-    cl_mem memObjects[] = new cl_mem[8];
-    int[] od = new int[]{edges[0].length};
-    
-    Pointer srcOpt = Pointer.to(od);
-    Pointer srcStartEdges = Pointer.to(edges[0]);
-    Pointer srcEndEdges = Pointer.to(edges[1]);
-    Pointer srcNodes = Pointer.to(nodes);
-    Pointer srcX = Pointer.to(attractXDisp);
-    Pointer srcY = Pointer.to(attractYDisp);
-    Pointer dstX = Pointer.to(xDisp);
-    Pointer dstY = Pointer.to(yDisp);
-    memObjects[0] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_uint * 1, srcOpt, null);
-    memObjects[1] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_uint * edges[0].length, srcStartEdges, null);
-    memObjects[2] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_uint * edges[1].length, srcEndEdges, null);
-    memObjects[3] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_uint * nodes.length, srcNodes, null);
-    memObjects[4] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * attractXDisp.length, srcX, null);
-    memObjects[5] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * attractYDisp.length, srcY, null);
-    memObjects[6] = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * xDisp.length, dstX, null);
-    memObjects[7] = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * yDisp.length, dstY, null);
-    
-    clSetKernelArg(attractAggregate, 0, Sizeof.cl_mem, Pointer.to(memObjects[0]));
-    clSetKernelArg(attractAggregate, 1, Sizeof.cl_mem, Pointer.to(memObjects[1]));
-    clSetKernelArg(attractAggregate, 2, Sizeof.cl_mem, Pointer.to(memObjects[2]));
-    clSetKernelArg(attractAggregate, 3, Sizeof.cl_mem, Pointer.to(memObjects[3]));
-    clSetKernelArg(attractAggregate, 4, Sizeof.cl_mem, Pointer.to(memObjects[4]));
-    clSetKernelArg(attractAggregate, 5, Sizeof.cl_mem, Pointer.to(memObjects[5]));
-    clSetKernelArg(attractAggregate, 6, Sizeof.cl_mem, Pointer.to(memObjects[6]));
-    clSetKernelArg(attractAggregate, 7, Sizeof.cl_mem, Pointer.to(memObjects[7]));
-    long start = System.currentTimeMillis();
-    clEnqueueNDRangeKernel(queue, attractAggregate, 1, null, global_work_size, local_work_size, 0, null, null);
-    int status = clEnqueueReadBuffer(queue, memObjects[6], CL_TRUE, 0, Sizeof.cl_float * xDisp.length, dstX, 0, null, null);
-    clFinish(queue);
-    status = clEnqueueReadBuffer(queue, memObjects[7], CL_TRUE, 0, Sizeof.cl_float * yDisp.length, dstY, 0, null, null);
-    clFinish(queue);
-    long end = System.currentTimeMillis();
-    System.out.printf("%d Seconds\n", (end - start) / 1000);
-    clReleaseMemObject(memObjects[0]);
-    clReleaseMemObject(memObjects[1]);
-    clReleaseMemObject(memObjects[2]);
-    clReleaseMemObject(memObjects[3]);
-    clReleaseMemObject(memObjects[4]);
-    clReleaseMemObject(memObjects[5]);
-    clReleaseMemObject(memObjects[6]);
-  }*/
   
-  
+  private void repel(cl_mem xPos, cl_mem yPos, cl_mem xDisp, cl_mem yDisp, long work){
+    cl_mem mem_work = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_int * 1, Pointer.to(new int[]{(int)work}), null);
+    int status = clSetKernelArg(repel, 0, Sizeof.cl_mem, Pointer.to(memRepelOd));
+    status = clSetKernelArg(repel, 1, Sizeof.cl_mem, Pointer.to(memNodes));
+    //status = clSetKernelArg(repel, 2, Sizeof.cl_mem, Pointer.to(memPairsEnd));
+    status = clSetKernelArg(repel, 2, Sizeof.cl_mem, Pointer.to(xPos));
+    status = clSetKernelArg(repel, 3, Sizeof.cl_mem, Pointer.to(yPos));
+    status = clSetKernelArg(repel, 4, Sizeof.cl_mem, Pointer.to(xDisp));
+    status = clSetKernelArg(repel, 5, Sizeof.cl_mem, Pointer.to(yDisp));
+    status = clSetKernelArg(repel, 6, Sizeof.cl_mem, Pointer.to(memNNodes));
+    status = clSetKernelArg(repel, 7, Sizeof.cl_mem, Pointer.to(mem_work));
+    status = clSetKernelArg(repel, 8, Sizeof.cl_mem, Pointer.to(cl_startIndexes));
+    status = clEnqueueNDRangeKernel(queue, repel, 1, null, new long[]{work}, new long[]{maxWorkItemSizes[0]}, 0, null, null);
+  }
   
   private void repel(float[] xPos, float[] yPos, float[] xDisp, float[] yDisp){
     int work = (int)((Math.pow(xPos.length,2)/2) - (xPos.length/2));
     long global_work_size[] = new long[]{work};
     long local_work_size[] = new long[]{maxWorkItemSizes[0]};
     int[] err = new int[1];
-    Pointer srcX,srcY,dstX,dstY, srcvNodes, srcuNodes;
+    Pointer srcX,srcY,dstX,dstY;
     cl_mem memObjects[] = new cl_mem[7];
     srcX = Pointer.to(xPos);
     srcY = Pointer.to(yPos);
     dstX = Pointer.to(xDisp);
     dstY = Pointer.to(yDisp);
-    //memObjects[0] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * 1, srcRepelOd, err);
-    //memObjects[1] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_uint * pairs[0].length, srcvNodes, err);
-    //memObjects[2] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_uint * pairs[1].length, srcuNodes, err);
     memObjects[3] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * xPos.length, srcX, err);
     memObjects[4] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * yPos.length, srcY, err);
     memObjects[5] = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * xDisp.length, dstX, err);
     memObjects[6] = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * yDisp.length, dstY, err);
     
-    int status = clSetKernelArg(repel, 0, Sizeof.cl_mem, Pointer.to(memRepelOd));
-    status = clSetKernelArg(repel, 1, Sizeof.cl_mem, Pointer.to(memNodes));
-    //status = clSetKernelArg(repel, 2, Sizeof.cl_mem, Pointer.to(memPairsEnd));
-    status = clSetKernelArg(repel, 2, Sizeof.cl_mem, Pointer.to(memObjects[3]));
-    status = clSetKernelArg(repel, 3, Sizeof.cl_mem, Pointer.to(memObjects[4]));
-    status = clSetKernelArg(repel, 4, Sizeof.cl_mem, Pointer.to(memObjects[5]));
-    status = clSetKernelArg(repel, 5, Sizeof.cl_mem, Pointer.to(memObjects[6]));
-    long start = System.currentTimeMillis();
-    status = clEnqueueNDRangeKernel(queue, repel, 1, null, global_work_size, local_work_size, 0, null, null);
-    clFinish(queue);
+    repel(memObjects[3],memObjects[4],memObjects[5],memObjects[6],work);
     clEnqueueReadBuffer(queue, memObjects[5], CL_TRUE, 0, Sizeof.cl_float * xDisp.length, dstX, 0, null, null);
-    clFinish(queue);
     clEnqueueReadBuffer(queue, memObjects[6], CL_TRUE, 0, Sizeof.cl_float * yDisp.length, dstY, 0, null, null);
-    clFinish(queue);
-    long end = System.currentTimeMillis();
-    System.out.printf("%d Seconds\n", (end - start) / 1000);
+    
     clReleaseMemObject(memObjects[3]);
     clReleaseMemObject(memObjects[4]);
     clReleaseMemObject(memObjects[5]);
     clReleaseMemObject(memObjects[6]);
   }
   
+  private void attract(cl_mem xPos, cl_mem yPos, cl_mem xDisp, cl_mem yDisp){
+    clSetKernelArg(attract, 0, Sizeof.cl_mem, Pointer.to(memAttractOd));
+    clSetKernelArg(attract, 1, Sizeof.cl_mem, Pointer.to(memEdgesStart));
+    clSetKernelArg(attract, 2, Sizeof.cl_mem, Pointer.to(memEdgesEnd));
+    clSetKernelArg(attract, 3, Sizeof.cl_mem, Pointer.to(xPos));
+    clSetKernelArg(attract, 4, Sizeof.cl_mem, Pointer.to(yPos));
+    clSetKernelArg(attract, 5, Sizeof.cl_mem, Pointer.to(xDisp));
+    clSetKernelArg(attract, 6, Sizeof.cl_mem, Pointer.to(yDisp));
+    clEnqueueNDRangeKernel(queue, attract, 1, null, new long[]{edges[0].length}, new long[]{maxWorkItemSizes[0]}, 0, null, null);
+  }
   
   private void attract(float[] xPos, float[] yPos, float[] xDisp, float[] yDisp){
-    long global_work_size[] = new long[]{edges[0].length};
-    long local_work_size[] = new long[]{maxWorkItemSizes[0]};
     cl_mem memObjects[] = new cl_mem[7];
-    float[] od = new float[]{Float.parseFloat(String.format("%f",optDist))};
     
     Pointer srcX = Pointer.to(xPos);
     Pointer srcY = Pointer.to(yPos);
@@ -526,25 +473,102 @@ public class FruchGPUPlacer extends AbstractPlacer {
     memObjects[5] = clCreateBuffer(context, CL_MEM_WRITE_ONLY, Sizeof.cl_float * xDisp.length, null, null);
     memObjects[6] = clCreateBuffer(context, CL_MEM_WRITE_ONLY, Sizeof.cl_float * yDisp.length, null, null);
     
-    clSetKernelArg(attract, 0, Sizeof.cl_mem, Pointer.to(memAttractOd));
-    clSetKernelArg(attract, 1, Sizeof.cl_mem, Pointer.to(memEdgesStart));
-    clSetKernelArg(attract, 2, Sizeof.cl_mem, Pointer.to(memEdgesEnd));
-    clSetKernelArg(attract, 3, Sizeof.cl_mem, Pointer.to(memObjects[3]));
-    clSetKernelArg(attract, 4, Sizeof.cl_mem, Pointer.to(memObjects[4]));
-    clSetKernelArg(attract, 5, Sizeof.cl_mem, Pointer.to(memObjects[5]));
-    clSetKernelArg(attract, 6, Sizeof.cl_mem, Pointer.to(memObjects[6]));
-    long start = System.currentTimeMillis();
-    clEnqueueNDRangeKernel(queue, attract, 1, null, global_work_size, local_work_size, 0, null, null);
+    attract(memObjects[3],memObjects[4],memObjects[5],memObjects[6]);
     int status = clEnqueueReadBuffer(queue, memObjects[5], CL_TRUE, 0, Sizeof.cl_float * xDisp.length, dstX, 0, null, null);
-    clFinish(queue);
     status = clEnqueueReadBuffer(queue, memObjects[6], CL_TRUE, 0, Sizeof.cl_float * yDisp.length, dstY, 0, null, null);
-    clFinish(queue);
-    long end = System.currentTimeMillis();
-    System.out.printf("%d Seconds\n", (end - start) / 1000);
     clReleaseMemObject(memObjects[3]);
     clReleaseMemObject(memObjects[4]);
     clReleaseMemObject(memObjects[5]);
     clReleaseMemObject(memObjects[6]);
+  }
+  
+  private void repelAggregate(cl_mem xDispOut, cl_mem yDispOut, cl_mem xDispIn, cl_mem yDispIn, cl_mem startIndexes, cl_mem nodes){
+    clSetKernelArg(repelAggregate1, 0, Sizeof.cl_mem, Pointer.to(xDispIn));
+    clSetKernelArg(repelAggregate1, 1, Sizeof.cl_mem, Pointer.to(yDispIn));
+    clSetKernelArg(repelAggregate1, 2, Sizeof.cl_mem, Pointer.to(xDispOut));
+    clSetKernelArg(repelAggregate1, 3, Sizeof.cl_mem, Pointer.to(yDispOut));
+    clSetKernelArg(repelAggregate1, 4, Sizeof.cl_mem, Pointer.to(nodes));
+    clSetKernelArg(repelAggregate1, 5, Sizeof.cl_mem, Pointer.to(startIndexes));
+    int status;
+    status = clEnqueueNDRangeKernel(queue, repelAggregate1, 1, null, new long[]{nodeList.size()}, new long[]{maxWorkItemSizes[0]}, 0, null, null);
+  }
+  
+  private void repelAggregate(float[] xDispOut, float[] yDispOut, float[] xDispIn, float[] yDispIn, int[] startIndexes){    
+    Pointer srcX = Pointer.to(xDispIn);
+    Pointer srcY = Pointer.to(yDispIn);
+    Pointer dstX = Pointer.to(xDispOut);
+    Pointer dstY = Pointer.to(yDispOut);
+    
+    int[] err = new int[1];
+    cl_mem memObjects[] = new cl_mem[6];
+    
+    memObjects[0] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * xDispIn.length, srcX, err);
+    memObjects[1] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * yDispIn.length, srcY, err);
+    memObjects[2] = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * xDispOut.length, dstX, err);
+    memObjects[3] = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * yDispOut.length, dstY, err);
+    memObjects[4] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR , Sizeof.cl_int * 1, Pointer.to(new int[]{xDispOut.length}), err);
+    memObjects[5] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR , Sizeof.cl_int * startIndexes.length, Pointer.to(startIndexes), err);
+    repelAggregate(memObjects[2], memObjects[3], memObjects[0], memObjects[1], memObjects[5], memObjects[4]);
+    clEnqueueReadBuffer(queue, memObjects[2], CL_TRUE, 0, Sizeof.cl_float * nodeList.size(), dstX, 0, null, null);
+    clEnqueueReadBuffer(queue, memObjects[3], CL_TRUE, 0, Sizeof.cl_float * nodeList.size(), dstY, 0, null, null);
+    
+  }
+  
+  private void attractAggregate(cl_mem xDispOut, cl_mem yDispOut, cl_mem xInter, cl_mem yInter, cl_mem xDispIn, cl_mem yDispIn, cl_mem chunks, cl_mem edges, long work_size){
+    clSetKernelArg(attractAggregate1, 0, Sizeof.cl_mem, Pointer.to(memEdgesStart));
+    clSetKernelArg(attractAggregate1, 1, Sizeof.cl_mem, Pointer.to(memEdgesEnd));
+    clSetKernelArg(attractAggregate1, 2, Sizeof.cl_mem, Pointer.to(xDispIn));
+    clSetKernelArg(attractAggregate1, 3, Sizeof.cl_mem, Pointer.to(yDispIn));
+    clSetKernelArg(attractAggregate1, 4, Sizeof.cl_mem, Pointer.to(xInter));
+    clSetKernelArg(attractAggregate1, 5, Sizeof.cl_mem, Pointer.to(yInter));
+    clSetKernelArg(attractAggregate1, 6, Sizeof.cl_mem, Pointer.to(chunks));
+    clSetKernelArg(attractAggregate1, 7, Sizeof.cl_mem, Pointer.to(edges));
+    int status;
+    status = clEnqueueNDRangeKernel(queue, attractAggregate1, 1, null, new long[]{work_size}, new long[]{maxWorkItemSizes[0]}, 0, null, null);
+  
+    clSetKernelArg(attractAggregate2, 0, Sizeof.cl_mem, Pointer.to(xInter));
+    clSetKernelArg(attractAggregate2, 1, Sizeof.cl_mem, Pointer.to(yInter));
+    clSetKernelArg(attractAggregate2, 2, Sizeof.cl_mem, Pointer.to(xDispOut));
+    clSetKernelArg(attractAggregate2, 3, Sizeof.cl_mem, Pointer.to(yDispOut));
+    clSetKernelArg(attractAggregate2, 4, Sizeof.cl_mem, Pointer.to(chunks));
+    
+    status = clEnqueueNDRangeKernel(queue, attractAggregate2, 1, null, new long[]{nodeList.size()}, new long[]{maxWorkItemSizes[0]}, 0, null, null);
+  }
+  
+  private void attractAggregate(float[] xDispOut, float[] yDispOut, float[] xDispIn, float[] yDispIn){
+    
+    int[] chunks = new int[]{100};
+    long global_work_size[] = new long[]{(long)Math.ceil((double)edges[0].length / (double)chunks[0])};
+    long local_work_size[] = new long[]{maxWorkItemSizes[0]};
+    
+    
+    float[] x = new float[chunks[0] * nodeList.size()];
+    float[] y = new float[chunks[0] * nodeList.size()];
+    
+    Pointer srcX = Pointer.to(xDispIn);
+    Pointer srcY = Pointer.to(yDispIn);
+    Pointer interX = Pointer.to(x);
+    Pointer interY = Pointer.to(y);
+    Pointer dstX = Pointer.to(xDispOut);
+    Pointer dstY = Pointer.to(yDispOut);
+    
+    int[] err = new int[1];
+    cl_mem memObjects[] = new cl_mem[10];
+    
+    memObjects[0] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * xDispIn.length, srcX, err);
+    memObjects[1] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * yDispIn.length, srcY, err);
+    memObjects[2] = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * x.length, interX, err);
+    memObjects[3] = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * y.length, interY, err);
+    memObjects[4] = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * xDispOut.length, dstX, err);
+    memObjects[5] = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * yDispOut.length, dstY, err);
+    memObjects[6] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * 1, Pointer.to(chunks), err);
+    memObjects[7] = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * 1, Pointer.to(new int[]{edges[0].length}), err);
+    
+    int status;
+    attractAggregate(memObjects[4], memObjects[5], memObjects[2], memObjects[3], memObjects[0], memObjects[1], memObjects[6], memObjects[7], (long)Math.ceil((double)edges[0].length / (double)chunks[0]));
+    
+    status = clEnqueueReadBuffer(queue, memObjects[4], CL_TRUE, 0, Sizeof.cl_float * xDispOut.length, dstX, 0, null, null);
+    status = clEnqueueReadBuffer(queue, memObjects[5], CL_TRUE, 0, Sizeof.cl_float * yDispOut.length, dstY, 0, null, null);
   }
   
   private cl_command_queue queue;
@@ -552,11 +576,15 @@ public class FruchGPUPlacer extends AbstractPlacer {
   private cl_context context;
   private cl_kernel attract;
   private cl_kernel attractAggregate;
+  private cl_kernel attractAggregate1;
+  private cl_kernel attractAggregate2;
   private cl_kernel repelAggregate;
+  private cl_kernel repelAggregate1;
   private cl_kernel repel;
   long[] maxWorkGroupSize = new long[1];
   long[] maxDimensions = new long[1];
   long[] maxWorkItemSizes;
+  
   private void GPUSetup(){
     CL.setExceptionsEnabled(true);
     int numPlatformsArray[] = new int[1];
@@ -592,9 +620,12 @@ public class FruchGPUPlacer extends AbstractPlacer {
     // Build the program
     clBuildProgram(program, 0, null, null, null, null);
     attract = clCreateKernel(program, "attract", null);
-    attractAggregate = clCreateKernel(program, "attractAggregate", null);
-    repelAggregate = clCreateKernel(program, "repelAggregate", null);
     repel = clCreateKernel(program, "repel", null);
+    attractAggregate = clCreateKernel(program, "attractAggregate", null);
+    attractAggregate1 = clCreateKernel(program, "attractAggregate1", null);
+    attractAggregate2 = clCreateKernel(program, "attractAggregate2", null);
+    repelAggregate = clCreateKernel(program, "repelAggregate", null);
+    repelAggregate1 = clCreateKernel(program, "repelAggregate1", null);
     
     
     clGetDeviceInfo(
@@ -778,120 +809,32 @@ public class FruchGPUPlacer extends AbstractPlacer {
         edges[1][count] = u;
         count++;
       }
-      HashMap<Integer, ArrayList<Integer>> pairUsageindexes = new HashMap<>();
-      TIntArrayList vNode = new TIntArrayList();
-      TIntArrayList uNode = new TIntArrayList();
-      count = 0;
-      for(int v = 0; v < nNodes - 1; v++){
-        for(int u = v + 1; u < nNodes; u++){
-          if(pairUsageindexes.get(v) == null){
-            pairUsageindexes.put(v, new ArrayList<Integer>());
-          }
-          if(pairUsageindexes.get(u) == null){
-            pairUsageindexes.put(u, new ArrayList<Integer>());
-          }
-          pairUsageindexes.get(v).add(count);
-          pairUsageindexes.get(u).add(count);
-          vNode.add(v);
-          uNode.add(u);
-          count++;
-        }
-      }
-      float[] repelXDisp = new float[vNode.size()]; 
-      float[] repelYDisp = new float[vNode.size()]; 
-      float[] attractXDisp = new float[graph.getEdgesList().size()]; 
-      float[] attractYDisp = new float[graph.getEdgesList().size()]; 
-		    //make arrays corresponding to the displacement vector for
-      //each node
       float[] xDisp = new float[nNodes];
       float[] yDisp = new float[nNodes];
       int[] nodes = edgeUsageIndexer.keys();
 
 		    // keep passing through the layout loop until the temp is
       // low initialIter + time for cooling schedule
-      init(nodes, edges);
+      int[] startIndexes = new int[nNodes];
+      for(int i = 0; i < nNodes - 1; i++){
+        int prev = 0;
+        if(i > 0){
+          prev = startIndexes[i];
+        }
+        startIndexes[i+1] = prev + (nNodes - (i + 1));
+      }
+      init(nodes, edges, xPos, yPos, xDisp, yDisp, startIndexes);
       long end = System.currentTimeMillis();
       System.out.printf("Setup: %f Seconds\n",(((double)end)-(double)start) / 1000);
-      int[][] pairs = new int[2][];
+      /*int[][] pairs = new int[2][];
       pairs[0] = vNode.toArray();
-      pairs[1] = uNode.toArray();
+      pairs[1] = uNode.toArray();*/
+      float[] zeros = new float[nNodes];
       while ((temp > 1) && (passes < maxPasses) && noBreak) {
-        //calculate repulsive forces between each pair of nodes (set both)
-        //oneRound(xPos, yPos, xDisp, yDisp);
         start = System.currentTimeMillis();
-        repel(xPos, yPos, repelXDisp, repelYDisp);
+        oneRound2(xPos, yPos, startIndexes, xDisp, yDisp);
         end = System.currentTimeMillis();
-        System.out.printf("rebel: %f Seconds\n",(((double)end)-(double)start) / 1000);
-        start = System.currentTimeMillis();
-        
-        int _v = 0,_u = 0 ;
-        for(int i = 0; i < repelXDisp.length; i++){
-          int index = i;
-          int vi = 0;
-          int ui = 0;
-          int sub = nNodes - 1;
-          while(index > sub - 1){
-            index -= sub;
-            sub--;
-            vi++;
-          }
-          ui = index+1+vi;
-          try{
-            xDisp[vi] += repelXDisp[i];
-            yDisp[vi] += repelYDisp[i];
-            xDisp[ui] -= repelXDisp[i];
-            yDisp[ui] -= repelYDisp[i];
-          }
-          catch(IndexOutOfBoundsException e){
-            throw e;
-          }
-          _u ++;
-          _u = _u % 1167;
-          if(_u == 0){
-            _v ++;
-            _u = 1 + _v;
-            sub--;
-          }
-        }
-        /*for(Integer v : pairUsageindexes.keySet()){
-          xDisp[v] = 0;
-          yDisp[v] = 0;
-          for(Integer i : pairUsageindexes.get(v)){
-            if(pairs[0][i] == v){
-              xDisp[v] += repelXDisp[i];
-              yDisp[v] += repelYDisp[i];
-            }
-            else if(pairs[1][i] == v){
-              xDisp[v] -= repelXDisp[i];
-              yDisp[v] -= repelYDisp[i];
-            }
-          }
-        }*/
-        end = System.currentTimeMillis();
-        System.out.printf("rebel agg: %f Seconds\n",(((double)end)-(double)start) / 1000);
-        //repelAggregate(pairs, nodes, repelXDisp, repelYDisp, xDisp, yDisp);
-        start = System.currentTimeMillis();
-        attract(xPos, yPos, attractXDisp, attractYDisp);
-        end = System.currentTimeMillis();
-        System.out.printf("attract: %f Seconds\n",(((double)end)-(double)start) / 1000);
-        start = System.currentTimeMillis();
-        for(Integer v : edgeUsageIndexer.keys()){
-          for(Integer i : edgeUsageIndexer.get(v).toArray()){
-            if(edges[0][i] == 1167 || edges[1][i] == 1167){
-              int test = 1;
-            }
-            if(edges[0][i] == v){
-              xDisp[v] -= attractXDisp[i];
-              yDisp[v] -= attractYDisp[i];
-            }
-            else if(edges[1][i] == v){
-              xDisp[v] += attractXDisp[i];
-              yDisp[v] += attractYDisp[i];
-            }
-          }
-        }
-        end = System.currentTimeMillis();
-        System.out.printf("attract agg: %f Seconds\n",(((double)end)-(double)start) / 1000);
+        System.out.printf("GPU time: %f Seconds\n",(((double)end)-(double)start) / 1000);
         //attractAggregate(edges, nodes, attractXDisp, attractYDisp, xDisp, yDisp);
         
         //caculate displacement, but limit max displacement to temp
