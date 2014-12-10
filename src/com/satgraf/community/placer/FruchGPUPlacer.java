@@ -609,7 +609,7 @@ public class FruchGPUPlacer extends AbstractPlacer {
     // Obtain a device ID 
     cl_device_id devices[] = new cl_device_id[numDevices];
     clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, numDevices, devices, null);
-    cl_device_id device = devices[1];
+    cl_device_id device = devices[0];
 
     // Create a context for the selected device
     context = clCreateContext(
