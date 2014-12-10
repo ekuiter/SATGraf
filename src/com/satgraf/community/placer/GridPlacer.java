@@ -10,6 +10,7 @@ import com.satlib.community.Community;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityNode;
 import com.satlib.community.placer.AbstractPlacer;
+import com.satlib.community.placer.CommunityPlacerFactory;
 import com.satlib.graph.DrawableNode;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -24,6 +25,9 @@ import java.util.Iterator;
  * @author zacknewsham
  */
 public class GridPlacer extends AbstractPlacer {
+  static{
+    CommunityPlacerFactory.getInstance().register("grid", GridPlacer.class);
+  }
 	
   private HashMap<CommunityNode, Point> nodePositions = new HashMap<CommunityNode, Point>();
   private TIntObjectHashMap<Dimension> communitySizes = new TIntObjectHashMap<>();

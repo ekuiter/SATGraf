@@ -55,6 +55,7 @@ import com.satlib.community.CommunityGraphFactory;
 import com.satlib.community.CommunityGraphFactoryFactory;
 import com.satlib.community.CommunityNode;
 import com.satlib.community.placer.AbstractPlacer;
+import com.satlib.community.placer.CommunityPlacerFactory;
 import com.satlib.community.placer.Coordinates;
 import com.satlib.graph.DrawableNode;
 import gnu.trove.list.array.TDoubleArrayList;
@@ -98,7 +99,9 @@ import static org.jocl.CL.*;
  * @author Skye Bender-deMoll email:skyebend@santafe.edu
  */
 public class FruchGPUPlacer extends AbstractPlacer {
-
+  static{
+    CommunityPlacerFactory.getInstance().register("fgpu", FruchGPUPlacer.class);
+  }
   private int pad = 20;
 
   //number of loops before cooling starts

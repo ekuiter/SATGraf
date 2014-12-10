@@ -8,25 +8,36 @@ package com.satgraf.evolution.UI;
 
 import com.satgraf.community.UI.CommunityGraphFrame;
 import static com.satgraf.evolution2.UI.Evolution2GraphFrame.help;
+import static com.satgraf.evolution2.UI.Evolution2GraphFrame.options;
 import static com.satgraf.evolution2.UI.Evolution2GraphFrame.usage;
 import com.satlib.community.CommunityGraphViewer;
 import com.satlib.community.CommunityMetric;
+import com.satlib.community.CommunityMetricFactory;
 import com.satlib.community.JSONCommunityGraph;
+import com.satlib.community.placer.CommunityPlacerFactory;
 import com.satlib.evolution.EvolutionGraphFactory;
-import com.satlib.evolution.EvolutionGraphFactoryFactory;
 import com.satlib.evolution.EvolutionGraphFactoryObserver;
+import com.validatedcl.validation.Help;
+import com.validatedcl.validation.RequiredOption;
+import com.validatedcl.validation.ValidatedCommandLine;
+import com.validatedcl.validation.ValidatedOption;
+import com.validatedcl.validation.rules.FileValidationRule;
+import com.validatedcl.validation.rules.ListValidationRule;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -124,30 +135,66 @@ public class EvolutionGraphFrame extends CommunityGraphFrame implements Evolutio
   }
   
   
+  public static Options options(){
+    Options options = new Options();
+    ValidatedOption o;
+    
+    o = new RequiredOption("f","file",true, "The file (either .cnf or .sb)");
+    o.addRule(new FileValidationRule(FileValidationRule.FileExists.yes, new String[]{"read"}));
+    options.addOption(o);
+    
+    o = new ValidatedOption("c", "community", true,"The community detection algorithm");
+    o.setDefault("ol");
+    o.addRule(new ListValidationRule(CommunityMetricFactory.getInstance().getNames()));
+    options.addOption(o);
+    
+    o = new ValidatedOption("s","solver",true,"The location of the modified solver");
+    o.setDefault(System.getProperty("user.dir") + "/minisat/minisat");
+    options.addOption(o);
+    
+    o = new ValidatedOption("l","layout",true,"The layout algorithm to use");
+    o.setDefault("f");
+    o.addRule(new ListValidationRule(CommunityPlacerFactory.getInstance().getNames()));
+    options.addOption(o);
+    
+    o = new ValidatedOption("p", "pattern",true,"A list of regex expressions to group variables (not yet implemented)");
+    options.addOption(o);
+    
+    return options;
+  }
   
   
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws IOException, ParseException {
     if (args.length == 0) {
       args = new String[]{
-        "formula/satcomp/dimacs/toybox.dimacs",
-        "ol",
-        "f",
-        "5",
-        System.getProperty("user.dir") + "/minisat/minisat"
+        "-f","formula/satcomp/dimacs/toybox.dimacs",
+        "-c","ol",
+        "-l","f",
+        "-s",System.getProperty("user.dir") + "/minisat/minisat"
       };
-    } else if (args.length < 5) {
-      System.out.println("Too few options. Please use:");
-      System.out.print(usage().concat("\n").concat(help()));
+    } 
+    if (args.length < 4) {
+      System.out.print(Help.getHelp(options()));
+      return;
+    }
+    CommandLineParser clp = new GnuParser();
+    Options o = options();
+    CommandLine cl = clp.parse(o, args);
+    
+    if(!ValidatedCommandLine.validateCommandLine(o, cl)){
+      System.err.println(ValidatedCommandLine.getError());
+      return;
     }
     HashMap<String, String> patterns = new HashMap<String, String>();
 
-    for (int i = 5; i < args.length; i += 2) {
+    /*for (int i = 5; i < args.length; i += 2) {
       patterns.put(args[i], args[i + 1]);
-    }
-    EvolutionGraphFactory factory = new DimacsEvolutionGraphFactory(args[4], args[1], patterns);
-    factory.makeGraph(new File(args[0]));
+    }*/
     
-    CommunityGraphViewer graphViewer = new CommunityGraphViewer(factory.getGraph(), factory.getNodeLists(), CommunityGraphFrame.getPlacer(args[2], factory.getGraph()));
+    EvolutionGraphFactory factory = new DimacsEvolutionGraphFactory(cl.getOptionValue("s"), cl.getOptionValue("c"), patterns);
+    factory.makeGraph(new File(cl.getOptionValue("f")));
+    
+    CommunityGraphViewer graphViewer = new CommunityGraphViewer(factory.getGraph(), factory.getNodeLists(), CommunityPlacerFactory.getInstance().getByName(cl.getOptionValue("l"), factory.getGraph()));
     EvolutionGraphFrame frmMain = new EvolutionGraphFrame(factory, graphViewer, factory.getPatterns(), factory.getMetric());
     frmMain.init();
     frmMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

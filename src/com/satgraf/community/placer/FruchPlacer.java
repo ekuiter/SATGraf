@@ -54,6 +54,7 @@ import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityNode;
 import com.satlib.community.placer.AbstractPlacer;
+import com.satlib.community.placer.CommunityPlacerFactory;
 import com.satlib.community.placer.Coordinates;
 import com.satlib.graph.DrawableNode;
 import java.awt.Rectangle;
@@ -94,6 +95,9 @@ import java.util.*;
  */
 
 public class FruchPlacer extends AbstractPlacer {
+  static{
+    CommunityPlacerFactory.getInstance().register("f", FruchPlacer.class);
+  }
 
     private int pad = 20;
     

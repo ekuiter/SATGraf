@@ -10,6 +10,7 @@ import com.satlib.community.CommunityGraphFactory;
 import com.satlib.community.CommunityGraphFactoryFactory;
 import com.satlib.community.CommunityGraphViewer;
 import com.satlib.community.placer.CommunityPlacer;
+import com.satlib.community.placer.CommunityPlacerFactory;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -62,7 +63,7 @@ public class CommunityApplet extends JApplet{
               p = (CommunityPlacer)factory.getGraph();
             }
             else{
-              p = CommunityGraphFrame.getPlacer("f", factory.getGraph());
+              p = CommunityPlacerFactory.getInstance().getByName("f", factory.getGraph());
             }
             frmMain.setProgressive(p);
             graphViewer.graph = factory.getGraph();

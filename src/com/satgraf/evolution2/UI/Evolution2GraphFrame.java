@@ -1,20 +1,47 @@
 package com.satgraf.evolution2.UI;
 
+import static com.satgraf.ForceInit.forceInit;
+import com.satgraf.community.UI.CommunityGraphFrame;
+import static com.satgraf.community.UI.CommunityGraphFrame.options;
+import com.satgraf.community.placer.FruchGPUPlacer;
+import com.satgraf.community.placer.FruchPlacer;
+import com.satgraf.community.placer.GridPlacer;
+import com.satgraf.community.placer.KKPlacer;
+import com.satgraf.graph.UI.GraphCanvasPanel;
+import com.satlib.community.CNMCommunityMetric;
+import com.satlib.community.CommunityMetric;
+import com.satlib.community.CommunityMetricFactory;
+import com.satlib.community.OLCommunityMetric;
+import com.satlib.community.placer.CommunityPlacer;
+import com.satlib.community.placer.CommunityPlacerFactory;
+import com.satlib.evolution.EvolutionGraphFactory;
+import com.satlib.evolution.EvolutionGraphFactoryObserver;
+import com.validatedcl.validation.Help;
+import com.validatedcl.validation.RequiredOption;
+import com.validatedcl.validation.ValidatedCommandLine;
+import com.validatedcl.validation.ValidatedOption;
+import com.validatedcl.validation.rules.FileValidationRule;
+import com.validatedcl.validation.rules.ListValidationRule;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 import javax.swing.JFrame;
-
-import com.satgraf.community.UI.CommunityGraphFrame;
-import com.satgraf.graph.UI.GraphCanvasPanel;
-import com.satlib.community.CommunityMetric;
-import com.satlib.community.placer.CommunityPlacer;
-import com.satlib.evolution.EvolutionGraphFactory;
-import com.satlib.evolution.EvolutionGraphFactoryObserver;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 public class Evolution2GraphFrame extends CommunityGraphFrame implements EvolutionGraphFactoryObserver{
-
+  static{
+    forceInit(FruchGPUPlacer.class);
+    forceInit(FruchPlacer.class);
+    forceInit(KKPlacer.class);
+    forceInit(GridPlacer.class);
+    forceInit(OLCommunityMetric.class);
+    forceInit(CNMCommunityMetric.class);
+  }
   private EvolutionGraphFactory factory;
   public Evolution2GraphFrame(EvolutionGraphFactory factory, Evolution2GraphViewer viewer, HashMap<String, Pattern> patterns, CommunityMetric metric) {
     super(viewer, patterns, metric);
@@ -62,27 +89,64 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
   }
   
   
-  public static void main(String[] args) throws IOException {
+  
+  public static Options options(){
+    Options options = new Options();
+    ValidatedOption o;
+    
+    o = new RequiredOption("f","file",true, "The file (either .cnf or .sb)");
+    o.addRule(new FileValidationRule(FileValidationRule.FileExists.yes, new String[]{"read"}));
+    options.addOption(o);
+    
+    o = new ValidatedOption("c", "community", true,"The community detection algorithm");
+    o.setDefault("ol");
+    o.addRule(new ListValidationRule(CommunityMetricFactory.getInstance().getNames()));
+    options.addOption(o);
+    
+    o = new ValidatedOption("s","solver",true,"The location of the modified solver");
+    o.setDefault(System.getProperty("user.dir") + "/minisat/minisat");
+    options.addOption(o);
+    
+    o = new ValidatedOption("l","layout",true,"The layout algorithm to use");
+    o.setDefault("f");
+    o.addRule(new ListValidationRule(CommunityPlacerFactory.getInstance().getNames()));
+    options.addOption(o);
+    
+    o = new ValidatedOption("p", "pattern",true,"A list of regex expressions to group variables (not yet implemented)");
+    options.addOption(o);
+    
+    return options;
+  }
+  
+  public static void main(String[] args) throws IOException, ParseException {
     if (args.length == 0) {
       args = new String[]{
-        "formula/satcomp/dimacs/toybox.dimacs",
-        "ol",
-        "f",
-        "5",
-        System.getProperty("user.dir") + "/minisat/minisat"
+        "-f","formula/satcomp/dimacs/toybox.cnf",
+        "-c","ol",
+        "-l","f",
+        "-s",System.getProperty("user.dir") + "/minisat/minisat"
       };
-    } else if (args.length < 5) {
-      System.out.println("Too few options. Please use:");
-      System.out.print(usage().concat("\n").concat(help()));
+    } 
+    if (args.length < 4) {
+      System.out.print(Help.getHelp(options()));
+      return;
+    }
+    CommandLineParser clp = new GnuParser();
+    Options o = options();
+    CommandLine cl = clp.parse(o, args);
+    
+    if(!ValidatedCommandLine.validateCommandLine(o, cl)){
+      System.err.println(ValidatedCommandLine.getError());
+      return;
     }
     HashMap<String, String> patterns = new HashMap<String, String>();
 
-    for (int i = 5; i < args.length; i += 2) {
+    /*for (int i = 5; i < args.length; i += 2) {
       patterns.put(args[i], args[i + 1]);
-    }
+    }*/
     
-    Evolution2GraphFactoryFactory factoryfactory = new Evolution2GraphFactoryFactory(args[1], args[4]);
-    EvolutionGraphFactory factory = factoryfactory.getFactory(new File(args[4]), patterns);//new DimacsEvolutionGraphFactory(args[4], args[1], patterns);
+    Evolution2GraphFactoryFactory factoryfactory = new Evolution2GraphFactoryFactory(cl.getOptionValue("c"), cl.getOptionValue("s"));
+    EvolutionGraphFactory factory = factoryfactory.getFactory(new File(cl.getOptionValue("f")), patterns);//new DimacsEvolutionGraphFactory(args[4], args[1], patterns);
     
     Evolution2GraphViewer graphViewer = new Evolution2GraphViewer(null, factory.getNodeLists(), null);
     Evolution2GraphFrame frmMain = new Evolution2GraphFrame(factory, graphViewer, factory.getPatterns(), factory.getMetric());
@@ -90,8 +154,8 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     frmMain.preinit();
     
     frmMain.setVisible(true);
-    factory.makeGraph(new File(args[0]));
-    CommunityPlacer p = CommunityGraphFrame.getPlacer(args[2], factory.getGraph());
+    factory.makeGraph(new File(cl.getOptionValue("f")));
+    CommunityPlacer p = CommunityPlacerFactory.getInstance().getByName(cl.getOptionValue("l"), factory.getGraph());
     frmMain.setProgressive(p);
     graphViewer.graph = factory.getGraph();
     graphViewer.setPlacer(p);

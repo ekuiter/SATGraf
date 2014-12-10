@@ -4,6 +4,7 @@ import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityNode;
 import com.satlib.community.placer.AbstractPlacer;
+import com.satlib.community.placer.CommunityPlacerFactory;
 import com.satlib.community.placer.Coordinates;
 import com.satlib.graph.DrawableNode;
 import java.awt.Rectangle;
@@ -16,6 +17,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 public class KKPlacer extends AbstractPlacer {
+  static{
+    CommunityPlacerFactory.getInstance().register("kk", KKPlacer.class);
+  }
 	
 	//kamada-kawai algorithm vars
     private double springConst = 1;       //K in KK paper (avg. i,j distance?)
