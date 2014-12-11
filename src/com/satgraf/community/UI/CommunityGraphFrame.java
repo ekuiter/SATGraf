@@ -147,7 +147,7 @@ public class CommunityGraphFrame extends GraphFrame{
         //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
         //"/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "-c","ol",
-        "-l","f"
+        "-l","fgpu"
       };
       //System.out.print(Help.getHelp(options()));
       //return;

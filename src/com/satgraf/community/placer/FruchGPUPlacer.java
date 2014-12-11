@@ -142,9 +142,16 @@ public class FruchGPUPlacer extends AbstractPlacer {
         "      __global float *yDisp,"+
         "      __global int *nodes," +
         "      __global int *pairs," +
-        "      __global int *startIndexes){"+
+        "      __global int *startIndexes,"+
+        "      __global int* totalWork){"+
         "         int sub = nodes[0] - 1;"+
-        "         int gid = get_global_id(0);"+
+        "         int work_dim = get_work_dim();"+
+        "         int gid = 0;"+
+        "         for(int i = 0; i < work_dim - 1; i++){"+
+        "           gid += get_global_id(i) * get_global_size(i);"+
+        "         }"+
+        "         gid += get_global_id(work_dim - 1);"+
+        "         if(gid >= *totalWork){return;}"+
         "         int v,u,i;"+
         "         v = u = i = 0;"+
         "         for(i = 0; i < nodes[0]; i++){"+
@@ -174,9 +181,16 @@ public class FruchGPUPlacer extends AbstractPlacer {
         "      __global const float *xPos,"+
         "      __global const float *yPos,"+
         "      __global float *xDisp,"+
-        "      __global float *yDisp){"+
-        
-        "             int eIndex = get_global_id(0);"+
+        "      __global float *yDisp,"+
+        "      __global int* totalWork){"+
+        "         int work_dim = get_work_dim();"+
+        "         int gid = 0;"+
+        "         for(int i = 0; i < work_dim - 1; i++){"+
+        "           gid += get_global_id(i) * get_global_size(i);"+
+        "         }"+
+        "         gid += get_global_id(work_dim - 1);"+
+        "         if(gid >= *totalWork){return;}"+
+        "         int eIndex = gid;"+
         "             int vIndex = edges_start[eIndex];"+
         "             int uIndex = edges_end[eIndex];"+
         "             float xDelta = xPos[vIndex] - xPos[uIndex];"+
@@ -191,50 +205,6 @@ public class FruchGPUPlacer extends AbstractPlacer {
         //"             xDisp[uIndex] += (xDelta / deltaLength) * force;"+
         //"             yDisp[uIndex] += (yDelta / deltaLength) * force;"+           
         "}"+
-        "__kernel void "+
-        "attractAggregate(__global const int *edges,"+
-        "                 __global const int *edges_start,"+
-        "                 __global const int *edges_end,"+ 
-        "                 __global const int *nodes,"+ 
-        "                 __global const float *xDispIn,"+
-        "                 __global const float *yDispIn,"+
-        "                 __global float *xDispOut,"+
-        "                 __global float *yDispOut){"+
-        ""+
-        "               int n = get_global_id(0);"+
-        "               int e;"+
-        "               for(e = 0; e < edges[0]; e++){"+
-        "                 if(edges_start[e] == n){" +
-        "                   xDispOut[n] -= xDispIn[e];"+
-        "                   yDispOut[n] -= yDispIn[e];"+
-        "                 }"+
-        "                 else if(edges_end[e] == n){"+
-        "                   xDispOut[n] += xDispIn[e];"+
-        "                   yDispOut[n] += yDispIn[e];"+
-        "                 }"+
-        "               }"+  
-        "}"+
-        "__kernel void "+
-        "repelAggregate(__global const int *pairs,"+
-        "                 __global const int *nodes,"+ 
-        "                 __global const float *xDispIn,"+
-        "                 __global const float *yDispIn,"+
-        "                 __global float *xDispOut,"+
-        "                 __global float *yDispOut){"+
-        ""+
-        "               int n = get_global_id(0);"+
-        "               int e;"+
-        "               for(e = 0; e < pairs[0]; e++){"+
-        "                 if(nodes[e] == n){" +
-        "                   xDispOut[n] += xDispIn[e];"+
-        "                   yDispOut[n] += yDispIn[e];"+
-        "                 }"+
-        "                 else if(nodes[e] == n){"+
-        "                   xDispOut[n] -= xDispIn[e];"+
-        "                   yDispOut[n] -= yDispIn[e];"+
-        "                 }"+
-        "               }"+  
-        "}" +
           "__kernel void attractAggregate1(__global int* edges_start,"
           + "__global int* edges_end,"
           + "__global float* xDispIn,"
@@ -242,8 +212,15 @@ public class FruchGPUPlacer extends AbstractPlacer {
           + "__global float* xDispOut,"
           + "__global float* yDispOut,"
           + "__global int* chunks,"
-          + "__global int* edges){"
-          + "int gid = get_global_id(0);"
+          + "__global int* edges,"+
+        "    __global int* totalWork){"+
+        "         int work_dim = get_work_dim();"+
+        "         int gid = 0;"+
+        "         for(int i = 0; i < work_dim - 1; i++){"+
+        "           gid += get_global_id(i) * get_global_size(i);"+
+        "         }"+
+        "         gid += get_global_id(work_dim - 1);"+
+        "         if(gid >= *totalWork){return;}"
           + "int chunk = gid % chunks[0];"
             + "int start = gid * chunks[0];"
             + "int end = min((gid + 1) * chunks[0],edges[0]);"
@@ -260,8 +237,15 @@ public class FruchGPUPlacer extends AbstractPlacer {
           + "__global float* yDispIn,"
           + "__global float* xDispOut,"
           + "__global float* yDispOut,"
-          + "__global int* chunks){"
-          + "int gid = get_global_id(0);"
+          + "__global int* chunks,"+
+        "    __global int* totalWork){"+
+        "         int work_dim = get_work_dim();"+
+        "         int gid = 0;"+
+        "         for(int i = 0; i < work_dim - 1; i++){"+
+        "           gid += get_global_id(i) * get_global_size(i);"+
+        "         }"+
+        "         gid += get_global_id(work_dim - 1);"+
+        "         if(gid >= *totalWork){return;}"
             + "int start = gid * chunks[0];"
             + "int end = start + chunks[0];"
             + "for(int i = start; i < end; i++){"
@@ -275,8 +259,15 @@ public class FruchGPUPlacer extends AbstractPlacer {
           + "__global float* xDispOut,"
           + "__global float* yDispOut,"
           + "__global int* nodes,"
-          + "__global int* startIndexes){"
-          + " int gid = get_global_id(0);"
+          + "__global int* startIndexes,"+
+        "    __global int* totalWork){"+
+        "         int work_dim = get_work_dim();"+
+        "         int gid = 0;"+
+        "         for(int i = 0; i < work_dim - 1; i++){"+
+        "           gid += get_global_id(i) * get_global_size(i);"+
+        "         }"+
+        "         gid += get_global_id(work_dim - 1);"+
+        "         if(gid >= *totalWork){return;}"
           + " xDispOut[gid] = 0;"
           + " yDispOut[gid] = 0;"
           + " int i = startIndexes[gid];"
@@ -306,6 +297,14 @@ public class FruchGPUPlacer extends AbstractPlacer {
   cl_mem memNEdges;
   cl_mem memAttractOd;
   cl_mem memRepelOd;
+  cl_mem memRepelWorkSize;
+  cl_mem memRepelAggregateWorkSize;
+  cl_mem memRepelAttractWorkSize;
+  cl_mem memRepelAttractAggregate1WorkSize;
+  cl_mem memRepelAttractAggregate2WorkSize;
+  cl_mem memAttractWorkSize;
+  cl_mem memAttractAggregate1WorkSize;
+  cl_mem memAttractAggregate2WorkSize;
   cl_mem cl_xPos, cl_yPos,cl_xDisp,cl_yDisp, cl_xInterAttract, cl_yInterAttract, cl_xInter2Attract, cl_yInter2Attract, cl_xInterRepel, cl_yInterRepel,cl_startIndexes,cl_chunks;
   Pointer dstX, dstY,srcX,srcY;
   int work;
@@ -322,6 +321,7 @@ public class FruchGPUPlacer extends AbstractPlacer {
     int[] nedges = new int[]{edges[0].length};
     float[] repelod = new float[]{(float)Math.pow(optDist,4)};
     float[] attractod = new float[]{(float)optDist};
+    chunks = new int[]{100};
     
     srcNodes = Pointer.to(nodes);
     //srcPairsStart = Pointer.to(pairs[0]);
@@ -348,11 +348,15 @@ public class FruchGPUPlacer extends AbstractPlacer {
     memNEdges = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_uint * 1, srcNEdges, null);
     memAttractOd = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * 1, srcAttractOd, null);
     memRepelOd = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * 1, srcRepelOd, null);
+    memRepelWorkSize = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_int * 1, Pointer.to(new int[]{work}),null);
+    memRepelAggregateWorkSize = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_int * 1, Pointer.to(new int[]{xDisp.length}),null);
+    memAttractWorkSize = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_int * 1, Pointer.to(new int[]{edges[0].length}),null);
+    memAttractAggregate1WorkSize = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_int * 1, Pointer.to(new int[]{chunks[0] * nodeList.size()}),null);
+    memAttractAggregate2WorkSize = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_int * 1, Pointer.to(new int[]{xDisp.length}),null);
     
     work = (int)((Math.pow(xPos.length,2)/2) - (xPos.length/2));
     int[] err = new int[1];
     
-    chunks = new int[]{100};
     
     tmpRepelXDisp = new float[work];
     tmpRepelYDisp = new float[work];
@@ -363,12 +367,14 @@ public class FruchGPUPlacer extends AbstractPlacer {
     
   }
   
+  private long getWorkSize(long workSize){
+    return (long)Math.ceil((double)workSize/maxWorkItemSizes[0])*maxWorkItemSizes[0];
+  }
   
   private void oneRound2(float[] xPos, float[] yPos, int[] startIndexes, float[] xDisp, float[] yDisp){
     int[] err = new int[1];
-    
-    cl_xPos = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * xPos.length, Pointer.to(xPos), err);
-    cl_yPos = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * xPos.length, Pointer.to(yPos), err);
+    cl_xPos = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * xPos.length + (int)(xPos.length * 0.1), Pointer.to(xPos), err);
+    cl_yPos = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, Sizeof.cl_float * xPos.length + (int)(yPos.length * 0.1), Pointer.to(yPos), err);
     cl_xInterRepel = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * tmpRepelXDisp.length, Pointer.to(tmpRepelXDisp), err);
     cl_yInterRepel = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * tmpRepelYDisp.length, Pointer.to(tmpRepelYDisp), err);
     cl_xDisp = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR , Sizeof.cl_float * xDisp.length, dstX, err);
@@ -412,16 +418,20 @@ public class FruchGPUPlacer extends AbstractPlacer {
   private void repel(cl_mem xPos, cl_mem yPos, cl_mem xDisp, cl_mem yDisp, long work){
     cl_mem mem_work = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, Sizeof.cl_int * 1, Pointer.to(new int[]{(int)work}), null);
     int status = clSetKernelArg(repel, 0, Sizeof.cl_mem, Pointer.to(memRepelOd));
-    status = clSetKernelArg(repel, 1, Sizeof.cl_mem, Pointer.to(memNodes));
+    status = status | clSetKernelArg(repel, 1, Sizeof.cl_mem, Pointer.to(memNodes));
     //status = clSetKernelArg(repel, 2, Sizeof.cl_mem, Pointer.to(memPairsEnd));
-    status = clSetKernelArg(repel, 2, Sizeof.cl_mem, Pointer.to(xPos));
-    status = clSetKernelArg(repel, 3, Sizeof.cl_mem, Pointer.to(yPos));
-    status = clSetKernelArg(repel, 4, Sizeof.cl_mem, Pointer.to(xDisp));
-    status = clSetKernelArg(repel, 5, Sizeof.cl_mem, Pointer.to(yDisp));
-    status = clSetKernelArg(repel, 6, Sizeof.cl_mem, Pointer.to(memNNodes));
-    status = clSetKernelArg(repel, 7, Sizeof.cl_mem, Pointer.to(mem_work));
-    status = clSetKernelArg(repel, 8, Sizeof.cl_mem, Pointer.to(cl_startIndexes));
-    status = clEnqueueNDRangeKernel(queue, repel, 1, null, new long[]{work}, new long[]{maxWorkItemSizes[0]}, 0, null, null);
+    status = status | clSetKernelArg(repel, 2, Sizeof.cl_mem, Pointer.to(xPos));
+    status = status | clSetKernelArg(repel, 3, Sizeof.cl_mem, Pointer.to(yPos));
+    status = status | clSetKernelArg(repel, 4, Sizeof.cl_mem, Pointer.to(xDisp));
+    status = status | clSetKernelArg(repel, 5, Sizeof.cl_mem, Pointer.to(yDisp));
+    status = status | clSetKernelArg(repel, 6, Sizeof.cl_mem, Pointer.to(memNNodes));
+    status = status | clSetKernelArg(repel, 7, Sizeof.cl_mem, Pointer.to(mem_work));
+    status = status | clSetKernelArg(repel, 8, Sizeof.cl_mem, Pointer.to(cl_startIndexes));
+    status = status | clSetKernelArg(repel, 9, Sizeof.cl_mem, Pointer.to(memRepelWorkSize));
+    if(status != 0){
+      throw new IllegalArgumentException();
+    }
+    status = clEnqueueNDRangeKernel(queue, repel, 1, null, new long[]{getWorkSize(work)}, new long[]{maxWorkItemSizes[1]}, 0, null, null);
   }
   
   private void repel(float[] xPos, float[] yPos, float[] xDisp, float[] yDisp){
@@ -458,7 +468,8 @@ public class FruchGPUPlacer extends AbstractPlacer {
     clSetKernelArg(attract, 4, Sizeof.cl_mem, Pointer.to(yPos));
     clSetKernelArg(attract, 5, Sizeof.cl_mem, Pointer.to(xDisp));
     clSetKernelArg(attract, 6, Sizeof.cl_mem, Pointer.to(yDisp));
-    clEnqueueNDRangeKernel(queue, attract, 1, null, new long[]{edges[0].length}, new long[]{maxWorkItemSizes[0]}, 0, null, null);
+    clSetKernelArg(attract, 7, Sizeof.cl_mem, Pointer.to(memAttractWorkSize));
+    clEnqueueNDRangeKernel(queue, attract, 1, null, new long[]{(long)(getWorkSize(edges[0].length))}, new long[]{maxWorkItemSizes[0]}, 0, null, null);
   }
   
   private void attract(float[] xPos, float[] yPos, float[] xDisp, float[] yDisp){
@@ -492,8 +503,9 @@ public class FruchGPUPlacer extends AbstractPlacer {
     clSetKernelArg(repelAggregate1, 3, Sizeof.cl_mem, Pointer.to(yDispOut));
     clSetKernelArg(repelAggregate1, 4, Sizeof.cl_mem, Pointer.to(nodes));
     clSetKernelArg(repelAggregate1, 5, Sizeof.cl_mem, Pointer.to(startIndexes));
+    clSetKernelArg(repelAggregate1, 6, Sizeof.cl_mem, Pointer.to(memRepelAggregateWorkSize));
     int status;
-    status = clEnqueueNDRangeKernel(queue, repelAggregate1, 1, null, new long[]{nodeList.size()}, new long[]{maxWorkItemSizes[0]}, 0, null, null);
+    status = clEnqueueNDRangeKernel(queue, repelAggregate1, 1, null, new long[]{getWorkSize(nodeList.size())}, new long[]{maxWorkItemSizes[0]}, 0, null, null);
   }
   
   private void repelAggregate(float[] xDispOut, float[] yDispOut, float[] xDispIn, float[] yDispIn, int[] startIndexes){    
@@ -526,16 +538,18 @@ public class FruchGPUPlacer extends AbstractPlacer {
     clSetKernelArg(attractAggregate1, 5, Sizeof.cl_mem, Pointer.to(yInter));
     clSetKernelArg(attractAggregate1, 6, Sizeof.cl_mem, Pointer.to(chunks));
     clSetKernelArg(attractAggregate1, 7, Sizeof.cl_mem, Pointer.to(edges));
+    clSetKernelArg(attractAggregate1, 8, Sizeof.cl_mem, Pointer.to(memAttractAggregate1WorkSize));
     int status;
-    status = clEnqueueNDRangeKernel(queue, attractAggregate1, 1, null, new long[]{work_size}, new long[]{maxWorkItemSizes[0]}, 0, null, null);
+    status = clEnqueueNDRangeKernel(queue, attractAggregate1, 1, null, new long[]{getWorkSize(work_size)}, new long[]{maxWorkItemSizes[0]}, 0, null, null);
   
     clSetKernelArg(attractAggregate2, 0, Sizeof.cl_mem, Pointer.to(xInter));
     clSetKernelArg(attractAggregate2, 1, Sizeof.cl_mem, Pointer.to(yInter));
     clSetKernelArg(attractAggregate2, 2, Sizeof.cl_mem, Pointer.to(xDispOut));
     clSetKernelArg(attractAggregate2, 3, Sizeof.cl_mem, Pointer.to(yDispOut));
     clSetKernelArg(attractAggregate2, 4, Sizeof.cl_mem, Pointer.to(chunks));
+    clSetKernelArg(attractAggregate2, 5, Sizeof.cl_mem, Pointer.to(memAttractAggregate2WorkSize));
     
-    status = clEnqueueNDRangeKernel(queue, attractAggregate2, 1, null, new long[]{nodeList.size()}, new long[]{maxWorkItemSizes[0]}, 0, null, null);
+    status = clEnqueueNDRangeKernel(queue, attractAggregate2, 1, null, new long[]{getWorkSize(nodeList.size())}, new long[]{maxWorkItemSizes[0]}, 0, null, null);
   }
   
   private void attractAggregate(float[] xDispOut, float[] yDispOut, float[] xDispIn, float[] yDispIn){
@@ -624,20 +638,20 @@ public class FruchGPUPlacer extends AbstractPlacer {
     clBuildProgram(program, 0, null, null, null, null);
     attract = clCreateKernel(program, "attract", null);
     repel = clCreateKernel(program, "repel", null);
-    attractAggregate = clCreateKernel(program, "attractAggregate", null);
     attractAggregate1 = clCreateKernel(program, "attractAggregate1", null);
     attractAggregate2 = clCreateKernel(program, "attractAggregate2", null);
-    repelAggregate = clCreateKernel(program, "repelAggregate", null);
     repelAggregate1 = clCreateKernel(program, "repelAggregate1", null);
     
     
     clGetDeviceInfo(
-        devices[1], CL_DEVICE_MAX_WORK_GROUP_SIZE, Sizeof.size_t,
+        devices[0], CL_DEVICE_MAX_WORK_GROUP_SIZE, Sizeof.size_t,
         Pointer.to(maxWorkGroupSize), null);
 
-    clGetDeviceInfo(devices[1], CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, Sizeof.cl_uint,Pointer.to(maxDimensions), null);
+    clGetDeviceInfo(devices[0], CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, Sizeof.cl_uint,Pointer.to(maxDimensions), null);
     maxWorkItemSizes = new long[(int)maxDimensions[0]];
-    clGetDeviceInfo(devices[1], CL_DEVICE_MAX_WORK_ITEM_SIZES, Sizeof.size_t * maxDimensions[0], Pointer.to(maxWorkItemSizes), null);
+    //clGetDeviceInfo(devices[0], CL_DEVICE_MAX_WORK_GROUP_SIZE, Sizeof.size_t * 1, Pointer.to(maxWorkItemSizes), null);
+    clGetDeviceInfo(devices[0], CL_DEVICE_MAX_WORK_ITEM_SIZES, Sizeof.size_t * maxDimensions[0], Pointer.to(maxWorkItemSizes), null);
+    //maxWorkItemSizes[0] = 2;
   }
   
   
