@@ -23,6 +23,8 @@ import org.json.simple.JSONObject;
 public abstract class GraphOptionsPanel extends JSplitPane implements GraphObserver{
   private GraphViewer graph;
   protected OptionsPanel optionsPanel;
+  protected GraphInfoPanel infoPanel;
+  private JScrollPane infoScroll;
   protected final JAccordianPanel checkBoxPanel = new JAccordianPanel();
   protected final HashMap<String, NodeCheckboxPanel> checkboxPanels = new HashMap<String, NodeCheckboxPanel>();
   protected final Collection<String> groups;
@@ -99,6 +101,9 @@ public abstract class GraphOptionsPanel extends JSplitPane implements GraphObser
     	  checkBoxPanel.removeBars();
           checkboxPanels.clear();
       }
+      infoPanel.init();
+      infoScroll = new JScrollPane(infoPanel);
+      checkBoxPanel.addBar("Graph Info", infoScroll);
       
       Iterator<String> groupsI = groups.iterator();
       while(groupsI.hasNext()){

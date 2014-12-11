@@ -7,12 +7,9 @@
 package com.satgraf.community.UI;
 
 
-import com.satlib.community.Community;
+
 import com.satlib.community.CommunityEdge;
-import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityGraphViewer;
-import com.satlib.community.CommunityNode;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import javax.swing.JScrollPane;
@@ -31,7 +28,6 @@ public class CommunityOptionsPanel extends GraphOptionsPanel{
 
   private CommunityCheckBoxPanel communityPanel;
   private JScrollPane communityScroll;
-  
   private EdgeCheckBoxPanel interConnectionPanel;
   private JScrollPane interConncetionScroll;
   
@@ -76,6 +72,7 @@ public class CommunityOptionsPanel extends GraphOptionsPanel{
   }
   
   protected void setGraph(CommunityGraphViewer graph, boolean clearPanel){
+    infoPanel = new CommunityGraphInfoPanel(graph.getGraph());
     super.setGraph(graph, clearPanel);
     synchronized(checkBoxPanel){
       communityPanel = new CommunityCheckBoxPanel(graph);
