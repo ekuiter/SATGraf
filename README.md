@@ -1,15 +1,41 @@
-com [formula/path.cnf | saved/path.sb] [ol | cnm] [f | grid | kk]
-"formula" "community algorithm" "layout algorithm"
-View the VIG of a SAT formula
+Usage: java -jar SatGraf.jar [com|imp|evo|evo2] <options>
 
-imp [formula/path.cnf | saved/path.sb] [ol | cnm] [f | grid | kk]
-"formula" "community algorithm" "layout algorithm"
-Display the VIG of a SAT formula and view how assigning specific variables specific values forces the implied value of other variables
+--------------------------------
+com
+-f --file(default = null) The file (either .cnf or .sb)
+Must be an existing file For which you have: read permissions
+-c --community(default = ol) The community detection algorithm
+Must be one of: ol,cnm
+-p --pattern(default = null) A list of regex expressions to group variables (not yet implemented)
+-l --layout(default = f) The layout algorithm to use
+Must be one of: f,fgpu,grid,kk
+--------------------------------
 
-evo [formula/path.cnf | saved/path.sb] [ol | cnm] [f | grid | kk] [dumpfreq] [/path/to/solver]
-"formula" "community algorithm" "layout algorithm" "dump frequency" "path to modified solver + options"
-View the evolution of the community VIG of a SAT formula while being solved, dumping after every [dumpfreq] conflict clauses
+--------------------------------
+imp
+Not currently supported
+--------------------------------
 
-evo2 [formula/path.cnf | saved/path.sb] [ol | cnm] [f | grid | kk] [dumpfreq] [/path/to/solver]
-"formula" "community algorithm" "layout algorithm" "dump frequency" "path to modified solver + options"
-View the evolution of the community VIG of a SAT formula while being solved, dumping after every [dumpfreq] variable assignments
+--------------------------------
+evo
+-f --file(default = null) The file (either .cnf or .sb)
+Must be an existing file For which you have: read permissions
+-s --solver(default = /home/zacknewsham/satgraf/minisat/minisat) The location of the modified solver
+-c --community(default = ol) The community detection algorithm
+Must be one of: ol,cnm
+-p --pattern(default = null) A list of regex expressions to group variables (not yet implemented)
+-l --layout(default = f) The layout algorithm to use
+Must be one of: f,fgpu,grid,kk
+--------------------------------
+
+--------------------------------
+evo2
+-f --file(default = null) The file (either .cnf or .sb)
+Must be an existing file For which you have: read permissions
+-s --solver(default = /home/zacknewsham/satgraf/minisat/minisat) The location of the modified solver
+-c --community(default = ol) The community detection algorithm
+Must be one of: ol,cnm
+-p --pattern(default = null) A list of regex expressions to group variables (not yet implemented)
+-l --layout(default = f) The layout algorithm to use
+Must be one of: f,fgpu,grid,kk
+--------------------------------
