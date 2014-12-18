@@ -103,7 +103,7 @@ public class FruchGPUPlacer extends AbstractPlacer {
     CommunityPlacerFactory.getInstance().register("fgpu", FruchGPUPlacer.class);
   }
   private int pad = 20;
-  private static final int float_workers = 2;
+  private static final int float_workers = 1;
   //number of loops before cooling starts
   private int initialIter = 30;
   private double progress = 0;

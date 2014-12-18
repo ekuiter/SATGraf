@@ -1,15 +1,9 @@
 
 import com.satgraf.community.UI.CommunityGraphFrame;
-import com.satgraf.community.placer.FruchGPUPlacer;
-import com.satgraf.community.placer.FruchPlacer;
-import com.satgraf.community.placer.GridPlacer;
-import com.satgraf.community.placer.KKPlacer;
 import com.satgraf.evolution.UI.EvolutionGraphFrame;
 import com.satgraf.evolution.UI.RandomQVTime;
 import com.satgraf.evolution2.UI.Evolution2GraphFrame;
 import com.satgraf.implication.UI.ImplicationGraphFrame;
-import com.satlib.community.CNMCommunityMetric;
-import com.satlib.community.OLCommunityMetric;
 import com.validatedcl.validation.Help;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -57,11 +51,13 @@ public class Main {
   }
   
   public static String usage(){
+    String dashes = "--------------------------------";
     StringBuilder builder = new StringBuilder();
-    builder.append("\ncom ").append(Help.getHelp(CommunityGraphFrame.options()));
-    builder.append("\nimp ").append("");
-    builder.append("\nevo ").append(Help.getHelp(EvolutionGraphFrame.options()));
-    builder.append("\nevo2 ").append(Help.getHelp(Evolution2GraphFrame.options()));
+    builder.append("Usage: java -jar SatGraf.jar [com|imp|evo|evo2] <options>");
+    builder.append(dashes).append("\ncom\n").append(Help.getHelp(CommunityGraphFrame.options())).append(dashes);
+    builder.append(dashes).append("\nimp\n").append("Not currently supported").append(dashes);
+    builder.append(dashes).append("\nevo\n").append(Help.getHelp(EvolutionGraphFrame.options())).append(dashes);
+    builder.append(dashes).append("\nevo2\n").append(Help.getHelp(Evolution2GraphFrame.options())).append(dashes);
     /*builder.append("com ").append(CommunityGraphFrame.usage()).append("\n").append(CommunityGraphFrame.help()).append("\n\n");
     builder.append("imp ").append(ImplicationGraphFrame.usage()).append("\n").append(ImplicationGraphFrame.help()).append("\n\n");
     builder.append("evo ").append(EvolutionGraphFrame.usage()).append("\n").append(EvolutionGraphFrame.help()).append("\n\n");
