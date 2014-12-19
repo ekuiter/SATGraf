@@ -2,7 +2,6 @@ package com.satgraf.evolution2.UI;
 
 import static com.satgraf.ForceInit.forceInit;
 import com.satgraf.community.UI.CommunityGraphFrame;
-import static com.satgraf.community.UI.CommunityGraphFrame.options;
 import com.satgraf.community.placer.FruchGPUPlacer;
 import com.satgraf.community.placer.FruchPlacer;
 import com.satgraf.community.placer.GridPlacer;
@@ -121,7 +120,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
   public static void main(String[] args) throws IOException, ParseException {
     if (args.length == 0) {
       args = new String[]{
-        "-f","formula/satcomp/dimacs/toybox.cnf",
+        "-f","formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
         "-c","ol",
         "-l","f",
         "-s",System.getProperty("user.dir") + "/minisat/minisat"

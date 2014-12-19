@@ -49,7 +49,12 @@ public abstract class GraphInfoPanel <T extends Graph> extends JPanel{
     c.gridx = 1;
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_END;
+    try{
     this.add(new JLabel(String.valueOf(graph.getClausesCount())), c);
+    }
+    catch(UnsupportedOperationException e){
+      
+    }
     
     c.gridx = 0;
     c.gridy = rows++;
@@ -60,7 +65,12 @@ public abstract class GraphInfoPanel <T extends Graph> extends JPanel{
     c.gridx = 1;
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_END;
+    try{
     this.add(new JLabel(String.valueOf(graph.getLongestClause().size())), c);
+    }
+    catch(UnsupportedOperationException | NullPointerException e){
+      
+    }
     
     c.gridx = 0;
     c.gridy = rows++;
@@ -71,7 +81,12 @@ public abstract class GraphInfoPanel <T extends Graph> extends JPanel{
     c.gridx = 1;
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_END;
+    try{
     this.add(new JLabel(String.valueOf(graph.getNodeCount())), c);
+    }
+    catch(UnsupportedOperationException e){
+      
+    }
     
     c.gridx = 0;
     c.gridy = rows++;
@@ -82,7 +97,12 @@ public abstract class GraphInfoPanel <T extends Graph> extends JPanel{
     c.gridx = 1;
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_END;
+    try{
     this.add(new JLabel(String.valueOf(graph.getEdgesList().size())), c);
+    }
+    catch(UnsupportedOperationException | NullPointerException e){
+      
+    }
     
     c.gridx = 0;
     c.gridy = rows++;
@@ -93,7 +113,12 @@ public abstract class GraphInfoPanel <T extends Graph> extends JPanel{
     c.gridx = 1;
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_END;
+    try{
     this.add(new JLabel(String.valueOf(graph.getTotalEdges())), c);
+    }
+    catch(UnsupportedOperationException e){
+      
+    }
     
     c.gridx = 0;
     c.gridy = rows++;
@@ -104,7 +129,12 @@ public abstract class GraphInfoPanel <T extends Graph> extends JPanel{
     c.gridx = 1;
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_END;
+    try{
     this.add(new JLabel(String.valueOf(graph.getWeight())), c);
+    }
+    catch(UnsupportedOperationException e){
+      
+    }
   }
   
   public int getRows(){

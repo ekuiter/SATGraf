@@ -40,7 +40,12 @@ public class CommunityGraphInfoPanel extends GraphInfoPanel<CommunityGraph>{
     c.gridx = 1;
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_END;
+    try{
     this.add(new JLabel(String.valueOf(graph.getQ())), c);
+    }
+    catch(UnsupportedOperationException e){
+      
+    }
     
     c.gridx = 0;
     c.gridy = rows++;
@@ -50,7 +55,12 @@ public class CommunityGraphInfoPanel extends GraphInfoPanel<CommunityGraph>{
     c.gridx = 1;
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_END;
+    try{
     this.add(new JLabel(String.valueOf(graph.getCommunities().size())), c);
+    }
+    catch(UnsupportedOperationException | NullPointerException e){
+      
+    }
     
     c.gridx = 0;
     c.gridy = rows++;
@@ -60,7 +70,12 @@ public class CommunityGraphInfoPanel extends GraphInfoPanel<CommunityGraph>{
     c.gridx = 1;
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_END;
+    try{
     this.add(new JLabel(String.valueOf(graph.getMinCommunitySize())), c);
+    }
+    catch(UnsupportedOperationException e){
+      
+    }
     
     c.gridx = 0;
     c.gridy = rows++;
@@ -70,7 +85,12 @@ public class CommunityGraphInfoPanel extends GraphInfoPanel<CommunityGraph>{
     c.gridx = 1;
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_END;
+    try{
     this.add(new JLabel(String.valueOf(graph.getMaxCommunitySize())), c);
+    }
+    catch(UnsupportedOperationException e){
+      
+    }
     
   }  
 }

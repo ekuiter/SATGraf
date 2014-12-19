@@ -195,6 +195,7 @@ public class FruchPlacer extends AbstractPlacer {
 
     
     public double getRandomBelow(int max){
+      //return Math.random() * max;
       return rand.nextDouble() * max;
     }
     

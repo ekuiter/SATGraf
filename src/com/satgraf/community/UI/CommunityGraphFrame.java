@@ -143,11 +143,12 @@ public class CommunityGraphFrame extends GraphFrame{
     if(args.length < 3){
       args = new String[]{
         //"formula/satcomp/dimacs/toybox.cnf",
+        //"-f","/home/zacknewsham/aes.sb",
         "-f","formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
         //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
         //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "-c","ol",
-        "-l","fgpu"
+        "-l","f"
       };
       //System.out.print(Help.getHelp(options()));
       //return;
