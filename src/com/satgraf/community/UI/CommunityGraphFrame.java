@@ -73,6 +73,8 @@ public class CommunityGraphFrame extends GraphFrame{
     }
     else if(placerName.equals("f")){
       return new FruchPlacer(graph);
+    } else if (placerName.equals("fgpu")) {
+    	return new FruchGPUPlacer(graph);
     }
     return null;
   }

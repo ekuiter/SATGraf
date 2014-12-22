@@ -10,6 +10,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 
 import javax.swing.BorderFactory;
@@ -76,9 +78,9 @@ public class GraphCanvasPanel extends JPanel{
   }
   
   static public Dimension getCanvasDimensions() {
-	  Toolkit tk = Toolkit.getDefaultToolkit();
-	  int width = ((int) tk.getScreenSize().getWidth()) - 410;
-	  int height = ((int) tk.getScreenSize().getHeight()) - 68;
+	  GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+	  int width = ((int) gd.getDisplayMode().getWidth()) - 410;
+	  int height = ((int) gd.getDisplayMode().getHeight()) - 68;
 	  
 	  return new Dimension(width, height);
   }

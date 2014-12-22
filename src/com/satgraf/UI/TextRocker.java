@@ -24,6 +24,7 @@ public class TextRocker extends JPanel {
 	private ArrayList<TextRockerListener> listeners = new ArrayList<TextRockerListener>();
 	private int lastUpdate;
 	private int min, max, prevValue;
+	private DocumentListener documentListener;
 	
 	public TextRocker(int id, String title, int initialValue, int min, int max) {
 		this.id = id;
@@ -72,7 +73,7 @@ public class TextRocker extends JPanel {
 			}
 		});
 		
-		textField.getDocument().addDocumentListener(new DocumentListener() {
+		documentListener = new DocumentListener() {
 			
 			@Override
 			public void removeUpdate(DocumentEvent arg0) {
@@ -88,7 +89,9 @@ public class TextRocker extends JPanel {
 			public void changedUpdate(DocumentEvent arg0) {
 				update();
 			}
-		});
+		};
+		
+		textField.getDocument().addDocumentListener(documentListener);
 	}
 	
 	public int getId() {
@@ -135,5 +138,12 @@ public class TextRocker extends JPanel {
 		};
     	
 		SwingUtilities.invokeLater(doRevert);
+    }
+    
+    public void setValue(int value) {
+       	this.prevValue = value;
+       	textField.getDocument().removeDocumentListener(documentListener);
+       	textField.setText(String.valueOf(value));
+       	textField.getDocument().addDocumentListener(documentListener);
     }
 }

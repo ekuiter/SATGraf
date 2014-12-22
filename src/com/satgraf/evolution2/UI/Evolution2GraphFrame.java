@@ -69,7 +69,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
         "ol",
         "f",
         "5",
-        System.getProperty("user.dir") + "/minisat/minisat"
+        System.getProperty("user.dir") + "/solvers/JRminisat/minisat"
       };
     } else if (args.length < 5) {
       System.out.println("Too few options. Please use:");

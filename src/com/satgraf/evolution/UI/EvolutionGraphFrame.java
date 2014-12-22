@@ -6,29 +6,29 @@
 
 package com.satgraf.evolution.UI;
 
-import com.satgraf.community.UI.CommunityGraphFrame;
 import static com.satgraf.evolution2.UI.Evolution2GraphFrame.help;
 import static com.satgraf.evolution2.UI.Evolution2GraphFrame.usage;
-import com.satlib.community.CommunityGraphViewer;
-import com.satlib.community.CommunityMetric;
-import com.satlib.community.JSONCommunityGraph;
-import com.satlib.evolution.EvolutionGraphFactory;
-import com.satlib.evolution.EvolutionGraphFactoryFactory;
-import com.satlib.evolution.EvolutionGraphFactoryObserver;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+
+import com.satgraf.community.UI.CommunityGraphFrame;
+import com.satlib.community.CommunityGraphViewer;
+import com.satlib.community.CommunityMetric;
+import com.satlib.community.JSONCommunityGraph;
+import com.satlib.evolution.EvolutionGraphFactory;
+import com.satlib.evolution.EvolutionGraphFactoryObserver;
 
 /**
  *
@@ -133,7 +133,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame implements Evolutio
         "ol",
         "f",
         "5",
-        System.getProperty("user.dir") + "/minisat/minisat"
+        System.getProperty("user.dir") + "/solvers/minisat/minisat"
       };
     } else if (args.length < 5) {
       System.out.println("Too few options. Please use:");

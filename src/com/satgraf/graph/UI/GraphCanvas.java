@@ -138,7 +138,7 @@ public abstract class GraphCanvas extends JTable implements MouseListener, Mouse
   
   private void mouseHighlight(MouseEvent e) {
 	Node n = graph.getNodeAtXY(e.getX(), e.getY());
-    if(n != null){
+    if(n != null && !(!graph.getShowAssignedVars() && n.isAssigned())){
     	if (graph.getSelectedNode() == n) {
     		graph.selectNode(null);
     	} else {
