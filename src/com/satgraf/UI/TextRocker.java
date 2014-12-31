@@ -99,11 +99,15 @@ public class TextRocker extends JPanel {
 	}
 	
     public void registerListener(TextRockerListener listener) {
-    	listeners.add(listener);
+    	synchronized (listeners) {
+    		listeners.add(listener);
+		}
     }
 
     public void removeListener(TextRockerListener listener) {
-    	listeners.remove(listener);
+    	synchronized (listeners) {
+    		listeners.remove(listener);
+		}
     }
 
     public void update() {
@@ -119,9 +123,11 @@ public class TextRocker extends JPanel {
 	       } else {
 	    	   this.prevValue = value;
 		       
-		       for (TextRockerListener ob : listeners) {
-		          ob.stateChanged(this.id, value);
-		       }
+	    	   synchronized (listeners) {
+	    		   for (TextRockerListener ob : listeners) {
+	 		          ob.stateChanged(this.id, value);
+	 		       }
+	    	   }
 	       }
        } catch (NumberFormatException e) {
     	   revertValue();

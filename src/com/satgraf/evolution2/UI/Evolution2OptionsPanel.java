@@ -29,6 +29,7 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 	private TextRocker decisionVisibleLength;
 	private TextRocker conflictRocker;
 	private JLabel conflictDescription = new JLabel("Conflict Description");
+	private boolean evolutionTriggeredConflict = false;
 	
 	public Evolution2OptionsPanel(GraphFrame frame, Evolution2GraphViewer graph, Collection<String> groups) {
 		super(frame, graph, groups, false);
@@ -106,6 +107,7 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 	
 	private void updateConflictRockerWithScalerInfo() {
 		int currentConflict = scaler.getCurrentConflict();
+		this.evolutionTriggeredConflict = true;
 	    conflictRocker.setValue(currentConflict);
 	    updateConflictDescription(currentConflict);
 	}
@@ -117,6 +119,11 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 		else if (id == decisionVisibleLength.getId())
 			graph.setDisplayDecisionVariableFor(value);
 		else if (id == conflictRocker.getId()) {
+			if (this.evolutionTriggeredConflict) {
+				this.evolutionTriggeredConflict = false;
+				return;
+			}
+			
 			boolean scanWasApplied = scaler.scanToConflict(value);
 			
 			if (scanWasApplied) {
