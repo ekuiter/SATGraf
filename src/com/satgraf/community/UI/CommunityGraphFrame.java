@@ -6,10 +6,20 @@
 
 package com.satgraf.community.UI;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.regex.Pattern;
+
+import javax.swing.JFrame;
+
+import org.json.simple.JSONObject;
+
 import com.satgraf.community.placer.FruchGPUPlacer;
 import com.satgraf.community.placer.FruchPlacer;
 import com.satgraf.community.placer.GridKKPlacer;
 import com.satgraf.community.placer.GridPlacer;
+import com.satgraf.community.placer.yPlacer;
 import com.satgraf.evolution.UI.EvolutionGraphFrame;
 import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphFrame;
@@ -20,12 +30,6 @@ import com.satlib.community.CommunityGraphViewer;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.JSONCommunityGraph;
 import com.satlib.community.placer.CommunityPlacer;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.regex.Pattern;
-import javax.swing.JFrame;
-import org.json.simple.JSONObject;
 
 /**
  *
@@ -75,6 +79,8 @@ public class CommunityGraphFrame extends GraphFrame{
       return new FruchPlacer(graph);
     } else if (placerName.equals("fgpu")) {
     	return new FruchGPUPlacer(graph);
+    } else if (placerName.equals("y")) {
+    	return new yPlacer(graph);
     }
     return null;
   }
