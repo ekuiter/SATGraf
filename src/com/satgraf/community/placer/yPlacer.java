@@ -57,7 +57,6 @@ public class yPlacer extends AbstractPlacer {
 	@Override
 	public void init() {
 		buildGraph2D();
-		// TODO: Might need to reposition in the end
 	}
 
 	@Override
