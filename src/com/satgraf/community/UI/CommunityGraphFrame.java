@@ -19,7 +19,6 @@ import com.satgraf.community.placer.FruchGPUPlacer;
 import com.satgraf.community.placer.FruchPlacer;
 import com.satgraf.community.placer.GridKKPlacer;
 import com.satgraf.community.placer.GridPlacer;
-import com.satgraf.community.placer.gephiPlacer;
 import com.satgraf.community.placer.jgraphPlacer;
 import com.satgraf.community.placer.yPlacer;
 import com.satgraf.evolution.UI.EvolutionGraphFrame;
@@ -85,8 +84,6 @@ public class CommunityGraphFrame extends GraphFrame{
     	return new yPlacer(graph);
     } else if (placerName.equals("j")) {
     	return new jgraphPlacer(graph);
-    } else if (placerName.equals("g")) {
-    	return new gephiPlacer(graph);
     }
     return null;
   }
