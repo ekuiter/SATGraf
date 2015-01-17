@@ -14,7 +14,7 @@ public class Evolution2GraphViewer extends CommunityGraphViewer {
 	private Node decisionVariable = null;
 	private boolean showDecisionVariable = true;
 	private int displayDecisionVariableFor = 100;
-	private int evolutionSpeed = 100;
+	private int evolutionSpeed = 10;
 
 	public Evolution2GraphViewer(CommunityGraph graph, HashMap<String, TIntObjectHashMap<String>> node_lists, CommunityPlacer pl) {
 		super(graph, node_lists, pl);

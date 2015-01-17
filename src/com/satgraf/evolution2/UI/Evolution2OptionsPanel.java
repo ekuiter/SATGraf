@@ -8,6 +8,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -28,6 +29,7 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 	private TextRocker decisionVisibleLength;
 	private TextRocker conflictRocker;
 	private JLabel conflictDescription = new JLabel("Conflict Description");
+	private boolean evolutionTriggeredConflict = false;
 	
 	public Evolution2OptionsPanel(GraphFrame frame, Evolution2GraphViewer graph, Collection<String> groups) {
 		super(frame, graph, groups, false);
@@ -96,6 +98,19 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 	public void newFileReady(int numLinesInFile) {
 		scaler.newFileReady(numLinesInFile);
 	}
+	
+	@Override
+	public void update(){
+	    super.update();
+	    updateConflictRockerWithScalerInfo();
+	}
+	
+	private void updateConflictRockerWithScalerInfo() {
+		int currentConflict = scaler.getCurrentConflict();
+		this.evolutionTriggeredConflict = true;
+	    conflictRocker.setValue(currentConflict);
+	    updateConflictDescription(currentConflict);
+	}
 
 	@Override
 	public void stateChanged(int id, int value) {
@@ -104,8 +119,26 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 		else if (id == decisionVisibleLength.getId())
 			graph.setDisplayDecisionVariableFor(value);
 		else if (id == conflictRocker.getId()) {
-			scaler.scanToConflict(value);
-			updateConflictDescription(value);
+			if (this.evolutionTriggeredConflict) {
+				this.evolutionTriggeredConflict = false;
+				return;
+			}
+			
+			boolean scanWasApplied = scaler.scanToConflict(value);
+			
+			if (scanWasApplied) {
+				updateConflictDescription(value);
+			} else {
+				Runnable doRevert = new Runnable() {
+					
+					@Override
+					public void run() {
+						updateConflictRockerWithScalerInfo();
+					}
+				};
+		    	
+				SwingUtilities.invokeLater(doRevert);
+			}
 		}
 	}
 	

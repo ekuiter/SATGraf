@@ -168,17 +168,24 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	    updateProgress();
 	  }
 	  
-	  public void scanToConflict(int conflictNumber) {
+	  public boolean scanToConflict(int conflictNumber) {
 		  if (timerTriggered)
 			  stopTimer();
+		  
+		  if ((conflictNumber > currentConflict && currentPosition >= totalLines-1) || (conflictNumber < currentConflict && currentPosition <= 0)) {
+			  return false;
+		  }
 		  
 		  this.isScanningForConflict = true;
 		  this.desiredConflict = conflictNumber;
 		  
-		  if (conflictNumber > currentConflict)
+		  if (conflictNumber > currentConflict) {
 			  updatePosition(totalLines);
-		  else if (conflictNumber < currentConflict)
+		  } else if (conflictNumber < currentConflict) {
 			  updatePosition(0);
+		  }
+		  
+		  return true;
 	  }
 	  
 	  private void parseLine(String line, boolean forwards, int lineNumber) {
@@ -545,5 +552,9 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 	  
 	  private void updateShowAssignedVars(boolean show) {
 		  graphviewer.setShowAssignedVars(show);
+	  }
+	  
+	  public int getCurrentConflict() {
+	  	  return this.currentConflict;
 	  }
 }

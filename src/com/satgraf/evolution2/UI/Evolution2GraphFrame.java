@@ -121,10 +121,11 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
   public static void main(String[] args) throws IOException, ParseException {
     if (args.length == 0) {
       args = new String[]{
-        "-f","formula/satcomp/dimacs/toybox.cnf",
-        "-c","ol",
-        "-l","f",
-        "-s",System.getProperty("user.dir") + "/minisat/minisat"
+        "formula/satcomp/dimacs/toybox.dimacs",
+        "ol",
+        "f",
+        "5",
+        System.getProperty("user.dir") + "/solvers/JRminisat/minisat"
       };
     } 
     if (args.length < 4) {
