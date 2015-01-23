@@ -6,16 +6,8 @@
 
 package com.satgraf.evolution.UI;
 
-import static com.satgraf.evolution2.UI.Evolution2GraphFrame.help;
-import static com.satgraf.evolution2.UI.Evolution2GraphFrame.options;
-import static com.satgraf.evolution2.UI.Evolution2GraphFrame.usage;
-import com.satlib.community.CommunityGraphViewer;
-import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
-import com.satlib.community.JSONCommunityGraph;
 import com.satlib.community.placer.CommunityPlacerFactory;
-import com.satlib.evolution.EvolutionGraphFactory;
-import com.satlib.evolution.EvolutionGraphFactoryObserver;
 import com.validatedcl.validation.Help;
 import com.validatedcl.validation.RequiredOption;
 import com.validatedcl.validation.ValidatedCommandLine;
@@ -155,13 +147,15 @@ public class EvolutionGraphFrame extends CommunityGraphFrame implements Evolutio
     options.addOption(o);
     
     o = new ValidatedOption("s","solver",true,"The location of the modified solver");
-    o.setDefault(System.getProperty("user.dir") + "/minisat/minisat");
+    o.addRule(new FileValidationRule(FileValidationRule.FileExists.yes,new String[]{"EXECUTE"}));
+    o.setDefault(System.getProperty("user.dir") + "/solvers/minisat/minisat");
     options.addOption(o);
     
     o = new ValidatedOption("l","layout",true,"The layout algorithm to use");
     o.setDefault("f");
     o.addRule(new ListValidationRule(CommunityPlacerFactory.getInstance().getNames()));
     options.addOption(o);
+    
     
     o = new ValidatedOption("p", "pattern",true,"A list of regex expressions to group variables (not yet implemented)");
     options.addOption(o);
@@ -173,16 +167,12 @@ public class EvolutionGraphFrame extends CommunityGraphFrame implements Evolutio
   public static void main(String[] args) throws IOException, ParseException {
     if (args.length == 0) {
       args = new String[]{
-        "formula/satcomp/dimacs/toybox.dimacs",
-        "ol",
-        "f",
-        "5",
-        System.getProperty("user.dir") + "/solvers/minisat/minisat"
+        "-f","formula/satcomp/dimacs/toybox.dimacs",
+        "-c","ol",
+        "-l","f"
       };
-    } 
-    if (args.length < 4) {
       System.out.print(Help.getHelp(options()));
-      return;
+      //return;
     }
     CommandLineParser clp = new GnuParser();
     Options o = options();
@@ -198,11 +188,11 @@ public class EvolutionGraphFrame extends CommunityGraphFrame implements Evolutio
       patterns.put(args[i], args[i + 1]);
     }*/
     
-    EvolutionGraphFactory factory = new DimacsEvolutionGraphFactory(cl.getOptionValue("s"), cl.getOptionValue("c"), patterns);
+    EvolutionGraphFactory factory = new DimacsEvolutionGraphFactory(cl.getOptionValue("s", o.getOption("s").getValue()), cl.getOptionValue("c", o.getOption("c").getValue()), patterns);
     factory.makeGraph(new File(cl.getOptionValue("f")));
-    
-    CommunityGraphViewer graphViewer = new CommunityGraphViewer(factory.getGraph(), factory.getNodeLists(), CommunityPlacerFactory.getInstance().getByName(cl.getOptionValue("l"), factory.getGraph()));
+    CommunityGraphViewer graphViewer = new CommunityGraphViewer(factory.getGraph(), factory.getNodeLists(), CommunityPlacerFactory.getInstance().getByName(cl.getOptionValue("l", o.getOption("l").getValue()), factory.getGraph()));
     EvolutionGraphFrame frmMain = new EvolutionGraphFrame(factory, graphViewer, factory.getPatterns(), factory.getMetric());
+    frmMain.setProgressive(factory);
     frmMain.init();
     frmMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frmMain.show();

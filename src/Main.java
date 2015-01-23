@@ -54,10 +54,10 @@ public class Main {
     String dashes = "--------------------------------";
     StringBuilder builder = new StringBuilder();
     builder.append("Usage: java -jar SatGraf.jar [com|imp|evo|evo2] <options>\n");
-    builder.append(dashes).append("\ncom\n").append(Help.getHelp(CommunityGraphFrame.options())).append("\n").append(dashes).append("\n");
-    builder.append(dashes).append("\nimp\n").append("Not currently supported\n").append(dashes).append("\n");
-    builder.append(dashes).append("\nevo\n").append(Help.getHelp(EvolutionGraphFrame.options())).append("\n").append(dashes).append("\n");
-    builder.append(dashes).append("\nevo2\n").append(Help.getHelp(Evolution2GraphFrame.options())).append("\n").append(dashes).append("\n");
+    builder.append(dashes).append("\ncom\n").append("\t".concat(Help.getHelp(CommunityGraphFrame.options()).replace("\n","\n\t"))).append("\n").append(dashes).append("\n");
+    builder.append(dashes).append("\nimp\n").append("\tNot currently supported\n".replace("\n","\n\t\n")).append(dashes).append("\n");
+    builder.append(dashes).append("\nevo\n").append("\t".concat(Help.getHelp(EvolutionGraphFrame.options()).replace("\n","\n\t"))).append("\n").append(dashes).append("\n");
+    builder.append(dashes).append("\nevo2\n").append("\t".concat(Help.getHelp(Evolution2GraphFrame.options()).replace("\n","\n\t"))).append("\n").append(dashes).append("\n");
     /*builder.append("com ").append(CommunityGraphFrame.usage()).append("\n").append(CommunityGraphFrame.help()).append("\n\n");
     builder.append("imp ").append(ImplicationGraphFrame.usage()).append("\n").append(ImplicationGraphFrame.help()).append("\n\n");
     builder.append("evo ").append(EvolutionGraphFrame.usage()).append("\n").append(EvolutionGraphFrame.help()).append("\n\n");

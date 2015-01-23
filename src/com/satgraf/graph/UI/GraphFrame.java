@@ -47,6 +47,9 @@ public abstract class GraphFrame extends JFrame{
   protected GraphCanvasPanel canvasPanel;
   protected GraphOptionsPanel panel;
   protected GraphViewer graphViewer;
+  public static boolean isUrl(String file){
+    return file.substring(0, "http://".length()).equals("http://");
+  }
   public GraphOptionsPanel getOptionsPanel(){
     return panel;
   }

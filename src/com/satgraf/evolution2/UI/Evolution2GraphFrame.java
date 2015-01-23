@@ -23,6 +23,7 @@ import com.validatedcl.validation.rules.FileValidationRule;
 import com.validatedcl.validation.rules.ListValidationRule;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 import javax.swing.JFrame;
@@ -93,17 +94,17 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     Options options = new Options();
     ValidatedOption o;
     
-    o = new RequiredOption("f","file",true, "The file (either .cnf or .sb)");
+    
+    o = new ValidatedOption("f","file",true, "The file (either .cnf or .sb)");
     o.addRule(new FileValidationRule(FileValidationRule.FileExists.yes, new String[]{"read"}));
+    options.addOption(o);
+    
+    o = new ValidatedOption("u","url",true, "A file URL (either .cnf or .sb)");
     options.addOption(o);
     
     o = new ValidatedOption("c", "community", true,"The community detection algorithm");
     o.setDefault("ol");
     o.addRule(new ListValidationRule(CommunityMetricFactory.getInstance().getNames()));
-    options.addOption(o);
-    
-    o = new ValidatedOption("s","solver",true,"The location of the modified solver");
-    o.setDefault(System.getProperty("user.dir") + "/minisat/minisat");
     options.addOption(o);
     
     o = new ValidatedOption("l","layout",true,"The layout algorithm to use");
@@ -114,6 +115,11 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     o = new ValidatedOption("p", "pattern",true,"A list of regex expressions to group variables (not yet implemented)");
     options.addOption(o);
     
+    o = new ValidatedOption("s","solver",true,"The location of the modified solver");
+    o.addRule(new FileValidationRule(FileValidationRule.FileExists.yes,new String[]{"execute"}));
+    o.setDefault(System.getProperty("user.dir") + "/solvers/minisat/minisat");
+    options.addOption(o);
+    
     return options;
   }
   
@@ -122,13 +128,10 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
       args = new String[]{
         "-f","formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
         "-c","ol",
-        "-l","f",
-        "-s",System.getProperty("user.dir") + "/minisat/minisat"
+        "-l","f"
       };
-    } 
-    if (args.length < 4) {
       System.out.print(Help.getHelp(options()));
-      return;
+      //return;
     }
     CommandLineParser clp = new GnuParser();
     Options o = options();
@@ -138,14 +141,27 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
       System.err.println(ValidatedCommandLine.getError());
       return;
     }
-    HashMap<String, String> patterns = new HashMap<String, String>();
-
-    /*for (int i = 5; i < args.length; i += 2) {
-      patterns.put(args[i], args[i + 1]);
-    }*/
     
-    Evolution2GraphFactoryFactory factoryfactory = new Evolution2GraphFactoryFactory(cl.getOptionValue("c"), cl.getOptionValue("s"));
-    EvolutionGraphFactory factory = factoryfactory.getFactory(new File(cl.getOptionValue("f")), patterns);//new DimacsEvolutionGraphFactory(args[4], args[1], patterns);
+    HashMap<String, String> patterns = new HashMap<String, String>();
+    Evolution2GraphFactoryFactory factoryfactory = new Evolution2GraphFactoryFactory(cl.getOptionValue("c", o.getOption("c").getValue()), cl.getOptionValue("s",o.getOption("s").getValue()));
+    EvolutionGraphFactory factory;
+    Object in;
+    if(cl.getOptionValue("f") == null && cl.getOptionValue("u") == null){
+      System.err.println("Must supply either -f or -u");
+      return;
+    }
+    else if(cl.getOptionValue("f") == null){
+      URL input = new URL(cl.getOptionValue("u"));
+      in = input;
+      factory = factoryfactory.getFactory(input, patterns);
+    
+    }
+    else{
+      File input = new File(cl.getOptionValue("f"));
+      in = input;
+      factory = factoryfactory.getFactory(input, patterns);
+    }
+    
     
     Evolution2GraphViewer graphViewer = new Evolution2GraphViewer(null, factory.getNodeLists(), null);
     Evolution2GraphFrame frmMain = new Evolution2GraphFrame(factory, graphViewer, factory.getPatterns(), factory.getMetric());
@@ -153,8 +169,13 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     frmMain.preinit();
     
     frmMain.setVisible(true);
-    factory.makeGraph(new File(cl.getOptionValue("f")));
-    CommunityPlacer p = CommunityPlacerFactory.getInstance().getByName(cl.getOptionValue("l"), factory.getGraph());
+    if(in instanceof File){
+      factory.makeGraph((File)in);
+    }
+    else if(in instanceof URL){
+      factory.makeGraph((URL)in);
+    }
+    CommunityPlacer p = CommunityPlacerFactory.getInstance().getByName(cl.getOptionValue("l", o.getOption("l").getValue()), factory.getGraph());
     frmMain.setProgressive(p);
     graphViewer.graph = factory.getGraph();
     graphViewer.setPlacer(p);

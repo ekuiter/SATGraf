@@ -82,6 +82,8 @@ public class CommunityNodePanel extends NodePanel<CommunityNode>{
     	community.setText("");
     	interLabel.setText("");
     	intraLabel.setText("");
+        panel.remove(interPanel);
+        panel.remove(intraPanel);
       return;
     }
     community.setText(String.format("%d", node.getCommunity()));

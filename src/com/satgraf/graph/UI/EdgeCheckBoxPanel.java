@@ -82,16 +82,26 @@ public class EdgeCheckBoxPanel<T extends Node, T1 extends Edge> extends JPanel{
   final void add(Edge conn){
     EdgeCheckBox jc = new EdgeCheckBox(conn);
     checkBoxes.put(conn.getId(), jc);
-      jc.setSelected(true);
+      jc.setSelected(conn.getState() == Edge.EdgeState.SHOW);
       jc.addItemListener(new ItemListener() {
         @Override
         public void itemStateChanged(ItemEvent ie) {
-          EdgeCheckBox box = (EdgeCheckBox)ie.getItem();
+          final EdgeCheckBox box = (EdgeCheckBox)ie.getItem();
           if(box.isSelected()){
-            graph.showEdge(box.getConnection());
+            Thread t = new Thread(){
+              public void run(){
+                graph.showEdge(box.getConnection());
+              }
+            };
+            t.start();
           }
           else{
-            graph.hideEdge(box.getConnection());
+            Thread t = new Thread(){
+              public void run(){
+                graph.hideEdge(box.getConnection());
+              }
+            };
+            t.start();
           }
         }
       });

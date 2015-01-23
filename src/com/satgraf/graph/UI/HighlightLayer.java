@@ -52,10 +52,10 @@ public class HighlightLayer extends Layer {
 	    Node n = graph.getSelectedNode();
 	    Point pos = getMousePosition();
 	    if ((n == null || !n.isVisible()) && pos != null) {
-	      n = getNodeAroundXY(pos.x, pos.y);
+  	      n = getNodeAroundXY(pos.x, pos.y);
 	    }
 	    int scaled_diameter = (int) Math.ceil(DrawableNode.NODE_DIAMETER * graph.getScale());
-	    while (n != null && (n.isVisible() || n == graph.getSelectedNode())) {
+	    while (n != null && (n.isVisible())) {
 	      Stroke s = g2.getStroke();
 	      Iterator<Edge> es = n.getEdges();
 	      while (es.hasNext()) {

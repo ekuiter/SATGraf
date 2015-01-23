@@ -29,7 +29,7 @@ public class Evolution2GraphFactoryFactory extends EvolutionGraphFactoryFactory{
     super(metricName, minisat);
   }
 
-  public CommunityGraphFactory getFactory(URL input, HashMap<String, String> patterns) {
+  public EvolutionGraphFactory getFactory(URL input, HashMap<String, String> patterns) {
     return instance = new RemoteDimacsEvolutionGraphFactory(this.metricName, patterns);
   }
 

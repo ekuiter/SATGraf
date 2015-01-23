@@ -12,9 +12,13 @@ import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityNode;
 import com.satlib.community.placer.AbstractPlacer;
+import com.satlib.community.placer.CommunityPlacerFactory;
 import com.satlib.graph.DrawableNode;
 
 public class yPlacer extends AbstractPlacer {
+  static{
+    CommunityPlacerFactory.getInstance().register("y", yPlacer.class);
+  }
 	
 	private Graph2D graph2D = new Graph2D();
 	private HashMap<CommunityNode, Node> nodeMap = new HashMap<CommunityNode, Node>();

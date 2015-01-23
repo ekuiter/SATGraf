@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import static com.satlib.evolution.EvolutionGraphFactoryFactory.pipeFileName;
 
 /**
  *
@@ -72,6 +73,7 @@ public class DimacsEvolutionGraphFactory  extends com.satlib.evolution.DimacsEvo
     notifyObservers(EvolutionGraphFactoryObserver.Action.addgraph);
   }
   
+  
   public void loadAdditionalGraphs() throws FileNotFoundException, IOException{
     graphs = new ArrayList<>();
     Thread t = new Thread(gbe);
@@ -85,10 +87,10 @@ public class DimacsEvolutionGraphFactory  extends com.satlib.evolution.DimacsEvo
     int lineCount = 0;
     
     Runtime run = Runtime.getRuntime();
-    NamedFifo fifo = new NamedFifo(dumpFile);
+    NamedFifo fifo = new NamedFifo(pipeFileName);
     fifo.create();
-    Process minipure = run.exec(String.format(System.getProperty("user.dir") + "/Minipure/binary/minipure -dump-freq=%d -dump-file=%s %s", dumpFreq, dumpFile.getAbsolutePath(), input.getAbsolutePath()));
-    BufferedReader reader = new BufferedReader(new FileReader(dumpFile));
+    Process minipure = run.exec(String.format(getMinisat() + " -dump-freq=%d -dump-file=%s %s", dumpFreq, pipeFileName, input.getAbsolutePath()));
+    BufferedReader reader = new BufferedReader(new FileReader(pipeFileName));
     GraphBuilderRunnable gbr = new GraphBuilderRunnable(
             getGraph(), 
             patterns, 
