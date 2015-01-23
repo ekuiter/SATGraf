@@ -6,7 +6,6 @@
 
 package com.satgraf.evolution.UI;
 
-import com.satgraf.community.UI.CommunityGraphFrame;
 import static com.satgraf.evolution2.UI.Evolution2GraphFrame.help;
 import static com.satgraf.evolution2.UI.Evolution2GraphFrame.options;
 import static com.satgraf.evolution2.UI.Evolution2GraphFrame.usage;
@@ -40,6 +39,13 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+
+import com.satgraf.community.UI.CommunityGraphFrame;
+import com.satlib.community.CommunityGraphViewer;
+import com.satlib.community.CommunityMetric;
+import com.satlib.community.JSONCommunityGraph;
+import com.satlib.evolution.EvolutionGraphFactory;
+import com.satlib.evolution.EvolutionGraphFactoryObserver;
 
 /**
  *
@@ -167,10 +173,11 @@ public class EvolutionGraphFrame extends CommunityGraphFrame implements Evolutio
   public static void main(String[] args) throws IOException, ParseException {
     if (args.length == 0) {
       args = new String[]{
-        "-f","formula/satcomp/dimacs/toybox.dimacs",
-        "-c","ol",
-        "-l","f",
-        "-s",System.getProperty("user.dir") + "/minisat/minisat"
+        "formula/satcomp/dimacs/toybox.dimacs",
+        "ol",
+        "f",
+        "5",
+        System.getProperty("user.dir") + "/solvers/minisat/minisat"
       };
     } 
     if (args.length < 4) {

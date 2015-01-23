@@ -7,10 +7,22 @@
 package com.satgraf.community.UI;
 
 import static com.satgraf.ForceInit.forceInit;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.regex.Pattern;
+
+import javax.swing.JFrame;
+
+import org.json.simple.JSONObject;
+
 import com.satgraf.community.placer.FruchGPUPlacer;
 import com.satgraf.community.placer.FruchPlacer;
+import com.satgraf.community.placer.GridKKPlacer;
 import com.satgraf.community.placer.GridPlacer;
 import com.satgraf.community.placer.KKPlacer;
+import com.satgraf.community.placer.jgraphPlacer;
+import com.satgraf.community.placer.yPlacer;
 import com.satgraf.evolution.UI.EvolutionGraphFrame;
 import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphFrame;
@@ -84,6 +96,25 @@ public class CommunityGraphFrame extends GraphFrame{
   public void init(){
     super.init();
     metric.getCommunities((CommunityGraph)graphViewer.getGraph());
+  }
+  public static CommunityPlacer getPlacer(String placerName, CommunityGraph graph){
+    
+    if(placerName.equals("kk")){
+      return new GridKKPlacer(graph);
+    }
+    else if(placerName.equals("grid")){
+      return new GridPlacer(graph);
+    }
+    else if(placerName.equals("f")){
+      return new FruchPlacer(graph);
+    } else if (placerName.equals("fgpu")) {
+    	return new FruchGPUPlacer(graph);
+    } else if (placerName.equals("y")) {
+    	return new yPlacer(graph);
+    } else if (placerName.equals("j")) {
+    	return new jgraphPlacer(graph);
+    }
+    return null;
   }
   
   public void fromJson(JSONObject json){

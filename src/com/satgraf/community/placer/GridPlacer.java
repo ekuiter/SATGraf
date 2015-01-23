@@ -388,4 +388,7 @@ public class GridPlacer extends AbstractPlacer {
     return nodePositions.get(node).y;
   }
 
+  public HashMap<CommunityNode, Point> getNodePositions() {
+	  return this.nodePositions;
+  }
 }
