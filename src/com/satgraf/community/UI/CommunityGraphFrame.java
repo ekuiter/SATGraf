@@ -148,7 +148,7 @@ public class CommunityGraphFrame extends GraphFrame{
       args = new String[]{
         //"formula/satcomp/dimacs/toybox.cnf",
         //"-f","/home/zacknewsham/aes.sb",
-        "-f","formula/satcomp/dimacs/toybox.cnf",
+        "-f","/home/zacknewsham/toybox.sb",
         //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
         //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "-c","ol",
@@ -167,7 +167,8 @@ public class CommunityGraphFrame extends GraphFrame{
     }
     
     
-    CommunityGraphFactoryFactory ff = new CommunityGraphFactoryFactory(cl.getOptionValue("c", o.getOption("c").getValue()));
+    String comName = cl.getOptionValue("c", o.getOption("c").getValue());
+    CommunityGraphFactoryFactory ff = new CommunityGraphFactoryFactory(comName);
     HashMap<String, String> patterns = new HashMap<>();
     CommunityGraphFactory factory;
     
@@ -193,6 +194,7 @@ public class CommunityGraphFrame extends GraphFrame{
     
     CommunityGraphViewer graphViewer = new CommunityGraphViewer(null, factory.getNodeLists(), null);
     CommunityGraphFrame frmMain = new CommunityGraphFrame(graphViewer, factory.getPatterns(), factory.getMetric());
+    frmMain.setCommunityName(comName);
     frmMain.setProgressive(factory);
     frmMain.preinit();
     if(in instanceof File){
@@ -204,11 +206,12 @@ public class CommunityGraphFrame extends GraphFrame{
     
     frmMain.setVisible(true);
     CommunityPlacer p = null;
+    frmMain.setPlacerName(cl.getOptionValue("l", o.getOption("l").getValue()));
     if(factory.getGraph() instanceof CommunityPlacer){
       p = (CommunityPlacer)factory.getGraph();
     }
     else{
-      p = CommunityPlacerFactory.getInstance().getByName(cl.getOptionValue("l", o.getOption("l").getValue()), factory.getGraph());
+      p = CommunityPlacerFactory.getInstance().getByName(frmMain.getPlacerName(), factory.getGraph());
     }
     frmMain.setProgressive(p);
     graphViewer.graph = factory.getGraph();

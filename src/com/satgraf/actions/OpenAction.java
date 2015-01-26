@@ -26,7 +26,7 @@ public abstract class OpenAction<T extends GraphFrame> implements ActionListener
   public void actionPerformed(ActionEvent ae) {
     JFileChooser chooser = new JFileChooser();
     FileNameExtensionFilter filter = new FileNameExtensionFilter(
-        "SB SatBench JSON files", "sb");
+        "SB SatBench JSON files", "sb", "CNF dimacs files","cnf");
     chooser.setFileFilter(filter);
     int returnVal = chooser.showOpenDialog(frame);
     if(returnVal == JFileChooser.APPROVE_OPTION) {

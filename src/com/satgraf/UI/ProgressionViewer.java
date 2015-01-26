@@ -21,7 +21,7 @@ import javax.swing.SwingUtilities;
  */
 public class ProgressionViewer extends JPanel{
   private Progressive item;
-  private JLabel label;
+  private final JLabel label;
   private JProgressBar bar;
   private Timer timer;
   public ProgressionViewer(){
@@ -35,17 +35,24 @@ public class ProgressionViewer extends JPanel{
     timer.schedule(new TimerTask() {
       @Override
       public void run() {
-        final int value = ProgressionViewer.this.item == null ? 0 : (int)(100 * ProgressionViewer.this.item.getProgress());
-        SwingUtilities.invokeLater ( new Runnable (){
-            public void run (){
-              bar.setValue(value);
-            }
-        });
+        synchronized(label){
+          final int value = ProgressionViewer.this.item == null ? 0 : (int)(100 * ProgressionViewer.this.item.getProgress());
+          if(value >= 100.0 && ProgressionViewer.this.getParent() != null){
+            ProgressionViewer.this.getParent().remove(ProgressionViewer.this);
+          }
+          SwingUtilities.invokeLater ( new Runnable (){
+              public void run (){
+                bar.setValue(value);
+              }
+          });
+        }
       }
     }, 0, 500);
   }
   public void setProgressive(Progressive item){
-    this.item = item;
-    label.setText(item.getProgressionName());
+    synchronized(label){
+      this.item = item;
+      label.setText(item.getProgressionName());
+    }
   }
 }
