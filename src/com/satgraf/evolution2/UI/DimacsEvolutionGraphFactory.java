@@ -57,8 +57,9 @@ public class DimacsEvolutionGraphFactory extends com.satlib.evolution.DimacsEvol
 
           NamedFifo fifo = new NamedFifo(pipeFileName);
           
-          if (fifo.getFile().exists())
-        	  fifo.getFile().delete();
+          if (fifo.getFile().exists()){
+            fifo.getFile().delete();
+          }
     	  fifo.create();
 
           Runtime.getRuntime().exec(String.format(getMinisat().concat(" %s"), input.getAbsolutePath()));

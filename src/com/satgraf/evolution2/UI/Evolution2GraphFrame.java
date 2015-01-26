@@ -43,12 +43,17 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     forceInit(CNMCommunityMetric.class);
   }
   private EvolutionGraphFactory factory;
+  public static String minisat;
   public Evolution2GraphFrame(EvolutionGraphFactory factory, Evolution2GraphViewer viewer, HashMap<String, Pattern> patterns, CommunityMetric metric) {
     super(viewer, patterns, metric);
     this.factory = factory;
     factory.addObserver(this);
   }
 
+  public void setFactory(EvolutionGraphFactory factory){
+    this.factory = factory;
+  }
+  
   public String toJson() {
     StringBuilder json = new StringBuilder(super.toJson());
 
@@ -126,7 +131,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
   public static void main(String[] args) throws IOException, ParseException {
     if (args.length == 0) {
       args = new String[]{
-        "-f","formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
+        "-f","formula/satcomp/dimacs/toybox.cnf",
         "-c","ol",
         "-l","f"
       };
@@ -142,8 +147,10 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
       return;
     }
     
+    String comName = cl.getOptionValue("c", o.getOption("c").getValue());
     HashMap<String, String> patterns = new HashMap<String, String>();
-    Evolution2GraphFactoryFactory factoryfactory = new Evolution2GraphFactoryFactory(cl.getOptionValue("c", o.getOption("c").getValue()), cl.getOptionValue("s",o.getOption("s").getValue()));
+    minisat = cl.getOptionValue("s",o.getOption("s").getValue());
+    Evolution2GraphFactoryFactory factoryfactory = new Evolution2GraphFactoryFactory(comName, minisat);
     EvolutionGraphFactory factory;
     Object in;
     if(cl.getOptionValue("f") == null && cl.getOptionValue("u") == null){
@@ -165,6 +172,8 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     
     Evolution2GraphViewer graphViewer = new Evolution2GraphViewer(null, factory.getNodeLists(), null);
     Evolution2GraphFrame frmMain = new Evolution2GraphFrame(factory, graphViewer, factory.getPatterns(), factory.getMetric());
+    frmMain.setPlacerName(cl.getOptionValue("l", o.getOption("l").getValue()));
+    frmMain.setCommunityName(comName);
     frmMain.setProgressive(factory);
     frmMain.preinit();
     
@@ -175,7 +184,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     else if(in instanceof URL){
       factory.makeGraph((URL)in);
     }
-    CommunityPlacer p = CommunityPlacerFactory.getInstance().getByName(cl.getOptionValue("l", o.getOption("l").getValue()), factory.getGraph());
+    CommunityPlacer p = CommunityPlacerFactory.getInstance().getByName(frmMain.getPlacerName(), factory.getGraph());
     frmMain.setProgressive(p);
     graphViewer.graph = factory.getGraph();
     graphViewer.setPlacer(p);
