@@ -6,24 +6,18 @@
 
 package com.satgraf.evolution.UI;
 
-import com.satlib.community.CommunityMetricFactory;
-import com.satlib.community.placer.CommunityPlacerFactory;
-import com.validatedcl.validation.Help;
-import com.validatedcl.validation.RequiredOption;
-import com.validatedcl.validation.ValidatedCommandLine;
-import com.validatedcl.validation.ValidatedOption;
-import com.validatedcl.validation.rules.FileValidationRule;
-import com.validatedcl.validation.rules.ListValidationRule;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -35,9 +29,17 @@ import org.json.simple.JSONObject;
 import com.satgraf.community.UI.CommunityGraphFrame;
 import com.satlib.community.CommunityGraphViewer;
 import com.satlib.community.CommunityMetric;
+import com.satlib.community.CommunityMetricFactory;
 import com.satlib.community.JSONCommunityGraph;
+import com.satlib.community.placer.CommunityPlacerFactory;
 import com.satlib.evolution.EvolutionGraphFactory;
 import com.satlib.evolution.EvolutionGraphFactoryObserver;
+import com.validatedcl.validation.Help;
+import com.validatedcl.validation.RequiredOption;
+import com.validatedcl.validation.ValidatedCommandLine;
+import com.validatedcl.validation.ValidatedOption;
+import com.validatedcl.validation.rules.FileValidationRule;
+import com.validatedcl.validation.rules.ListValidationRule;
 
 /**
  *
@@ -148,7 +150,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame implements Evolutio
     
     o = new ValidatedOption("s","solver",true,"The location of the modified solver");
     o.addRule(new FileValidationRule(FileValidationRule.FileExists.yes,new String[]{"EXECUTE"}));
-    o.setDefault(System.getProperty("user.dir") + "/solvers/minisat/minisat");
+    o.setDefault(System.getProperty("user.dir") + "/solvers/Minipure/binary/minipure");
     options.addOption(o);
     
     o = new ValidatedOption("l","layout",true,"The layout algorithm to use");
@@ -203,11 +205,13 @@ public class EvolutionGraphFrame extends CommunityGraphFrame implements Evolutio
   @Override
   public void notifyObserver(EvolutionGraphFactory factory, Action action) {
     if(action == Action.newline){
-      
-    //((EvolutionOptionsPanel)panel).newFileReady(factory.getLineNumber());
     }
     else if(action == Action.process){
       show();
+    } else if (action == Action.addgraph) {
+    	List<CommunityGraphViewer> graphs = ((DimacsEvolutionGraphFactory)this.factory).getGraphs();
+    	CommunityGraphViewer gv = graphs.get(graphs.size()-1);
+    	((EvolutionPanel)canvasPanel).addGraph(gv);
     }
   }
 }

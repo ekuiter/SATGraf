@@ -49,6 +49,10 @@ class GraphBuilderRunnable implements Runnable{
     }
   }
   
+  public int getLineCount() {
+	  return lines.size();
+  }
+  
   public String getLine(){
     synchronized(lines){
       if(lines.isEmpty()){

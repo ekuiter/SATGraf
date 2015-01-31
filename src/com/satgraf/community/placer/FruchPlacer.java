@@ -655,6 +655,9 @@ public class FruchPlacer extends AbstractPlacer {
 
   @Override
   public void init() {
+	  if (this.graph.getNodeCount() <= 0) {
+		  return;
+	  }
     advancePositions();
   }
 

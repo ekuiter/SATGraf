@@ -31,7 +31,7 @@ import static com.satlib.evolution.EvolutionGraphFactoryFactory.pipeFileName;
  */
 public class DimacsEvolutionGraphFactory  extends com.satlib.evolution.DimacsEvolutionGraphFactory{
   private File dimacsFile;
-  private List<CommunityGraph> graphs;
+  private List<CommunityGraphViewer> graphs;
   private GraphBuilderExecutor gbe = new GraphBuilderExecutor(this);
   public DimacsEvolutionGraphFactory(String minisat, String metricName, HashMap<String, String> patterns) {
     super(minisat, metricName, patterns);
@@ -69,10 +69,13 @@ public class DimacsEvolutionGraphFactory  extends com.satlib.evolution.DimacsEvo
   }
   
   public void addGraph(CommunityGraphViewer cg){
-    //graphs.add(cg);
+    graphs.add(cg);
     notifyObservers(EvolutionGraphFactoryObserver.Action.addgraph);
   }
   
+  public List<CommunityGraphViewer> getGraphs() {
+	  return this.graphs;
+  }
   
   public void loadAdditionalGraphs() throws FileNotFoundException, IOException{
     graphs = new ArrayList<>();
@@ -99,10 +102,10 @@ public class DimacsEvolutionGraphFactory  extends com.satlib.evolution.DimacsEvo
     Thread t1 = new Thread(gbr);
     t1.start();
     while((line = reader.readLine()) != null){
-      if(line.length() != 0 && (line.charAt(0) == 'p' || line.charAt(0) == 'c')){
+      if(line.length() == 0 || line.charAt(0) == 'p' || line.charAt(0) == 'c'){
         continue;
       }
-      if(line.equals("$")){
+      if(line.equals("$") && gbr.getLineCount() > 0){
         gbr.finished();
         gbe.addThread(gbr);
         gbr = new GraphBuilderRunnable(getGraph(), patterns, getMetric().getClass(), new FruchPlacer(getGraph()).getClass());
