@@ -12,9 +12,12 @@ import java.awt.event.ItemListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+
 import javax.swing.JPanel;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+
 import com.satlib.graph.Edge;
 import com.satlib.graph.GraphViewer;
 import com.satlib.graph.Node;
@@ -63,7 +66,6 @@ public class EdgeCheckBoxPanel<T extends Node, T1 extends Edge> extends JPanel{
   
   public EdgeCheckBoxPanel(GraphViewer graph, HashSet<T1> connections) {
     this.graph = graph;
-    int community = 0;
     
     Iterator<T1> conns = connections.iterator();
     while(conns.hasNext()){
