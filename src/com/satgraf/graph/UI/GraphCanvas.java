@@ -52,7 +52,6 @@ public abstract class GraphCanvas extends JLayeredPane implements MouseListener,
   
   protected void setupLayers() {
 	  highlightLayer = new HighlightLayer(this.getSize(), graph);
-	  this.add(highlightLayer);
 	  
 	  nodeLayer = createNewNodeLayer();
       this.add(nodeLayer);
@@ -89,13 +88,11 @@ public abstract class GraphCanvas extends JLayeredPane implements MouseListener,
   boolean drawnAll = false;
   
   private void mouseHighlight(MouseEvent e) {
+	boolean clicked = e.getClickCount() == 1;
 	Node n = highlightLayer.getNodeAroundXY(e.getX(), e.getY());
-    if(e.getClickCount() == 1){
-      graph.selectNode(n);
-    }
     
 	//e.getClickCount()
-	/*if (this.clickedVariable == null || clicked) {
+	if (this.clickedVariable == null || clicked) {
 	    if(n != null && !(!graph.getShowAssignedVars() && n.isAssigned())){
 	    	graph.selectNode(n);
 	    	this.repaint();
@@ -103,11 +100,11 @@ public abstract class GraphCanvas extends JLayeredPane implements MouseListener,
 	    	graph.selectNode(null);
 	    	this.repaint();
 	    }
-	}*/
+	}
 	
-	/*if (clicked) {
+	if (clicked) {
 		this.clickedVariable = n;
-	}*/
+	}
   }
 
   @Override
@@ -136,7 +133,6 @@ public abstract class GraphCanvas extends JLayeredPane implements MouseListener,
   
   public void mouseMoved(MouseEvent e){
 	  mouseHighlight(e);
-      repaint();
   }
   
   @Override
@@ -164,8 +160,8 @@ public abstract class GraphCanvas extends JLayeredPane implements MouseListener,
 		  Graphics g2 = image.createGraphics();
 		  super.paintChildren(g2);
 		  g.drawImage(image, 0, 0, Color.BLACK, null);
-		  highlightLayer.paintComponent(g);
 		  buffer = image;
+		  highlightLayer.paintComponent(g);
 	  }
   }
   
