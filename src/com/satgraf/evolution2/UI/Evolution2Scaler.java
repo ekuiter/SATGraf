@@ -544,12 +544,15 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  }
 			  		  
 		  if (update >= totalLines) {
-			  stopTimer();
 			  update = totalLines;
 		  }
 		  
 		  timerTriggered = true;
 		  updatePosition(update);
+		  
+		  if (currentPosition == totalLines) {
+			  stopTimer();
+		  }
 	  }
 	  
 	  private void updateShowAssignedVars(boolean show) {
