@@ -72,7 +72,9 @@ public class CommunityOptionsPanel extends GraphOptionsPanel{
   }
   
   protected void setGraph(CommunityGraphViewer graph, boolean clearPanel){
-    infoPanel = new CommunityGraphInfoPanel(graph.getGraph());
+    if(infoPanel == null){
+      infoPanel = new CommunityGraphInfoPanel(graph);
+    }
     super.setGraph(graph, clearPanel);
     synchronized(checkBoxPanel){
       communityPanel = new CommunityCheckBoxPanel(graph);

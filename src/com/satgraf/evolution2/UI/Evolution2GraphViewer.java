@@ -1,17 +1,21 @@
 package com.satgraf.evolution2.UI;
 
-import gnu.trove.map.hash.TIntObjectHashMap;
-
-import java.util.HashMap;
-
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityGraphViewer;
+import com.satlib.community.CommunityNode;
 import com.satlib.community.placer.CommunityPlacer;
+import com.satlib.graph.GraphObserver;
 import com.satlib.graph.Node;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 
 public class Evolution2GraphViewer extends CommunityGraphViewer {
 	
 	private Node decisionVariable = null;
+    private List<CommunityNode> decisions = new ArrayList<>();
 	private boolean showDecisionVariable = true;
 	private int displayDecisionVariableFor = 100;
 	private int evolutionSpeed = 10;
@@ -55,4 +59,12 @@ public class Evolution2GraphViewer extends CommunityGraphViewer {
 	public int getEvolutionSpeed() {
 		return this.evolutionSpeed;
 	}
+    
+    public void recordDecisionVariable(CommunityNode n){
+      decisions.add(n);
+      notifyObservers(GraphObserver.Action.decisionVariable);
+    }
+    public Collection getDecisionVariables(){
+      return decisions;
+    }
 }

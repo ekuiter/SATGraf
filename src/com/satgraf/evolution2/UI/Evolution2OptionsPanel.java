@@ -33,6 +33,7 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 	
 	public Evolution2OptionsPanel(GraphFrame frame, Evolution2GraphViewer graph, Collection<String> groups) {
 		super(frame, graph, groups, false);
+        infoPanel = new Evolution2GraphInfoPanel(graph);
 		setGraph(graph);
 		this.graph = graph;
 		

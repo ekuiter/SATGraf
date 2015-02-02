@@ -17,12 +17,15 @@ import javax.swing.JPanel;
  *
  * @author zacknewsham
  */
-public abstract class GraphInfoPanel <T extends Graph> extends JPanel{
-  protected T graph;
+public abstract class GraphInfoPanel <T extends GraphViewer> extends JPanel{
+  protected T graphViewer;
+  protected Graph graph;
   protected int rows = 0;
-  public GraphInfoPanel(T graph){
-    this.graph = graph;
+  public GraphInfoPanel(T graphViewer){
+    this.graphViewer = graphViewer;
+    this.graph = graphViewer.graph;
   }
+  public abstract Graph getGraph();
   
   public void init(){
     this.setLayout(new GridBagLayout());

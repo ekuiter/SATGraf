@@ -247,7 +247,9 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  if (n != null) {
 			  NodeAssignmentState prevState = n.getAssignmentState();
 			  n.setActivity(activity);
-			  
+			  if(isDecisionVariable){
+                graphviewer.recordDecisionVariable(n);
+              }
 			  if (isDecisionVariable && graphviewer.getShowDecisionVariable() && lastDecisionVariable != lineNumber) {
 				  graphviewer.setDecisionVariable(n);
 				  lastDecisionVariable = lineNumber;

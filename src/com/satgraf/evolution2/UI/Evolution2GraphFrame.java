@@ -82,8 +82,9 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
 
   @Override
   public com.satgraf.actions.ExportAction getExportAction() {
-	if(graphViewer != null)
+	if(graphViewer != null){
 		graphViewer.selectNode(null);
+    }
     return new ExportAction(this);
   }
   
@@ -131,7 +132,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
   public static void main(String[] args) throws IOException, ParseException {
     if (args.length == 0) {
       args = new String[]{
-        "-f","formula/satcomp/dimacs/toybox.dimacs",
+        "-f","formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
         "-c","ol",
         "-l","f"
       };
