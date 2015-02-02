@@ -1,6 +1,7 @@
 package com.satgraf.evolution2.UI;
 
 import static com.satgraf.ForceInit.forceInit;
+
 import com.satgraf.community.UI.CommunityGraphFrame;
 import com.satgraf.community.placer.FruchGPUPlacer;
 import com.satgraf.community.placer.FruchPlacer;
@@ -13,6 +14,7 @@ import com.satlib.community.CommunityMetricFactory;
 import com.satlib.community.OLCommunityMetric;
 import com.satlib.community.placer.CommunityPlacer;
 import com.satlib.community.placer.CommunityPlacerFactory;
+import com.satlib.evolution.DimacsEvolutionGraphFactory;
 import com.satlib.evolution.EvolutionGraphFactory;
 import com.satlib.evolution.EvolutionGraphFactoryObserver;
 import com.validatedcl.validation.Help;
@@ -21,19 +23,25 @@ import com.validatedcl.validation.ValidatedCommandLine;
 import com.validatedcl.validation.ValidatedOption;
 import com.validatedcl.validation.rules.FileValidationRule;
 import com.validatedcl.validation.rules.ListValidationRule;
+
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.regex.Pattern;
+
 import javax.swing.JFrame;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-public class Evolution2GraphFrame extends CommunityGraphFrame implements EvolutionGraphFactoryObserver{
+public class Evolution2GraphFrame extends CommunityGraphFrame implements EvolutionGraphFactoryObserver {
   static{
     forceInit(FruchGPUPlacer.class);
     forceInit(FruchPlacer.class);
@@ -48,6 +56,12 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     super(viewer, patterns, metric);
     this.factory = factory;
     factory.addObserver(this);
+    
+    this.addWindowListener(new WindowAdapter() {
+    	public void windowClosing(WindowEvent e) {
+    		DimacsEvolutionGraphFactory.deleteOutputFolder();
+    	}
+	});
   }
 
   public void setFactory(EvolutionGraphFactory factory){

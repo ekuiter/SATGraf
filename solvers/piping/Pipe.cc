@@ -66,6 +66,10 @@ void Pipe::printVar(const int id, int state, bool isDecisionVariable, int activi
         ss << " 0 ";
     }
     
+    if (activity < 0) {
+      activity = 0;
+    }
+    
     ss << activity << " ";
     ss << id+1 << "\n";
     
