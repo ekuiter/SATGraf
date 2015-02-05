@@ -155,7 +155,7 @@ public class CommunityGraphFrame extends GraphFrame{
         "-l","f"
       };
       System.out.print(Help.getHelp(options()));
-      //return;
+      return;
     }
     CommandLineParser clp = new GnuParser();
     Options o = options();

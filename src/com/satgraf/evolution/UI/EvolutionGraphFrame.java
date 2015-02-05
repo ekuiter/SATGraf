@@ -174,7 +174,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame implements Evolutio
         "-l","f"
       };
       System.out.print(Help.getHelp(options()));
-      //return;
+      return;
     }
     CommandLineParser clp = new GnuParser();
     Options o = options();

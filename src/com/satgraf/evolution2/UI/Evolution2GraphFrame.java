@@ -4,6 +4,7 @@ import static com.satgraf.ForceInit.forceInit;
 import com.satgraf.community.UI.CommunityGraphFrame;
 import com.satgraf.community.placer.FruchGPUPlacer;
 import com.satgraf.community.placer.FruchPlacer;
+import com.satgraf.community.placer.GridKKPlacer;
 import com.satgraf.community.placer.GridPlacer;
 import com.satgraf.community.placer.KKPlacer;
 import com.satgraf.graph.UI.GraphCanvasPanel;
@@ -38,6 +39,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     forceInit(FruchGPUPlacer.class);
     forceInit(FruchPlacer.class);
     forceInit(KKPlacer.class);
+    forceInit(GridKKPlacer.class);
     forceInit(GridPlacer.class);
     forceInit(OLCommunityMetric.class);
     forceInit(CNMCommunityMetric.class);
@@ -132,12 +134,12 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
   public static void main(String[] args) throws IOException, ParseException {
     if (args.length == 0) {
       args = new String[]{
-        "-f","formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
+        "-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/unif-k3-r4.267-v421-c1796-S4839562527790587617.cnf",
         "-c","ol",
         "-l","f"
       };
       System.out.print(Help.getHelp(options()));
-      //return;
+      return;
     }
     CommandLineParser clp = new GnuParser();
     Options o = options();

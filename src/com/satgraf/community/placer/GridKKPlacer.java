@@ -12,6 +12,7 @@ import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityGraphAdapter;
 import com.satlib.community.CommunityNode;
 import com.satlib.community.placer.AbstractPlacer;
+import com.satlib.community.placer.CommunityPlacerFactory;
 import com.satlib.graph.DrawableNode;
 import com.satlib.graph.UnionFind;
 import gnu.trove.list.array.TIntArrayList;
@@ -28,6 +29,9 @@ import java.util.Iterator;
  * @author zacknewsham
  */
 public class GridKKPlacer extends AbstractPlacer{
+  static{
+    CommunityPlacerFactory.getInstance().register("gkk", GridKKPlacer.class);
+  }
   private TIntObjectHashMap<KKPlacer> kkPlacers = new TIntObjectHashMap<KKPlacer>();
   private KKPlacer communityKKPlacer;
   private HashMap<CommunityNode, Point> nodePositions = new HashMap<CommunityNode, Point>();
