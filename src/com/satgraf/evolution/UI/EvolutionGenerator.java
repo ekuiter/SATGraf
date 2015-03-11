@@ -5,11 +5,6 @@
  */
 
 package com.satgraf.evolution.UI;
-import gnu.trove.impl.hash.TIntIntHash;
-import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.map.hash.TObjectCharHashMap;
-import java.text.DecimalFormat;
-import javax.swing.JOptionPane;
 import com.satlib.community.CNMCommunityMetric;
 import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityGraph;
@@ -17,6 +12,12 @@ import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityNode;
 import com.satlib.community.ConcreteCommunityGraph;
 import com.satlib.community.OLCommunityMetric;
+import gnu.trove.impl.hash.TIntIntHash;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TObjectCharHashMap;
+import java.text.DecimalFormat;
+import java.util.HashSet;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -210,28 +211,126 @@ public class EvolutionGenerator extends javax.swing.JDialog {
       return getLitBetween(high, max);
     }
   }
+  private static int[] makeClause(int vars_count, int clauseLength){
+    int[] ret = new int[clauseLength];
+    HashSet<Integer> in = new HashSet<>();
+    for(int i = 0; i < clauseLength; i++){
+      int var = getRandomBetween(1, vars_count);
+      while(in.contains(var) || in.contains(0-var)){
+        var = getRandomBetween(1, vars_count);
+      }
+      ret[i] = var;
+      
+      in.add(var);
+    }
+    return ret;
+  }
   private static int[] makeClause(int vars_count, int coms_count, double q){
+    return makeClause(vars_count, coms_count, q, 3);
+  }
+  
+  private static int[] makeClause(int vars_count, int coms_count, double q, int clauseLength){
     int cmty = getRandomBetween(1, coms_count);
     int cmtySize = (int)Math.round((double)vars_count / (double)coms_count);
+    int[] ret = new int[clauseLength];
     
-    int a = 0;
-    while(a == 0 || a > vars_count){
-      a = getLitBetween(1, cmtySize);
-      a = a < 0 ? 0 - (Math.abs(a) * coms_count + cmty) : Math.abs(a) * coms_count + cmty;
+    for(int i = 0; i < clauseLength; i++){
+      int a = 0;
+      if(i == 0){
+        while(a == 0 || a > vars_count){
+          a = getLitBetween(1, cmtySize);
+          a = a < 0 ? 0 - (Math.abs(a) * coms_count + cmty) : Math.abs(a) * coms_count + cmty;
+        }
+        ret[0] = a;
+      }
+      else{
+        int b = 0;
+        while(b == 0 || b > vars_count){
+          double r1 = Math.random();
+          b = r1 < q ? getLitBetween(0, cmtySize) * coms_count + cmty : getLitBetween(1, vars_count);
+        }
+        ret[i] = b;
+      }
     }
-    
-    int b = 0;
-    while(b == 0 || b > vars_count){
-      double r1 = Math.random();
-      b = r1 < q ? getLitBetween(0, cmtySize) * coms_count + cmty : getLitBetween(1, vars_count);
-    }
-    int c = 0;
-    while(c == 0 || c > vars_count){
-      double r2 = Math.random();
-      c = r2 < q ? getLitBetween(0, cmtySize) * coms_count + cmty : getLitBetween(1, vars_count);
-    }
-    return new int[]{a, b, c};//String.format("%d %d %d 0\n", a, b, c);
+    return ret;
   }
+  
+
+  public static CommunityGraph makeCommunity(int vars_count, int clauses_count, int clauseLength) {
+    CommunityGraph cg = new ConcreteCommunityGraph();
+    TIntIntHashMap varDist = new TIntIntHashMap();
+    cg.setVariableDistribution(varDist);
+    while(cg.getClausesCount() < clauses_count){
+      TObjectCharHashMap<CommunityNode> nodes = new TObjectCharHashMap<CommunityNode>();
+      int[] clause = makeClause(vars_count, clauseLength);
+      for(int i = 0; i < clauseLength; i++){
+        boolean t = clause[i] > 0;
+        if(!t){
+          clause[i] = 0 - clause[i];
+        }
+        varDist.put(clause[i], varDist.get(clause[i]) + 1);
+        
+        CommunityNode a = cg.createNode(clause[i], null);
+        nodes.put(a, t ? '1' : '0');
+      }
+      for(CommunityNode n1 : nodes.keySet()){
+        for(CommunityNode n2 : nodes.keySet()){
+          if(n1 != n2){
+            CommunityEdge e = cg.getEdge(n1, n2);
+            if(!n1.getEdgesList().contains(e)){
+              n1.addEdge(e);
+            }
+            if(!n2.getEdgesList().contains(e)){
+              n2.addEdge(e);
+            }
+          }
+        }
+      }
+    }
+    CommunityMetric cm = new OLCommunityMetric();
+    
+    double mod = cm.getCommunities(cg);
+    return cg;
+  }
+  
+  public static CommunityGraph makeCommunity(int vars_count, int clauses_count, int minClause, int maxClause){
+    CommunityGraph cg = new ConcreteCommunityGraph();
+    TIntIntHashMap varDist = new TIntIntHashMap();
+    cg.setVariableDistribution(varDist);
+    while(cg.getClausesCount() < clauses_count){
+      TObjectCharHashMap<CommunityNode> nodes = new TObjectCharHashMap<CommunityNode>();
+      int clauseLength = getRandomBetween(minClause, maxClause);
+      int[] clause = makeClause(vars_count, clauseLength);
+      for(int i = 0; i < clauseLength; i++){
+        boolean t = clause[i] > 0;
+        if(!t){
+          clause[i] = 0 - clause[i];
+        }
+        varDist.put(clause[i], varDist.get(clause[i]) + 1);
+        
+        CommunityNode a = cg.createNode(clause[i], null);
+        nodes.put(a, t ? '1' : '0');
+      }
+      for(CommunityNode n1 : nodes.keySet()){
+        for(CommunityNode n2 : nodes.keySet()){
+          if(n1 != n2){
+            CommunityEdge e = cg.getEdge(n1, n2);
+            if(!n1.getEdgesList().contains(e)){
+              n1.addEdge(e);
+            }
+            if(!n2.getEdgesList().contains(e)){
+              n2.addEdge(e);
+            }
+          }
+        }
+      }
+    }
+    CommunityMetric cm = new OLCommunityMetric();
+    
+    double mod = cm.getCommunities(cg);
+    return cg;
+  }
+  
   public static CommunityGraph makeCommunity(int vars_count, int clauses_count, int coms_count, double q){
     CommunityGraph cg = new ConcreteCommunityGraph();
     TIntIntHashMap varDist = new TIntIntHashMap();

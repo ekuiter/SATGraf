@@ -4,6 +4,10 @@ import com.satgraf.evolution.UI.EvolutionGraphFrame;
 import com.satgraf.evolution.UI.RandomQVTime;
 import com.satgraf.evolution2.UI.Evolution2GraphFrame;
 import com.satgraf.implication.UI.ImplicationGraphFrame;
+import com.satgraf.test.QAgainstTimeRandomBucketing;
+import com.satgraf.test.QAgainstTimeRandomBucketingFixedCVR;
+import com.satgraf.test.QAgainstTimeRandomBucketingNoQ;
+import com.satgraf.test.QAgainstTimeRandomBucketingVarLength;
 import com.validatedcl.validation.Help;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -45,8 +49,17 @@ public class Main {
     else if(args[0].equals("evo2")){
       Evolution2GraphFrame.main(newargs);
     }
-    else if(args[0].equals("random")){
-      RandomQVTime.main(newargs);
+    else if(args[0].equals("q")){
+      QAgainstTimeRandomBucketing.main(newargs);
+    }
+    else if(args[0].equals("qcvr")){
+      QAgainstTimeRandomBucketingFixedCVR.main(newargs);
+    }
+    else if(args[0].equals("noq")){
+      QAgainstTimeRandomBucketingNoQ.main(newargs);
+    }
+    else if(args[0].equals("rlen")){
+      QAgainstTimeRandomBucketingVarLength.main(newargs);
     }
   }
   
