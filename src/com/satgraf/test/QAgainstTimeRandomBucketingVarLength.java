@@ -58,13 +58,13 @@ public class QAgainstTimeRandomBucketingVarLength extends com.satgraf.test.QAgai
     QAgainstTimeRandomBucketingVarLength q = new QAgainstTimeRandomBucketingVarLength();
     if(args.length == 0){
       args = new String[]{
-        "/media/zacknewsham/SAT/bucketingNoQ",
+        "/media/zacknewsham/SAT/bucketingVarLength",
         "100",//min vars
-        "1000",//max vars
-        "100",//inc vars
-        "200",//min clauses
-        "5000",//max clauses
-        "1000",//inc clauses
+        "10000",//max vars
+        "200",//inc vars
+        "1000",//min clauses
+        "50000",//max clauses
+        "2000",//inc clauses
         "2",//min clause length
         "5"//max clause length
       };

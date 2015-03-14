@@ -219,7 +219,8 @@ public class EvolutionGenerator extends javax.swing.JDialog {
       while(in.contains(var) || in.contains(0-var)){
         var = getRandomBetween(1, vars_count);
       }
-      ret[i] = var;
+      int pos = (int)Math.round(Math.random());
+      ret[i] = pos == 0 ? 0 - var : var;
       
       in.add(var);
     }
@@ -235,13 +236,14 @@ public class EvolutionGenerator extends javax.swing.JDialog {
     int[] ret = new int[clauseLength];
     
     for(int i = 0; i < clauseLength; i++){
-      int a = 0;
+      int pos = (int)Math.round(Math.random());
       if(i == 0){
+        int a = 0;
         while(a == 0 || a > vars_count){
           a = getLitBetween(1, cmtySize);
           a = a < 0 ? 0 - (Math.abs(a) * coms_count + cmty) : Math.abs(a) * coms_count + cmty;
         }
-        ret[0] = a;
+        ret[0] = pos == 0 ? 0 - a : a;
       }
       else{
         int b = 0;
@@ -249,7 +251,7 @@ public class EvolutionGenerator extends javax.swing.JDialog {
           double r1 = Math.random();
           b = r1 < q ? getLitBetween(0, cmtySize) * coms_count + cmty : getLitBetween(1, vars_count);
         }
-        ret[i] = b;
+        ret[i] = pos == 0 ? 0 - b : b;
       }
     }
     return ret;
@@ -273,10 +275,11 @@ public class EvolutionGenerator extends javax.swing.JDialog {
         CommunityNode a = cg.createNode(clause[i], null);
         nodes.put(a, t ? '1' : '0');
       }
+      cg.createClause(nodes);
       for(CommunityNode n1 : nodes.keySet()){
         for(CommunityNode n2 : nodes.keySet()){
           if(n1 != n2){
-            CommunityEdge e = cg.getEdge(n1, n2);
+            CommunityEdge e = cg.createEdge(n1, n2, false);
             if(!n1.getEdgesList().contains(e)){
               n1.addEdge(e);
             }
@@ -311,10 +314,11 @@ public class EvolutionGenerator extends javax.swing.JDialog {
         CommunityNode a = cg.createNode(clause[i], null);
         nodes.put(a, t ? '1' : '0');
       }
+      cg.createClause(nodes);
       for(CommunityNode n1 : nodes.keySet()){
         for(CommunityNode n2 : nodes.keySet()){
           if(n1 != n2){
-            CommunityEdge e = cg.getEdge(n1, n2);
+            CommunityEdge e = cg.createEdge(n1, n2, false);
             if(!n1.getEdgesList().contains(e)){
               n1.addEdge(e);
             }

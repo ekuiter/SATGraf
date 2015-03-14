@@ -9,9 +9,7 @@ package com.satgraf.test;
 
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,19 +54,18 @@ public class QAgainstTimeRandomBucketingNoQ extends com.satgraf.test.QAgainstTim
   }
   public static void main(String[] args){
     QAgainstTimeRandomBucketingNoQ q = new QAgainstTimeRandomBucketingNoQ();
-    q.outdir = args[0];
     if(args.length == 0){
-    q.outdir = args[0];
       args = new String[]{
         "/media/zacknewsham/SAT/bucketingNoQ",
         "100",//min vars
-        "1000",//max vars
-        "100",//inc vars
-        "200",//min clauses
-        "5000",//max clauses
-        "1000"//inc clauses
+        "10000",//max vars
+        "200",//inc vars
+        "1000",//min clauses
+        "100000",//max clauses
+        "2000"//inc clauses
       };
     }
+    q.outdir = args[0];
     int varsFrom = Integer.parseInt(args[1]);
     int varsTo = Integer.parseInt(args[2]);
     int varsInc = Integer.parseInt(args[3]);

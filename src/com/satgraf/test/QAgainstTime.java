@@ -30,11 +30,11 @@ public class QAgainstTime {
     
     CommunityMetric metric = new OLCommunityMetric();
     double Q = metric.getCommunities(c);
-    long startTime = System.currentTimeMillis();
     System.out.printf("\"%s\",%d,%d,%d,%d,", f.getAbsolutePath(), c.getNodes().size(), c.getClausesCount(), c.getCommunities().size(),c.getEdgesList().size());
     
     if(satCompTime == 0.0){
       Runtime run = Runtime.getRuntime();
+      long startTime = System.currentTimeMillis();
       Process minipure = run.exec(String.format("/usr/bin/minisat %s", f.getAbsolutePath()));
       try {
         synchronized(minipure){
