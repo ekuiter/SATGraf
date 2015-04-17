@@ -25,22 +25,27 @@ import com.satgraf.evolution.UI.EvolutionGenerator;
 
 public class QAgainstTimeRandomBucketingVarLength extends com.satgraf.test.QAgainstTime{
   private String outdir;
-  public void run(int vars, int clauses, int minLength, int maxLength, int rep) throws Exception{
-    CommunityGraph c = EvolutionGenerator.makeCommunity(vars, clauses, minLength, maxLength);
-    f = new File(String.format(outdir + "/%d.%d.%d.%d.%d.cnf", vars, clauses,minLength, maxLength, rep));
+  public void run(int vars, int clauses, int minLength, int maxLength, int rep, double avgLength) throws Exception{
+    CommunityGraph c = EvolutionGenerator.makeCommunity(vars, clauses, minLength, maxLength, avgLength);
+    f = new File(String.format(outdir + "/%d.%d.%d.%d.%f.%d.cnf", vars, clauses,minLength, maxLength, (double)Math.round(avgLength * 100) / 100, rep));
+    if(f.exists()){
+      return;
+    }
     c.writeDimacs(f);
     timeout = 60 * 15 * 1000;
     super.run(c, 0.0);
   }
   
-  public void getRuns(int varsFrom, int varsTo, int varsInc, int clausesFrom, int clausesTo, int clausesInc, int minClause, int maxClause){
+  public void getRuns(int varsFrom, int varsTo, int varsInc, int clausesFrom, int clausesTo, int clausesInc, int minClause, int maxClause, double lengthInc){
     ArrayList<Object[]> col =new ArrayList<>();
     for(int i = 0; i < 3; i++){
       for(int v = varsFrom; v < varsTo; v+= varsInc){
         for(int c = clausesFrom; c < clausesTo; c+= clausesInc){
-          col.add(new Object[]{
-            v, c, i
-          });
+          for(double l = minClause; l < maxClause; l += lengthInc){
+            col.add(new Object[]{
+              v, c, i, l
+            });
+          }
         }
       }
     }
@@ -48,7 +53,7 @@ public class QAgainstTimeRandomBucketingVarLength extends com.satgraf.test.QAgai
     for(int i = 0; i < col.size(); i++){
       Object[] o = col.get(i);
       try {
-        run((int)o[0], (int)o[1], minClause, maxClause, (int)o[2]);
+        run((int)o[0], (int)o[1], minClause, maxClause, (int)o[2], (double)o[3]);
       } catch (Exception ex) {
         Logger.getLogger(QAgainstTimeRandomBucketingVarLength.class.getName()).log(Level.SEVERE, null, ex);
       }
@@ -66,7 +71,8 @@ public class QAgainstTimeRandomBucketingVarLength extends com.satgraf.test.QAgai
         "50000",//max clauses
         "2000",//inc clauses
         "2",//min clause length
-        "5"//max clause length
+        "4",//max clause length
+        "0.1"//clause length inc
       };
     }
     q.outdir = args[0];
@@ -78,6 +84,7 @@ public class QAgainstTimeRandomBucketingVarLength extends com.satgraf.test.QAgai
     int clausesInc = Integer.parseInt(args[6]);
     int minClauseLength = Integer.parseInt(args[7]);
     int maxClauseLength = Integer.parseInt(args[8]);
-    q.getRuns(varsFrom, varsTo, varsInc, clausesFrom, clausesTo, clausesInc, minClauseLength, maxClauseLength);
+    double clauseLengthInc = Double.parseDouble(args[9]);
+    q.getRuns(varsFrom, varsTo, varsInc, clausesFrom, clausesTo, clausesInc, minClauseLength, maxClauseLength, clauseLengthInc);
   }
 }
