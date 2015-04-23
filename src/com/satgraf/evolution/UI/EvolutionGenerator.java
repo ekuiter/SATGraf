@@ -296,14 +296,28 @@ public class EvolutionGenerator extends javax.swing.JDialog {
     return cg;
   }
   
-  public static CommunityGraph makeCommunity(int vars_count, int clauses_count, int minClause, int maxClause){
+  private static final double e = 0.001;
+  public static CommunityGraph makeCommunity(int vars_count, int clauses_count, int minClause, int maxClause, double avgLength){
     CommunityGraph cg = new ConcreteCommunityGraph();
     TIntIntHashMap varDist = new TIntIntHashMap();
     cg.setVariableDistribution(varDist);
+    int totalLength = 0;
     while(cg.getClausesCount() < clauses_count){
       TObjectCharHashMap<CommunityNode> nodes = new TObjectCharHashMap<CommunityNode>();
-      int clauseLength = getRandomBetween(minClause, maxClause);
+      int clauseLength = 0;
+      
+      //we are right on the wanted average clause length, so generate random clause within full range
+      if(totalLength == 0 || Math.abs((double)totalLength / (double) cg.getClausesCount() - avgLength) < 0.001){
+        clauseLength = getRandomBetween(minClause, maxClause);
+      }
+      else if((double)totalLength / (double) cg.getClausesCount() - avgLength > 0){
+        clauseLength = getRandomBetween(minClause, (int)Math.floor(avgLength));
+      }
+      else{
+        clauseLength = getRandomBetween((int)Math.ceil(avgLength), maxClause);
+      }
       int[] clause = makeClause(vars_count, clauseLength);
+      totalLength += clause.length;
       for(int i = 0; i < clauseLength; i++){
         boolean t = clause[i] > 0;
         if(!t){

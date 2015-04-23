@@ -11,6 +11,7 @@ import java.awt.Dimension;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import org.json.simple.JSONArray;
@@ -84,6 +85,11 @@ public abstract class GraphOptionsPanel extends JSplitPane implements GraphObser
   public OptionsPanel getOptionsPanel(){
     return optionsPanel;
   }
+  
+  public void addPanel(JPanel panel, String name){
+    checkBoxPanel.addBar(name, panel);
+  }
+  
   public void update(){
     Iterator<NodeCheckboxPanel> panels = checkboxPanels.values().iterator();
     while(panels.hasNext()){

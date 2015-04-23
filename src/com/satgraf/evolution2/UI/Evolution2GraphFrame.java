@@ -1,14 +1,18 @@
 package com.satgraf.evolution2.UI;
 
 import static com.satgraf.ForceInit.forceInit;
-
 import com.satgraf.community.UI.CommunityGraphFrame;
 import com.satgraf.community.placer.FruchGPUPlacer;
 import com.satgraf.community.placer.FruchPlacer;
 import com.satgraf.community.placer.GridKKPlacer;
 import com.satgraf.community.placer.GridPlacer;
 import com.satgraf.community.placer.KKPlacer;
+import com.satgraf.evolution2.observers.EvolutionObserver;
+import com.satgraf.evolution2.observers.EvolutionObserverFactory;
+import com.satgraf.evolution2.observers.VSIDSTemporalLocalityEvolutionObserver;
 import com.satgraf.graph.UI.GraphCanvasPanel;
+import com.satgraf.graph.UI.GraphOptionsPanel;
+import com.satgraf.graph.UI.OptionsPanel;
 import com.satlib.community.CNMCommunityMetric;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
@@ -19,23 +23,19 @@ import com.satlib.evolution.DimacsEvolutionGraphFactory;
 import com.satlib.evolution.EvolutionGraphFactory;
 import com.satlib.evolution.EvolutionGraphFactoryObserver;
 import com.validatedcl.validation.Help;
-import com.validatedcl.validation.RequiredOption;
 import com.validatedcl.validation.ValidatedCommandLine;
 import com.validatedcl.validation.ValidatedOption;
 import com.validatedcl.validation.rules.FileValidationRule;
 import com.validatedcl.validation.rules.ListValidationRule;
-
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.regex.Pattern;
-
 import javax.swing.JFrame;
-
+import javax.swing.JPanel;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -51,6 +51,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     forceInit(GridPlacer.class);
     forceInit(OLCommunityMetric.class);
     forceInit(CNMCommunityMetric.class);
+    forceInit(VSIDSTemporalLocalityEvolutionObserver.class);
   }
   private EvolutionGraphFactory factory;
   public static String minisat;
@@ -142,18 +143,22 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     o.setDefault(System.getProperty("user.dir") + "/solvers/minisat/minisat");
     options.addOption(o);
     
+    o = new ValidatedOption("o", "observers", true, "A named evolution observer");
+    o.addRule(new ListValidationRule(EvolutionObserverFactory.getInstance().getNames()));
+    options.addOption(o);
     return options;
   }
   
   public static void main(String[] args) throws IOException, ParseException {
     if (args.length == 0) {
       args = new String[]{
-        "-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/unif-k3-r4.267-v421-c1796-S4839562527790587617.cnf",
+        "-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/aes_16_10_keyfind_3.cnf",
         "-c","ol",
-        "-l","f"
+        "-l","f",
+        "-o","VSIDST"
       };
       System.out.print(Help.getHelp(options()));
-      return;
+      //return;
     }
     CommandLineParser clp = new GnuParser();
     Options o = options();
@@ -208,6 +213,14 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     frmMain.init();
     frmMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frmMain.show();
+    GraphOptionsPanel panel = frmMain.panel;
+    if(cl.getOptionValue("o") != null){
+      EvolutionObserver observer = EvolutionObserverFactory.getInstance().getByName(cl.getOptionValue("o"), factory.getGraph());
+      if(observer instanceof JPanel){
+        panel.addPanel((JPanel)observer, observer.getName());
+      }
+      
+    }
   }
 
   public static String usage() {

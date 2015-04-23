@@ -1,5 +1,7 @@
 package com.satgraf.evolution2.UI;
 
+import com.satgraf.evolution2.observers.EvolutionObserver;
+import com.satgraf.evolution2.observers.EvolutionObserverFactory;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -214,14 +216,18 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 		  for (String c : line.split(" ")) {
 			  if (c.compareTo("v") == 0) { // Start of line
 				  continue;
-			  } else if (c.compareTo("d") == 0) {
-				  if (forwards)
+			  } 
+              else if (c.compareTo("d") == 0) {
+				  if (forwards){
 				  	  isDecisionVariable = true;
+                  }
 			  	  continue;
-			  } else if (c.compareTo("p") == 0) {
+			  } 
+              else if (c.compareTo("p") == 0) {
 				  // This is just a propagation variable. Do nothing with it at the moment.
 				  continue;
-			  } else if (!stateFound) { // Var state
+			  } 
+              else if (!stateFound) { // Var state
 				  stateFound = true;
 				  
 				  if (forwards) { // Not necessary to do if in reverse
@@ -236,10 +242,12 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 					  		state = NodeAssignmentState.UNASSIGNED;
 					  }
 				  }
-			  } else if (!activityFound) {
+			  } 
+              else if (!activityFound) {
 				  activity = Integer.parseInt(c);
 				  activityFound = true;
-			  } else {
+			  } 
+              else {
 				  n = graph.getNode(Integer.parseInt(c));
 			  }
 		  }
@@ -254,14 +262,22 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 				  graphviewer.setDecisionVariable(n);
 				  lastDecisionVariable = lineNumber;
 				  				  				  
-				  if (timerTriggered)
+				  if (timerTriggered){
 				  	  return;
+                  }
 			  }
 			  
-			  if (forwards && state != prevState)
+			  if (forwards && state != prevState){
 				  n.setAssignmentState(state);
-			  else if (!forwards)
+              }
+			  else if (!forwards){
 				  n.revertToPreviousAssignmentState();
+              }
+              if(forwards && isDecisionVariable){
+                for(EvolutionObserver observer : EvolutionObserverFactory.getInstance().observers()){
+                  observer.nodeAssigned(n, isDecisionVariable);
+                }
+              }
 			  
 			  if (n.getAssignmentState() != prevState || isDecisionVariable) // Will redraw the node if it has changed at all
 				  updatedNodes.add(n);

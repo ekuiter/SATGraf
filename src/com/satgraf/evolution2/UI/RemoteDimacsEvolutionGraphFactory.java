@@ -10,6 +10,7 @@ import com.satlib.NamedFifo;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityGraphViewer;
 import com.satlib.community.CommunityNode;
+import com.satlib.evolution.EvolutionGraph;
 import static com.satlib.evolution.EvolutionGraphFactoryFactory.pipeFileName;
 import com.satlib.evolution.EvolutionGraphFactoryObserver;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -30,7 +31,7 @@ public class RemoteDimacsEvolutionGraphFactory  extends com.satlib.evolution.Dim
     super(null, metricName, patterns);
   }
 
-  public void process(CommunityGraph cg) {
+  public void process(EvolutionGraph cg) {
     node_lists = new HashMap<>();
     TIntObjectHashMap<String> list = new TIntObjectHashMap<>();
     Iterator<CommunityNode> nodes = cg.getNodeIterator();

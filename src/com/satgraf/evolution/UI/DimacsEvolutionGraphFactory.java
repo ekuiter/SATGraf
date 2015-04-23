@@ -12,6 +12,8 @@ import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityGraphViewer;
 import com.satlib.community.CommunityNode;
 import com.satlib.community.ConcreteCommunityGraph;
+import com.satlib.evolution.EvolutionGraph;
+import static com.satlib.evolution.EvolutionGraphFactoryFactory.pipeFileName;
 import com.satlib.evolution.EvolutionGraphFactoryObserver;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import java.io.BufferedReader;
@@ -23,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import static com.satlib.evolution.EvolutionGraphFactoryFactory.pipeFileName;
 
 /**
  *
@@ -38,7 +39,7 @@ public class DimacsEvolutionGraphFactory  extends com.satlib.evolution.DimacsEvo
   }
   
       
-  public void process(CommunityGraph cg){
+  public void process(EvolutionGraph cg){
     node_lists = new HashMap<String, TIntObjectHashMap<String>>();
     TIntObjectHashMap<String> list = new TIntObjectHashMap<String>();
     Iterator<CommunityNode> nodes = cg.getNodeIterator();
