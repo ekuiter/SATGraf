@@ -76,12 +76,14 @@ public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements Ev
     c.weighty = 0.8;
     c.weightx = 1.0;
     c.gridheight = 1;
+    c.fill = GridBagConstraints.BOTH;
     c.gridwidth = 4;
     dataset.addSeries(series);
     chartPanel.setPreferredSize(new Dimension(100,300));
     this.add(chartPanel, c);
     c.ipady = 0;
     
+    c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 0;
     c.gridy = 1;
     c.weighty = 0.0;
@@ -154,7 +156,7 @@ public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements Ev
     }
   }
   public String getName(){
-    return "VSIDS";
+    return "VSIDS T";
   }
 
   
