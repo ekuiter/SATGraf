@@ -22,8 +22,8 @@ public class DecisionVariableLayer extends Layer {
 	public void paintComponent(final Graphics g) {
 		Evolution2GraphViewer graph = (Evolution2GraphViewer) this.graph;
 		
-		if (graph.getShowDecisionVariable()) {
-		    Node decisionVariable = graph.getDecisionVariable();
+		if (graph.getGraph().getShowDecisionVariable()) {
+		    Node decisionVariable = graph.getGraph().getDecisionVariable();
 		    if (decisionVariable != null && decisionVariable.isVisible()) {
 		      drawDecisionVariable(decisionVariable, g);
 		    }

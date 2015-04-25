@@ -7,8 +7,9 @@ import com.satgraf.community.placer.FruchPlacer;
 import com.satgraf.community.placer.GridKKPlacer;
 import com.satgraf.community.placer.GridPlacer;
 import com.satgraf.community.placer.KKPlacer;
-import com.satgraf.evolution2.observers.EvolutionObserver;
-import com.satgraf.evolution2.observers.EvolutionObserverFactory;
+import com.satlib.evolution.observers.EvolutionObserver;
+import com.satlib.evolution.observers.EvolutionObserverFactory;
+import com.satgraf.evolution2.observers.VSIDSSpacialLocalityEvolutionObserver;
 import com.satgraf.evolution2.observers.VSIDSTemporalLocalityEvolutionObserver;
 import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphOptionsPanel;
@@ -52,6 +53,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     forceInit(OLCommunityMetric.class);
     forceInit(CNMCommunityMetric.class);
     forceInit(VSIDSTemporalLocalityEvolutionObserver.class);
+    forceInit(VSIDSSpacialLocalityEvolutionObserver.class);
   }
   private EvolutionGraphFactory factory;
   public static String minisat;
@@ -152,10 +154,11 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
   public static void main(String[] args) throws IOException, ParseException {
     if (args.length == 0) {
       args = new String[]{
-        "-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/aes_16_10_keyfind_3.cnf",
+        "-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/unif-k3-r4.267-v421-c1796-S4839562527790587617.cnf",
+        //"-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/aes_16_10_keyfind_3.cnf",
         "-c","ol",
         "-l","f",
-        "-o","VSIDST"
+        "-o","VSIDSS"
       };
       System.out.print(Help.getHelp(options()));
       //return;
@@ -235,8 +238,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
   @Override
   public void notifyObserver(EvolutionGraphFactory factory, Action action) {
     if(action == Action.newline){
-      
-    ((Evolution2OptionsPanel)panel).newFileReady(factory.getLineNumber());
+      ((Evolution2OptionsPanel)panel).scaler.evolution.newFileReady(factory.getLineNumber());
     }
     else if(action == Action.process){
       show();

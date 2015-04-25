@@ -52,7 +52,7 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 		panel.add(scaler);
 		
 		// Evolution speed
-		this.evolutionSpeed = new TextRocker(0, "Speed of Evolution", graph.getEvolutionSpeed(), 1, Integer.MAX_VALUE);
+		this.evolutionSpeed = new TextRocker(0, "Speed of Evolution", graph.getGraph().getEvolutionSpeed(), 1, Integer.MAX_VALUE);
 		panel.add(evolutionSpeed);
 		evolutionSpeed.registerListener(this);
 		
@@ -70,7 +70,7 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 		hideDecisionVariable.addChangeListener(new ChangeListener() {
 	      @Override
 	      public void stateChanged(ChangeEvent e) {
-	        Evolution2OptionsPanel.this.graph.setShowDecisionVariable(hideDecisionVariable.isSelected());
+	        Evolution2OptionsPanel.this.graph.getGraph().setShowDecisionVariable(hideDecisionVariable.isSelected());
 	        if (!hideDecisionVariable.isSelected()) {
 	        	int o = 0;
 	        }
@@ -82,7 +82,7 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 		panel.add(panel2);
 		
 		// Decision Visible length
-		this.decisionVisibleLength = new TextRocker(1, "Decision Variable Display Length", graph.getDisplayDecisionVariableFor(), 0, 10000);
+		this.decisionVisibleLength = new TextRocker(1, "Decision Variable Display Length", graph.getGraph().getDisplayDecisionVariableFor(), 0, 10000);
 		panel.add(decisionVisibleLength);
 		decisionVisibleLength.registerListener(this);
 		
@@ -96,9 +96,9 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 		super.setGraph(graph, false);
 	}
 
-	public void newFileReady(int numLinesInFile) {
+	/*public void newFileReady(int numLinesInFile) {
 		scaler.newFileReady(numLinesInFile);
-	}
+	}*/
 	
 	@Override
 	public void update(){
@@ -116,20 +116,21 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 	@Override
 	public void stateChanged(int id, int value) {
 		if (id == evolutionSpeed.getId())
-			graph.setEvolutionSpeed(value);
+			graph.getGraph().setEvolutionSpeed(value);
 		else if (id == decisionVisibleLength.getId())
-			graph.setDisplayDecisionVariableFor(value);
+			graph.getGraph().setDisplayDecisionVariableFor(value);
 		else if (id == conflictRocker.getId()) {
 			if (this.evolutionTriggeredConflict) {
 				this.evolutionTriggeredConflict = false;
 				return;
 			}
 			
-			boolean scanWasApplied = scaler.scanToConflict(value);
+			boolean scanWasApplied = scaler.evolution.scanToConflict(value, false);
 			
 			if (scanWasApplied) {
 				updateConflictDescription(value);
-			} else {
+			} 
+            else {
 				Runnable doRevert = new Runnable() {
 					
 					@Override

@@ -91,7 +91,7 @@ public class Evolution2GraphInfoPanel extends CommunityGraphInfoPanel implements
 
   @Override
   public void notify(GraphViewer graph, Action action) {
-    Collection<CommunityNode> decisions = ((Evolution2GraphViewer)graph).getDecisionVariables();
+    Collection<CommunityNode> decisions = ((Evolution2GraphViewer)graph).getGraph().getDecisionVariables();
     if(action == Action.decisionVariable && decisions.size() % 10 == 0){
       int lastCommunity = -1;
       int interCom = 0;

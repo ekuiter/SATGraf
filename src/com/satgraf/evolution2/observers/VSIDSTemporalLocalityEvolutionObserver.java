@@ -6,10 +6,10 @@
 
 package com.satgraf.evolution2.observers;
 
+import com.satlib.evolution.observers.EvolutionObserver;
+import com.satlib.evolution.observers.EvolutionObserverFactory;
 import com.satlib.community.CommunityNode;
 import com.satlib.evolution.EvolutionGraph;
-import com.satlib.evolution.EvolutionGraphFactory;
-import com.satlib.evolution.EvolutionGraphFactoryObserver;
 import com.satlib.graph.Clause;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -155,8 +155,19 @@ public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements Ev
       lblWorstCase.setText(String.valueOf(worstCase));
     }
   }
+  
+
+  @Override
+  public void newFileReady() {
+    
+  }
+  
   public String getName(){
     return "VSIDS T";
+  }
+
+  @Override
+  public void updateGraph() {
   }
 
   
