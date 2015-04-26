@@ -7,10 +7,11 @@ import com.satgraf.community.placer.FruchPlacer;
 import com.satgraf.community.placer.GridKKPlacer;
 import com.satgraf.community.placer.GridPlacer;
 import com.satgraf.community.placer.KKPlacer;
-import com.satlib.evolution.observers.EvolutionObserver;
 import com.satlib.evolution.observers.EvolutionObserverFactory;
+import com.satlib.evolution.observers.EvolutionObserver;
 import com.satgraf.evolution2.observers.VSIDSSpacialLocalityEvolutionObserver;
 import com.satgraf.evolution2.observers.VSIDSTemporalLocalityEvolutionObserver;
+import com.satgraf.evolution2.observers.VisualEvolutionObserver;
 import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphOptionsPanel;
 import com.satgraf.graph.UI.OptionsPanel;
@@ -52,6 +53,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     forceInit(GridPlacer.class);
     forceInit(OLCommunityMetric.class);
     forceInit(CNMCommunityMetric.class);
+    forceInit(com.satgraf.evolution2.observers.EvolutionObserverFactory.class);
     forceInit(VSIDSTemporalLocalityEvolutionObserver.class);
     forceInit(VSIDSSpacialLocalityEvolutionObserver.class);
   }
@@ -154,8 +156,8 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
   public static void main(String[] args) throws IOException, ParseException {
     if (args.length == 0) {
       args = new String[]{
-        "-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/unif-k3-r4.267-v421-c1796-S4839562527790587617.cnf",
-        //"-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/aes_16_10_keyfind_3.cnf",
+        //"-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/unif-k3-r4.267-v421-c1796-S4839562527790587617.cnf",
+        "-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/aes_16_10_keyfind_3.cnf",
         "-c","ol",
         "-l","f",
         "-o","VSIDSS"
@@ -218,7 +220,15 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     frmMain.show();
     GraphOptionsPanel panel = frmMain.panel;
     if(cl.getOptionValue("o") != null){
-      EvolutionObserver observer = EvolutionObserverFactory.getInstance().getByName(cl.getOptionValue("o"), factory.getGraph());
+      
+      EvolutionObserver observer = null;
+      if(VisualEvolutionObserver.class.isAssignableFrom(EvolutionObserverFactory.getInstance().getObserverType(cl.getOptionValue("o")))){
+        observer = EvolutionObserverFactory.getInstance().getByName(cl.getOptionValue("o"), graphViewer);
+      }
+      else{
+        observer = EvolutionObserverFactory.getInstance().getByName(cl.getOptionValue("o"), factory.getGraph());
+      }
+      
       if(observer instanceof JPanel){
         panel.addPanel((JPanel)observer, observer.getName());
       }

@@ -4,11 +4,11 @@
  */
 package com.satgraf.community.UI;
 
-import java.awt.Graphics;
-
 import com.satgraf.graph.UI.EdgeLayer;
 import com.satgraf.graph.UI.GraphCanvas;
-import com.satlib.graph.GraphViewer;
+import com.satgraf.graph.UI.HighlightLayer;
+import com.satlib.community.CommunityGraphViewer;
+import java.awt.Graphics;
 
 /**
  *
@@ -18,8 +18,13 @@ public class CommunityCanvas extends GraphCanvas {
 	
   private Graphics g;
   
-  public CommunityCanvas(GraphViewer graph){
+  public CommunityCanvas(CommunityGraphViewer graph){
     super(graph);
+  }
+  
+  @Override
+  protected HighlightLayer createNewHighlightLayer(){
+    return new CommunityHighlightLayer(this.getSize(), (CommunityGraphViewer)graph);
   }
   
   @Override

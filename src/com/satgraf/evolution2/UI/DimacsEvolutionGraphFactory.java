@@ -6,6 +6,7 @@
 
 package com.satgraf.evolution2.UI;
 
+import com.satgraf.graph.UI.GraphFrame;
 import com.satlib.NamedFifo;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityGraphViewer;
@@ -20,6 +21,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -85,7 +88,8 @@ public class DimacsEvolutionGraphFactory extends com.satlib.evolution.DimacsEvol
 	try {
 		return new BufferedReader(new FileReader(pipeFileName));
 	} catch (Exception e) {
-		return openPipedFile();
+      Logger.getLogger(DimacsEvolutionGraphFactory.class.getName()).log(Level.SEVERE, null, e);
+      return openPipedFile();
 	}
   }
 

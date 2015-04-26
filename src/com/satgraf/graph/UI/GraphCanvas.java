@@ -26,19 +26,20 @@ import com.satlib.graph.Node;
  *
  * @author zacknewsham
  */
-public abstract class GraphCanvas extends JLayeredPane implements MouseListener, MouseMotionListener, GraphObserver{
+public class GraphCanvas extends JLayeredPane implements MouseListener, MouseMotionListener, GraphObserver {
+
   protected GraphViewer graph;
   private Node clickedVariable = null;
   private BufferedImage buffer;
-  
+
   // Layers
   private HighlightLayer highlightLayer;
   private NodeLayer nodeLayer;
   private EdgeLayer edgeLayer;
-  
-  public GraphCanvas(GraphViewer graph){
-	this.setLayout(new BorderLayout());
-	this.setBackground(Color.BLACK);
+
+  public GraphCanvas(GraphViewer graph) {
+    this.setLayout(new BorderLayout());
+    this.setBackground(Color.BLACK);
     this.setPreferredSize(graph.getBounds().getSize());
     this.setSize(graph.getBounds().getSize());
     this.graph = graph;
@@ -46,65 +47,69 @@ public abstract class GraphCanvas extends JLayeredPane implements MouseListener,
     this.addMouseListener(this);
     this.addMouseMotionListener(this);
     this.setOpaque(true);
-    
+
     setupLayers();
   }
-  
+
   protected void setupLayers() {
-	  highlightLayer = new HighlightLayer(this.getSize(), graph);
-	  
-	  nodeLayer = createNewNodeLayer();
-      this.add(nodeLayer);
-      
-      edgeLayer = createNewEdgeLayer();
-      this.add(edgeLayer);
+    highlightLayer = createNewHighlightLayer();
+
+    nodeLayer = createNewNodeLayer();
+    this.add(nodeLayer);
+
+    edgeLayer = createNewEdgeLayer();
+    this.add(edgeLayer);
   }
-  
+
   protected NodeLayer createNewNodeLayer() {
-	  return new NodeLayer(this.getSize(), graph);
+    return new NodeLayer(this.getSize(), graph);
+  }
+
+  protected HighlightLayer createNewHighlightLayer(){
+    return new HighlightLayer(this.getSize(), graph);
   }
   
   protected EdgeLayer createNewEdgeLayer() {
-	  return new EdgeLayer(this.getSize(), graph);
+    return new EdgeLayer(this.getSize(), graph);
   }
-  
+
   public Dimension getPreferredSize() {
     Dimension d = super.getPreferredSize();
     Dimension canvasBounds = GraphCanvasPanel.getCanvasDimensions();
-    
-    d.height = (int)(graph.getScale() * d.height);
-    d.width = (int)(graph.getScale() * d.width);
-    
+
+    d.height = (int) (graph.getScale() * d.height);
+    d.width = (int) (graph.getScale() * d.width);
+
     if (d.width < canvasBounds.width) {
-    	d.width = canvasBounds.width;
+      d.width = canvasBounds.width;
     }
     if (d.height < canvasBounds.height) {
-    	d.height = canvasBounds.height;
+      d.height = canvasBounds.height;
     }
-    
+
     return d;
   }
 
   boolean drawnAll = false;
-  
+
   private void mouseHighlight(MouseEvent e) {
-	boolean clicked = e.getClickCount() == 1;
-	Node n = highlightLayer.getNodeAroundXY(e.getX(), e.getY());
-    
-	//e.getClickCount()
-	if (this.clickedVariable == null || clicked) {
-	    if(n != null && !(!graph.getShowAssignedVars() && n.isAssigned())){
-	    	graph.selectNode(n);
-	    	this.repaint();
-	    } else if (n == null && graph.getSelectedNode() != null) {
-	    	graph.selectNode(null);
-	    	this.repaint();
-	    }
-	}
-	
-	if (clicked) {
-		this.clickedVariable = n;
-	}
+    boolean clicked = e.getClickCount() == 1;
+    Node n = highlightLayer.getNodeAroundXY(e.getX(), e.getY());
+
+    //e.getClickCount()
+    if (this.clickedVariable == null || clicked) {
+      if (n != null && !(!graph.getShowAssignedVars() && n.isAssigned())) {
+        graph.selectNode(n);
+        this.repaint();
+      } else if (n == null && graph.getSelectedNode() != null) {
+        graph.selectNode(null);
+        this.repaint();
+      }
+    }
+
+    if (clicked) {
+      this.clickedVariable = n;
+    }
   }
 
   @Override
@@ -127,60 +132,58 @@ public abstract class GraphCanvas extends JLayeredPane implements MouseListener,
   @Override
   public void mouseExited(MouseEvent e) {
   }
-     
-  public void mouseDragged(MouseEvent e){
+
+  public void mouseDragged(MouseEvent e) {
   }
-  
-  public void mouseMoved(MouseEvent e){
-	  mouseHighlight(e);
+
+  public void mouseMoved(MouseEvent e) {
+    mouseHighlight(e);
   }
-  
+
   @Override
-  public String JsonName(){
+  public String JsonName() {
     return "canvas";
   }
-  
-  @Override 
-  public String toJson(){
+
+  @Override
+  public String toJson() {
     return "null";
-  } 
-  
+  }
+
   @Override
   public void initFromJson(JSONObject o) {
-    
+
   }
-  
+
   @Override
   protected void paintChildren(Graphics g) {
-	  if (!graph.isUpdateRequired()) {
-		  g.drawImage(buffer, 0, 0, Color.BLACK, null);
-		  highlightLayer.paintComponent(g);
-	  } else {
-		  BufferedImage image = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		  Graphics g2 = image.createGraphics();
-		  super.paintChildren(g2);
-		  g.drawImage(image, 0, 0, Color.BLACK, null);
-		  buffer = image;
-		  highlightLayer.paintComponent(g);
-	  }
+    if (!graph.isUpdateRequired()) {
+      g.drawImage(buffer, 0, 0, Color.BLACK, null);
+      highlightLayer.paintComponent(g);
+    } else {
+      BufferedImage image = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
+      Graphics g2 = image.createGraphics();
+      super.paintChildren(g2);
+      g.drawImage(image, 0, 0, Color.BLACK, null);
+      buffer = image;
+      highlightLayer.paintComponent(g);
+    }
   }
-  
+
   @Override
-  public void notify(GraphViewer graph, GraphObserver.Action action){
-    if(action == Action.setscale){
+  public void notify(GraphViewer graph, GraphObserver.Action action) {
+    if (action == Action.setscale) {
       revalidate();
-    }
-    else if(action == Action.updatedEdges || action == Action.updatedNodes){
+    } else if (action == Action.updatedEdges || action == Action.updatedNodes) {
       repaint();
-    }
-    else{
+    } else {
       repaint();
     }
   }
-  
+
   public static RenderingHints getRenderingHints() {
-      RenderingHints hints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-      hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      return hints;
+    RenderingHints hints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+    hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    return hints;
   }
 }

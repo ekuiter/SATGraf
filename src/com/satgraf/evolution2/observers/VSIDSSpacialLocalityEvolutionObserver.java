@@ -6,11 +6,12 @@
 
 package com.satgraf.evolution2.observers;
 
-import com.satlib.evolution.observers.EvolutionObserver;
-import com.satlib.evolution.observers.EvolutionObserverFactory;
+import com.satgraf.evolution2.UI.Evolution2GraphViewer;
 import com.satlib.community.Community;
 import com.satlib.community.CommunityNode;
 import com.satlib.evolution.EvolutionGraph;
+import com.satlib.evolution.observers.EvolutionObserver;
+import com.satlib.evolution.observers.EvolutionObserverFactory;
 import com.satlib.graph.Clause;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -51,13 +52,15 @@ import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.GroupedStackedBarRenderer;
 import org.jfree.data.KeyToGroupMap;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.general.DatasetChangeEvent;
 
 /**
  *
  * @author zacknewsham
  */
-public class VSIDSSpacialLocalityEvolutionObserver  extends JPanel implements EvolutionObserver, ChartMouseListener{
+public class VSIDSSpacialLocalityEvolutionObserver extends JPanel implements VisualEvolutionObserver, ChartMouseListener{
   private final EvolutionGraph graph;
+  private final Evolution2GraphViewer graphViewer;
   private final SortableCategoryDataset dataset = new SortableCategoryDataset();
   private final JFreeChart objChart = ChartFactory.createStackedAreaChart("Communities used", "Community ID", "# Decision", dataset);
   private final ChartPanel chartPanel = new ChartPanel(objChart);
@@ -72,8 +75,9 @@ public class VSIDSSpacialLocalityEvolutionObserver  extends JPanel implements Ev
     EvolutionObserverFactory.getInstance().register("VSIDSS", VSIDSSpacialLocalityEvolutionObserver.class);
   }
   
-  public VSIDSSpacialLocalityEvolutionObserver(EvolutionGraph graph){
-    this.graph = graph;
+  public VSIDSSpacialLocalityEvolutionObserver(Evolution2GraphViewer graph){
+    this.graph = graph.getGraph();
+    this.graphViewer = graph;
     init();
     
     rdoDistributionTotal.addActionListener(new ActionListener() {
@@ -97,10 +101,10 @@ public class VSIDSSpacialLocalityEvolutionObserver  extends JPanel implements Ev
   
   public final void init(){
     synchronized(dataset){
-    ButtonGroup group = new ButtonGroup();
-    group.add(rdoCommunity);
-    group.add(rdoDistributionTotal);
-    group.add(rdoDistributionRatio);
+      ButtonGroup group = new ButtonGroup();
+      group.add(rdoCommunity);
+      group.add(rdoDistributionTotal);
+      group.add(rdoDistributionRatio);
       for(Community c : graph.getCommunities()){
         dataset.addValue(0, SERIES_1.concat(" (Total)"), String.valueOf(c.getId()));
         dataset.addValue(0, SERIES_1.concat(" (Ratio)"), String.valueOf(c.getId()));
@@ -108,7 +112,7 @@ public class VSIDSSpacialLocalityEvolutionObserver  extends JPanel implements Ev
       KeyToGroupMap map = new KeyToGroupMap("G1");
 
       Paint p1 = new ChartColor(0x00, 0xff, 0x00);
-      
+
       Paint p2 = new ChartColor(0xff, 0x00, 0x00);
       map.mapKeyToGroup(SERIES_1.concat(" (Total)"), "G1");
       map.mapKeyToGroup(SERIES_1.concat(" (Ratio)"), "G2");
@@ -238,10 +242,14 @@ public class VSIDSSpacialLocalityEvolutionObserver  extends JPanel implements Ev
       Plot p = cme.getChart().getPlot();
       if(cme.getEntity() instanceof CategoryItemEntity){
         renderer.selected = (CategoryItemEntity)cme.getEntity();
+        graphViewer.selectCommunity(Integer.valueOf((String)renderer.selected.getColumnKey()));
       }
       else{
         renderer.selected = null;
+        graphViewer.selectCommunity(null);
       }
+      objChart.getCategoryPlot().datasetChanged(new DatasetChangeEvent(cme, dataset));
+      chartPanel.repaint();
   }
 
   @Override
@@ -249,9 +257,26 @@ public class VSIDSSpacialLocalityEvolutionObserver  extends JPanel implements Ev
       Plot p = cme.getChart().getPlot();
       if(cme.getEntity() instanceof CategoryItemEntity){
         renderer.hover = (CategoryItemEntity)cme.getEntity();
+        graphViewer.selectCommunity(Integer.valueOf((String)renderer.hover.getColumnKey()));
+        objChart.getCategoryPlot().datasetChanged(new DatasetChangeEvent(cme, dataset));
+        chartPanel.repaint();
       }
       else {
+        boolean repaint = false;
+        if(renderer.hover != null){
+          repaint = true;
+        }
         renderer.hover = null;
+        if(renderer.selected != null){
+          graphViewer.selectCommunity(Integer.valueOf((String)renderer.selected.getColumnKey()));
+        }
+        else{
+          graphViewer.selectCommunity(null);
+        }
+        if(repaint){
+          objChart.getCategoryPlot().datasetChanged(new DatasetChangeEvent(cme, dataset));
+          chartPanel.repaint();
+        }
       }
   }
 
@@ -346,7 +371,7 @@ public class VSIDSSpacialLocalityEvolutionObserver  extends JPanel implements Ev
           return selectedPaint;
         }
       }
-      else if(hover != null){
+      if(hover != null){
         if(hover.getRowKey().equals(getPlot().getDataset().getRowKey(row)) && hover.getColumnKey().equals(getPlot().getDataset().getColumnKey(col))){
           return selectedPaint;
         }
