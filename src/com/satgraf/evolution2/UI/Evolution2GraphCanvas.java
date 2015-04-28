@@ -1,5 +1,6 @@
 package com.satgraf.evolution2.UI;
 
+import com.satlib.evolution.Evolution2GraphViewer;
 import com.satgraf.community.UI.CommunityCanvas;
 
 public class Evolution2GraphCanvas extends CommunityCanvas {

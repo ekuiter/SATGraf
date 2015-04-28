@@ -1,5 +1,6 @@
 package com.satgraf.evolution2.UI;
 
+import com.satlib.evolution.Evolution2GraphViewer;
 import com.satlib.evolution.Evolution;
 import com.satlib.evolution.observers.EvolutionObserver;
 import com.satlib.evolution.observers.EvolutionObserverFactory;

@@ -14,7 +14,6 @@ public class EvolutionObserverFactory extends com.satlib.evolution.observers.Evo
   static{
     com.satlib.evolution.observers.EvolutionObserverFactory.setSingleton(new EvolutionObserverFactory());
   }
-  
   private EvolutionObserverFactory(){}
   
 }

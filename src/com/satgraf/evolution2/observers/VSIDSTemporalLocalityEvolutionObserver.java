@@ -6,10 +6,10 @@
 
 package com.satgraf.evolution2.observers;
 
-import com.satlib.evolution.observers.EvolutionObserver;
-import com.satlib.evolution.observers.EvolutionObserverFactory;
 import com.satlib.community.CommunityNode;
 import com.satlib.evolution.EvolutionGraph;
+import com.satlib.evolution.observers.EvolutionObserver;
+import com.satlib.evolution.observers.EvolutionObserverFactory;
 import com.satlib.graph.Clause;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -17,11 +17,13 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -39,10 +41,13 @@ public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements Ev
   private final JLabel lblWorstCase = new JLabel("0");
   private static final int VARS_PER_REDRAW = 10;
   private final List<CommunityNode> decisions = new ArrayList<>();
-  private XYSeriesCollection dataset = new XYSeriesCollection();
-  private XYSeries series = new XYSeries("All");
-  private JFreeChart objChart = ChartFactory.createXYLineChart("Communities used", "# Decision", "# Communities", dataset);
+  private HashMap<CommunityNode, List<CommunityNode>> propogations = new HashMap<>();
+  private final XYSeriesCollection dataset = new XYSeriesCollection();
+  private final XYSeries decisionSeries = new XYSeries("Decisions");
+  private final XYSeries propogationSeries = new XYSeries("Propogations");
+  private final JFreeChart objChart = ChartFactory.createXYLineChart("Communities used", "# Decision", "# Communities", dataset);
   private final ChartPanel chartPanel = new ChartPanel(objChart);
+  private final JScrollPane chartScroll = new JScrollPane(chartPanel);
   static{
     EvolutionObserverFactory.getInstance().register("VSIDST", VSIDSTemporalLocalityEvolutionObserver.class);
   }
@@ -50,7 +55,9 @@ public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements Ev
   public VSIDSTemporalLocalityEvolutionObserver(EvolutionGraph graph){
     this.graph = graph;
     init();
-    series.add(0, 0);
+    decisionSeries.add(0, 0);
+    propogationSeries.add(0, 0);
+    propogations.put(null, new ArrayList<CommunityNode>());
     txtWindowSize.addActionListener(new ActionListener(){
 
       @Override
@@ -78,9 +85,11 @@ public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements Ev
     c.gridheight = 1;
     c.fill = GridBagConstraints.BOTH;
     c.gridwidth = 4;
-    dataset.addSeries(series);
+    dataset.addSeries(decisionSeries);
+    dataset.addSeries(propogationSeries);
     chartPanel.setPreferredSize(new Dimension(100,300));
-    this.add(chartPanel, c);
+    chartPanel.setMinimumSize(chartPanel.getPreferredSize());
+    this.add(chartScroll, c);
     c.ipady = 0;
     
     c.fill = GridBagConstraints.HORIZONTAL;
@@ -117,20 +126,38 @@ public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements Ev
     //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
   private synchronized void fullRedraw(){
-    series.clear();
-    series.add(0,0);
-    Set<Integer> coms = new HashSet<>();
+    decisionSeries.clear();
+    decisionSeries.add(0,0);
+    propogationSeries.clear();
+    propogationSeries.add(0,0);
+    Set<Integer> decisionComs = new HashSet<>();
+    Set<Integer> propogationComs = new HashSet<>();
     int worstCase = Integer.parseInt(lblWorstCase.getText());
     int windowSize = Integer.parseInt(txtWindowSize.getText());
+    for(CommunityNode p : propogations.get(null)){
+      propogationComs.add(p.getCommunity());
+    }
+    propogationSeries.update(new Integer(0), new Integer(propogationComs.size()));
+    propogationComs.clear();
     for(int i = 0; i < decisions.size(); i++){
       if(i > 0 && i % windowSize == 0){
-        series.add(i, coms.size());
-        if(coms.size() > worstCase){
-          worstCase = coms.size();
+        decisionSeries.add(i, propogationComs.size());
+        if(decisionComs.size() > worstCase){
+          worstCase = decisionComs.size();
         }
-        coms.clear();
+        decisionComs.clear();
       }
-      coms.add(decisions.get(i).getCommunity());
+      CommunityNode d = decisions.get(i);
+      if(i == 0){
+        for(CommunityNode p : propogations.get(d)){
+          propogationComs.add(p.getCommunity());
+        }
+        d = null;
+      }
+      for(CommunityNode p : propogations.get(d)){
+        propogationComs.add(p.getCommunity());
+      }
+      decisionComs.add(decisions.get(i).getCommunity());
     }
     lblWorstCase.setText(String.valueOf(worstCase));
   }
@@ -140,18 +167,42 @@ public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements Ev
     int windowSize = Integer.parseInt(txtWindowSize.getText());
     if(isDecision){
       decisions.add(n);
+      propogations.put(n, new ArrayList<CommunityNode>());
+      if(decisions.size() == 1){
+        Set<Integer> propogationComs = new HashSet<>();
+        for(CommunityNode p : propogations.get(null)){
+          propogationComs.add(p.getCommunity());
+        }
+        propogationSeries.update(new Integer(0), new Integer(propogationComs.size()));
+      }
     }
-    if((decisions.size() % windowSize) == 0){
-      Set<Integer> coms = new HashSet<>();
+    else{
+      CommunityNode d = null;
+      if(!decisions.isEmpty()){
+        d = decisions.get(decisions.size() - 1);
+      }
+      propogations.get(d).add(n);
+    }
+    if(isDecision && !decisions.isEmpty() && (decisions.size() % windowSize) == 0){
+      Set<Integer> decisionComs = new HashSet<>();
+      Set<Integer> propogationComs = new HashSet<>();
       int worstCase = Integer.parseInt(lblWorstCase.getText());
       for(int i = decisions.size() - 10; i < decisions.size(); i++){
-        coms.add(decisions.get(i).getCommunity());
+        decisionComs.add(decisions.get(i).getCommunity());
+        if(i > 1){
+          CommunityNode d = decisions.get(i - 1);
+          for(CommunityNode p : propogations.get(d)){
+            propogationComs.add(p.getCommunity());
+          }
+        }
       }
-      series.add(decisions.size(), coms.size());
-      if(coms.size() > worstCase){
-        worstCase = coms.size();
+      decisionSeries.add(decisions.size(), decisionComs.size());
+      propogationSeries.add(decisions.size(), propogationComs.size());
+      if(decisionComs.size() > worstCase){
+        worstCase = decisionComs.size();
       }
-      coms.clear();
+      decisionComs.clear();
+      propogationComs.clear();
       lblWorstCase.setText(String.valueOf(worstCase));
     }
   }

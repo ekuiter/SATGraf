@@ -1,5 +1,6 @@
 package com.satgraf.evolution2.UI;
 
+import com.satlib.evolution.Evolution2GraphViewer;
 import static com.satgraf.ForceInit.forceInit;
 import com.satgraf.community.UI.CommunityGraphFrame;
 import com.satgraf.community.placer.FruchGPUPlacer;
@@ -7,14 +8,12 @@ import com.satgraf.community.placer.FruchPlacer;
 import com.satgraf.community.placer.GridKKPlacer;
 import com.satgraf.community.placer.GridPlacer;
 import com.satgraf.community.placer.KKPlacer;
-import com.satlib.evolution.observers.EvolutionObserverFactory;
-import com.satlib.evolution.observers.EvolutionObserver;
+import com.satgraf.evolution2.observers.EvolutionObserverFactory;
 import com.satgraf.evolution2.observers.VSIDSSpacialLocalityEvolutionObserver;
 import com.satgraf.evolution2.observers.VSIDSTemporalLocalityEvolutionObserver;
 import com.satgraf.evolution2.observers.VisualEvolutionObserver;
 import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphOptionsPanel;
-import com.satgraf.graph.UI.OptionsPanel;
 import com.satlib.community.CNMCommunityMetric;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
@@ -24,6 +23,7 @@ import com.satlib.community.placer.CommunityPlacerFactory;
 import com.satlib.evolution.DimacsEvolutionGraphFactory;
 import com.satlib.evolution.EvolutionGraphFactory;
 import com.satlib.evolution.EvolutionGraphFactoryObserver;
+import com.satlib.evolution.observers.EvolutionObserver;
 import com.validatedcl.validation.Help;
 import com.validatedcl.validation.ValidatedCommandLine;
 import com.validatedcl.validation.ValidatedOption;
@@ -160,7 +160,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
         "-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/aes_16_10_keyfind_3.cnf",
         "-c","ol",
         "-l","f",
-        "-o","VSIDSS"
+        "-o","VSIDST"
       };
       System.out.print(Help.getHelp(options()));
       //return;

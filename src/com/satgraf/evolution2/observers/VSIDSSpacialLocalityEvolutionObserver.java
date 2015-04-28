@@ -6,7 +6,7 @@
 
 package com.satgraf.evolution2.observers;
 
-import com.satgraf.evolution2.UI.Evolution2GraphViewer;
+import com.satlib.evolution.Evolution2GraphViewer;
 import com.satlib.community.Community;
 import com.satlib.community.CommunityNode;
 import com.satlib.evolution.EvolutionGraph;

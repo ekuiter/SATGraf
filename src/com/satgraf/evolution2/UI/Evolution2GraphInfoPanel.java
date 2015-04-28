@@ -6,6 +6,7 @@
 
 package com.satgraf.evolution2.UI;
 
+import com.satlib.evolution.Evolution2GraphViewer;
 import com.satgraf.community.UI.CommunityGraphInfoPanel;
 import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityGraph;
