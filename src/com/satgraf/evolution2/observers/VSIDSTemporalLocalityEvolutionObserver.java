@@ -141,23 +141,19 @@ public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements Ev
     propogationComs.clear();
     for(int i = 0; i < decisions.size(); i++){
       if(i > 0 && i % windowSize == 0){
-        decisionSeries.add(i, propogationComs.size());
+        propogationSeries.add(i, propogationComs.size());
+        decisionSeries.add(i, decisionComs.size());
         if(decisionComs.size() > worstCase){
           worstCase = decisionComs.size();
         }
         decisionComs.clear();
+        propogationComs.clear();
       }
       CommunityNode d = decisions.get(i);
-      if(i == 0){
-        for(CommunityNode p : propogations.get(d)){
-          propogationComs.add(p.getCommunity());
-        }
-        d = null;
-      }
       for(CommunityNode p : propogations.get(d)){
         propogationComs.add(p.getCommunity());
       }
-      decisionComs.add(decisions.get(i).getCommunity());
+      decisionComs.add(d.getCommunity());
     }
     lblWorstCase.setText(String.valueOf(worstCase));
   }

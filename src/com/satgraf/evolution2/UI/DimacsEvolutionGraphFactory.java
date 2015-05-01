@@ -21,8 +21,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
+import java.util.Timer;
 
 /**
  *
@@ -85,12 +88,25 @@ public class DimacsEvolutionGraphFactory extends com.satlib.evolution.DimacsEvol
   }
   
   private BufferedReader openPipedFile() {
+    Timer timer = new Timer();
+    TimerTask watchdog = new TimerTask(){
+      @Override
+      public void run() {
+        System.err.println("Unable to open pipe file: " + pipeFileName);
+      }
+    };
+    timer.schedule(watchdog, 30000);
+    
 	try {
-		return new BufferedReader(new FileReader(pipeFileName));
-	} catch (Exception e) {
+      return new BufferedReader(new FileReader(pipeFileName));
+	} 
+    catch (Exception e) {
       Logger.getLogger(DimacsEvolutionGraphFactory.class.getName()).log(Level.SEVERE, null, e);
       return openPipedFile();
 	}
+    finally{
+      watchdog.cancel();
+    }
   }
 
   @Override

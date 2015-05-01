@@ -33,7 +33,7 @@ public class EdgeLayer extends Layer {
     return Color.WHITE;
   }
 
-  public void paintComponent(final Graphics g) {
+  public synchronized void paintComponent(final Graphics g) {
     this.g = g;
     int taskCount = 8 * threadCount;
     int edgeCount = graph.getGraph().getEdgesList().size();
@@ -56,9 +56,7 @@ public class EdgeLayer extends Layer {
     for (Future future : threads) {
       try {
         future.get();
-      } catch (InterruptedException ex) {
-        ex.printStackTrace();
-      } catch (ExecutionException ex) {
+      } catch (InterruptedException | ExecutionException ex) {
         ex.printStackTrace();
       }
     }
