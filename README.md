@@ -3,7 +3,7 @@ unzip satgraf.zip
 cd satgraf
 cd solvers/minisat
 make
-
+cd ../../
 
 
 Notes:
