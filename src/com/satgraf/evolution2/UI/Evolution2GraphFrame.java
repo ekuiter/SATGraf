@@ -17,6 +17,7 @@ import com.satgraf.graph.UI.GraphOptionsPanel;
 import com.satlib.community.CNMCommunityMetric;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
+import com.satlib.community.LouvianCommunityMetric;
 import com.satlib.community.OLCommunityMetric;
 import com.satlib.community.placer.CommunityPlacer;
 import com.satlib.community.placer.CommunityPlacerFactory;
@@ -51,6 +52,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     forceInit(KKPlacer.class);
     forceInit(GridKKPlacer.class);
     forceInit(GridPlacer.class);
+    forceInit(LouvianCommunityMetric.class);
     forceInit(OLCommunityMetric.class);
     forceInit(CNMCommunityMetric.class);
     forceInit(com.satgraf.evolution2.observers.EvolutionObserverFactory.class);
@@ -144,7 +146,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     
     o = new ValidatedOption("s","solver",true,"The location of the modified solver");
     o.addRule(new FileValidationRule(FileValidationRule.FileExists.yes,new String[]{"execute"}));
-    o.setDefault(System.getProperty("user.dir") + "/solvers/minisat/minisat");
+    o.setDefault("solvers/minisat/minisat");
     options.addOption(o);
     
     o = new ValidatedOption("o", "observers", true, "A named evolution observer");
@@ -158,7 +160,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
       args = new String[]{
         //"-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/unif-k3-r4.267-v421-c1796-S4839562527790587617.cnf",
         "-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/aes_16_10_keyfind_3.cnf",
-        "-c","ol",
+        "-c","l",
         "-l","f",
         "-o","VSIDST"
       };
