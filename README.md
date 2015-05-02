@@ -3,7 +3,7 @@ unzip satgraf.zip
 cd satgraf
 cd solvers/minisat
 make
-
+cd ../
 
 
 Notes:
@@ -54,3 +54,5 @@ evo2
 	-p --pattern(default = null) A list of regex expressions to group variables (not yet implemented)
 	-l --layout(default = f) The layout algorithm to use
 	Must be one of: f,fgpu,grid,kk
+	-o --observer(default = null) The observer to use
+	Must be one of: VSIDST,VSIDSS
