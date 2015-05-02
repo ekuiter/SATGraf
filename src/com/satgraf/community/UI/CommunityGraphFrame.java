@@ -83,8 +83,8 @@ public class CommunityGraphFrame extends GraphFrame{
   }
   
   public void init(){
-    super.init();
     metric.getCommunities((CommunityGraph)graphViewer.getGraph());
+    super.init();
   }
   
   public void fromJson(JSONObject json){

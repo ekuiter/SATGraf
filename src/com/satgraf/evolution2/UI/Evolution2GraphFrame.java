@@ -3,6 +3,7 @@ package com.satgraf.evolution2.UI;
 import com.satlib.evolution.Evolution2GraphViewer;
 import static com.satgraf.ForceInit.forceInit;
 import com.satgraf.community.UI.CommunityGraphFrame;
+import com.satgraf.community.placer.CircularCommunityPlacer;
 import com.satgraf.community.placer.FruchGPUPlacer;
 import com.satgraf.community.placer.FruchPlacer;
 import com.satgraf.community.placer.GridKKPlacer;
@@ -49,6 +50,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
   static{
     forceInit(FruchGPUPlacer.class);
     forceInit(FruchPlacer.class);
+    forceInit(CircularCommunityPlacer.class);
     forceInit(KKPlacer.class);
     forceInit(GridKKPlacer.class);
     forceInit(GridPlacer.class);
@@ -160,9 +162,10 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
       args = new String[]{
         //"-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/unif-k3-r4.267-v421-c1796-S4839562527790587617.cnf",
         "-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/aes_16_10_keyfind_3.cnf",
+        //"-f","./formula/27round.cnf",
         "-c","l",
-        "-l","f",
-        "-o","VSIDST"
+        "-l","c",
+        //"-o","VSIDST"
       };
       System.out.print(Help.getHelp(options()));
       //return;
@@ -216,8 +219,8 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     CommunityPlacer p = CommunityPlacerFactory.getInstance().getByName(frmMain.getPlacerName(), factory.getGraph());
     frmMain.setProgressive(p);
     graphViewer.graph = factory.getGraph();
-    graphViewer.setPlacer(p);
     frmMain.init();
+    graphViewer.setPlacer(p);
     frmMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frmMain.show();
     GraphOptionsPanel panel = frmMain.panel;

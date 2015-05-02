@@ -1,19 +1,19 @@
 package com.satgraf.graph.UI;
 
+import com.satgraf.UI.Layer;
+import com.satlib.graph.Edge;
+import com.satlib.graph.GraphViewer;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import com.satgraf.UI.Layer;
-import com.satlib.graph.Edge;
-import com.satlib.graph.GraphViewer;
 
 public class EdgeLayer extends Layer {
 	
@@ -35,7 +35,7 @@ public class EdgeLayer extends Layer {
 
   public synchronized void paintComponent(final Graphics g) {
     this.g = g;
-    int taskCount = 8 * threadCount;
+    int taskCount = threadCount;
     int edgeCount = graph.getGraph().getEdgesList().size();
     Graphics2D g2d = (Graphics2D) g.create();
 
@@ -65,7 +65,7 @@ public class EdgeLayer extends Layer {
 
   private void drawEdges(int from, int to) {
     ArrayList<Edge> edges = new ArrayList<Edge>(graph.getGraph().getEdgesList());
-
+    scale = graph.getScale();
     for (int i = from; i < to; i++) {
       Edge e = edges.get(i);
 
@@ -77,22 +77,25 @@ public class EdgeLayer extends Layer {
     }
   }
 
+  private static final BasicStroke stroke = new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+  private static final RenderingHints hints = GraphCanvas.getRenderingHints();
+  private double scale = 1.0;
   protected void drawConnection(Edge c) {
     if (!graph.shouldShowEdge(c)){
       return;
     }
 
     if(c.getStart().isVisible() && c.getEnd().isVisible()){
-      int startX = (int) (c.getStart().getX(graph) * graph.getScale());
-      int startY = (int) (c.getStart().getY(graph) * graph.getScale());
-      int endX = (int) (c.getEnd().getX(graph) * graph.getScale());
-      int endY = (int) (c.getEnd().getY(graph) * graph.getScale());
-
+      int startX = (int) (c.getStart().getX(graph) * scale);
+      int startY = (int) (c.getStart().getY(graph) * scale);
+      int endX = (int) (c.getEnd().getX(graph) * scale);
+      int endY = (int) (c.getEnd().getY(graph) * scale);
+      
       synchronized (graph) {
         g.setColor(getColor(c));
         Graphics2D g2d = (Graphics2D) g.create();
-        g2d.setRenderingHints(GraphCanvas.getRenderingHints());
-        g2d.setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2d.setRenderingHints(hints);
+        g2d.setStroke(stroke);
         g2d.drawLine(startX, startY, endX, endY);
       }
     }

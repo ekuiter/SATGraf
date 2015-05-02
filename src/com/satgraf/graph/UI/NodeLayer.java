@@ -91,7 +91,7 @@ public class NodeLayer extends Layer {
 		int x = (int) (n.getX(graph) * graph.getScale()) - diameter/2;
 		int y = (int) (n.getY(graph) * graph.getScale()) - diameter/2;
 			 
-		synchronized (g) {
+		synchronized (graph) {
 			g.setColor(color);
 			g.drawArc(x, y, diameter, diameter, 0, 360);
 			g.setColor(fillColor);

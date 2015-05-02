@@ -105,7 +105,7 @@ public class FruchPlacer extends AbstractPlacer {
     private int initialIter = 30;  
     private double progress = 0;
     private int maxPasses = 500;    
-    private double optDist = 100;    
+    public double optDist = 100;    
     private int updates = 0;
     private boolean rescaleLayout = true; 
     private boolean firstLayout = true;
@@ -114,8 +114,8 @@ public class FruchPlacer extends AbstractPlacer {
     private boolean isSeedSet = false;
 
     private Collection<CommunityNode> nodeList;
-    private int width = 2500;
-    private int height = 2500;
+    public int width = 2500;
+    public int height = 2500;
     private boolean update = true;
     private Random rand = new Random(this.seed);
     private HashMap locations = new HashMap();
@@ -127,9 +127,15 @@ public class FruchPlacer extends AbstractPlacer {
       return progress;
     }
     
-    public FruchPlacer(CommunityGraph g) {
+    public FruchPlacer(CommunityGraph g){
+      this(g, 2500, 2500);
+    }
+    public FruchPlacer(CommunityGraph g, int width, int height) {
       super(g);
       nodeList = g.getNodes();
+      this.width = width;
+      this.height = height;
+      optDist = 0.46 * Math.sqrt(((width * height) / (this.graph.getNodeCount() + 1)));
     }
 
     /**
@@ -324,7 +330,6 @@ public class FruchPlacer extends AbstractPlacer {
 		    Object[] nl = nodeList.toArray();
 	
 		    // calc constants
-		    optDist = 0.46 * Math.sqrt(((width * height) / (nl.length + 1)));
 		    double temp = width / 10;
 		    int passes = 0;
 		    int nNodes = nl.length;
@@ -352,7 +357,7 @@ public class FruchPlacer extends AbstractPlacer {
 		    double[] xPos = new double[nNodes];
 		    double[] yPos = new double[nNodes];
 		    boolean[] fixed = new boolean[nNodes];
-	
+            edges.addAll(graph.getEdgesList());
 		    for (int i = 0; i < nNodes; i++) {
 				CommunityNode workNode = (CommunityNode)nl[i];
 				xPos[i] = getX(workNode);
@@ -361,7 +366,6 @@ public class FruchPlacer extends AbstractPlacer {
 				maxHeight = Math.max(maxHeight,DrawableNode.NODE_DIAMETER + DrawableNode.NODE_X_SPACING);
 				//fixed[i] = workNode.__getattr_Fixed();
 				fixed[i] = false;
-				edges.addAll(workNode.getEdgesList());
 				nodeIndexer.put(workNode, new Integer(i));
 		    }
 	
@@ -435,7 +439,7 @@ public class FruchPlacer extends AbstractPlacer {
 				    if (deltaLength == 0) 
 				    	deltaLength = 0.001;
 				    
-				    force = calcAttraction(deltaLength);
+				    force = calcAttraction(deltaLength) * edge.getWeight();
 				    if(vIndex == 1167){
                       int test = 1;
                     }
@@ -655,9 +659,9 @@ public class FruchPlacer extends AbstractPlacer {
 
   @Override
   public void init() {
-	  if (this.graph.getNodeCount() <= 0) {
-		  return;
-	  }
+    if (this.graph.getNodeCount() <= 0) {
+      return;
+    }
     advancePositions();
   }
 
