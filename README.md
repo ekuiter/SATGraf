@@ -1,9 +1,14 @@
 Installation:
+
 unzip satgraf.zip
+
 cd satgraf
+
 cd solvers/minisat
+
 make
-cd ../
+
+cd ../../
 
 
 Notes:
@@ -50,9 +55,9 @@ evo2
 	-s --solver(default = solvers/minisat/minisat) The location of the modified solver
 	Must be an existing file For which you have: execute permissions
 	-c --community(default = ol) The community detection algorithm
-	Must be one of: ol,cnm
+	Must be one of: ol,cnm,l
 	-p --pattern(default = null) A list of regex expressions to group variables (not yet implemented)
 	-l --layout(default = f) The layout algorithm to use
-	Must be one of: f,fgpu,grid,kk
+	Must be one of: f,fgpu,grid,kk,c
 	-o --observer(default = null) The observer to use
 	Must be one of: VSIDST,VSIDSS

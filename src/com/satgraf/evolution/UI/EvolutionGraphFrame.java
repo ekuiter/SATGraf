@@ -6,6 +6,7 @@
 
 package com.satgraf.evolution.UI;
 
+import static com.satgraf.ForceInit.forceInit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -27,10 +28,18 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import com.satgraf.community.UI.CommunityGraphFrame;
+import com.satgraf.community.placer.CircularCommunityPlacer;
+import com.satgraf.community.placer.FruchGPUPlacer;
+import com.satgraf.community.placer.FruchPlacer;
+import com.satgraf.community.placer.GridPlacer;
+import com.satgraf.community.placer.KKPlacer;
+import com.satlib.community.CNMCommunityMetric;
 import com.satlib.community.CommunityGraphViewer;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
 import com.satlib.community.JSONCommunityGraph;
+import com.satlib.community.LouvianCommunityMetric;
+import com.satlib.community.OLCommunityMetric;
 import com.satlib.community.placer.CommunityPlacerFactory;
 import com.satlib.evolution.EvolutionGraphFactory;
 import com.satlib.evolution.EvolutionGraphFactoryObserver;
@@ -47,6 +56,16 @@ import com.validatedcl.validation.rules.ListValidationRule;
  */
 public class EvolutionGraphFrame extends CommunityGraphFrame implements EvolutionGraphFactoryObserver {
   EvolutionGraphFactory factory;
+  static{
+    forceInit(FruchGPUPlacer.class);
+    forceInit(FruchPlacer.class);
+    forceInit(KKPlacer.class);
+    forceInit(GridPlacer.class);
+    forceInit(CircularCommunityPlacer.class);
+    forceInit(LouvianCommunityMetric.class);
+    forceInit(OLCommunityMetric.class);
+    forceInit(CNMCommunityMetric.class);
+  }
   private JMenuItem generate = new JMenuItem("Generate");
   private ArrayList<CommunityGraphViewer> graphs = new ArrayList<CommunityGraphViewer>();
   public EvolutionGraphFrame(EvolutionGraphFactory factory, CommunityGraphViewer graphViewer, HashMap<String, Pattern> patterns, CommunityMetric placer) {

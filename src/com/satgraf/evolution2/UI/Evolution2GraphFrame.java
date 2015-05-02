@@ -50,10 +50,10 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
   static{
     forceInit(FruchGPUPlacer.class);
     forceInit(FruchPlacer.class);
-    forceInit(CircularCommunityPlacer.class);
     forceInit(KKPlacer.class);
     forceInit(GridKKPlacer.class);
     forceInit(GridPlacer.class);
+    forceInit(CircularCommunityPlacer.class);
     forceInit(LouvianCommunityMetric.class);
     forceInit(OLCommunityMetric.class);
     forceInit(CNMCommunityMetric.class);

@@ -7,6 +7,7 @@
 package com.satgraf.community.UI;
 
 import static com.satgraf.ForceInit.forceInit;
+import com.satgraf.community.placer.CircularCommunityPlacer;
 import com.satgraf.community.placer.FruchGPUPlacer;
 import com.satgraf.community.placer.FruchPlacer;
 import com.satgraf.community.placer.GridPlacer;
@@ -22,6 +23,7 @@ import com.satlib.community.CommunityGraphViewer;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
 import com.satlib.community.JSONCommunityGraph;
+import com.satlib.community.LouvianCommunityMetric;
 import com.satlib.community.OLCommunityMetric;
 import com.satlib.community.placer.CommunityPlacer;
 import com.satlib.community.placer.CommunityPlacerFactory;
@@ -52,6 +54,8 @@ public class CommunityGraphFrame extends GraphFrame{
     forceInit(FruchPlacer.class);
     forceInit(KKPlacer.class);
     forceInit(GridPlacer.class);
+    forceInit(CircularCommunityPlacer.class);
+    forceInit(LouvianCommunityMetric.class);
     forceInit(OLCommunityMetric.class);
     forceInit(CNMCommunityMetric.class);
   }
