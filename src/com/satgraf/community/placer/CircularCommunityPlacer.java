@@ -6,14 +6,14 @@
 
 package com.satgraf.community.placer;
 
+import com.satgraf.graph.placer.FruchPlacer;
+import com.satgraf.graph.placer.AbstractPlacer;
+import com.satgraf.graph.placer.Coordinates;
 import com.satlib.community.Community;
 import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityNode;
 import com.satlib.community.ConcreteCommunityGraph;
-import com.satlib.community.placer.AbstractPlacer;
-import com.satlib.community.placer.CommunityPlacerFactory;
-import com.satlib.community.placer.Coordinates;
 import com.satlib.graph.DrawableNode;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -31,7 +31,7 @@ import java.util.Random;
  *
  * @author zacknewsham
  */
-public class CircularCommunityPlacer extends AbstractPlacer{
+public class CircularCommunityPlacer extends AbstractPlacer<CommunityNode, CommunityGraph> implements CommunityPlacer{
   static{
     CommunityPlacerFactory.getInstance().register("c", CircularCommunityPlacer.class);
   }

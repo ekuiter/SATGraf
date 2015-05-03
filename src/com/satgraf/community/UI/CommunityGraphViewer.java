@@ -6,7 +6,7 @@
 
 package com.satgraf.community.UI;
 
-import com.satlib.community.placer.CommunityPlacer;
+import com.satgraf.community.placer.CommunityPlacer;
 import static com.satlib.graph.DrawableNode.COMMUNITY_COLORS;
 import com.satlib.graph.Edge;
 import com.satlib.graph.Edge.EdgeState;

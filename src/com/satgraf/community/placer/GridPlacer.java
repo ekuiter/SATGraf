@@ -6,12 +6,13 @@
 
 package com.satgraf.community.placer;
 
+import com.satgraf.graph.placer.AbstractPlacer;
 import com.satlib.community.Community;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityNode;
-import com.satlib.community.placer.AbstractPlacer;
-import com.satlib.community.placer.CommunityPlacerFactory;
 import com.satlib.graph.DrawableNode;
+import com.satlib.graph.Graph;
+import com.satlib.graph.Node;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import java.awt.Dimension;
@@ -24,7 +25,7 @@ import java.util.Iterator;
  *
  * @author zacknewsham
  */
-public class GridPlacer extends AbstractPlacer {
+public class GridPlacer extends AbstractPlacer<CommunityNode, CommunityGraph> implements CommunityPlacer {
   static{
     CommunityPlacerFactory.getInstance().register("grid", GridPlacer.class);
   }
@@ -87,7 +88,6 @@ public class GridPlacer extends AbstractPlacer {
     super(graph);
   }
   
-  @Override
   public int getCommunityAtXY(int x, int y){
     Iterator<Community> comms = graph.getCommunities().iterator();
     while(comms.hasNext()){
@@ -113,7 +113,7 @@ public class GridPlacer extends AbstractPlacer {
     if(community == -1){
       return null;
     }
-    Iterator<CommunityNode> nodes = getCommunityNodes(community).iterator();
+    Iterator<CommunityNode> nodes = graph.getCommunity(community).getNodes().iterator();
     Rectangle r = new Rectangle(0, 0, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER);
     while(nodes.hasNext()){
       CommunityNode node = (CommunityNode)nodes.next();

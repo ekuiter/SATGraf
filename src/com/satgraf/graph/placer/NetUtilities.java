@@ -47,8 +47,14 @@
  * wolfgang.hoschek@cern.ch
  * @author Hacked by Eytan Adar for Guess classes
  *$$*/
-package com.satgraf.community.placer;
+package com.satgraf.graph.placer;
 
+import com.satlib.community.Community;
+import com.satlib.community.CommunityEdge;
+import com.satlib.community.CommunityGraph;
+import com.satlib.community.CommunityNode;
+import com.satlib.graph.Edge;
+import com.satlib.graph.Node;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import java.util.ArrayList;
@@ -58,11 +64,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-
-import com.satlib.community.Community;
-import com.satlib.community.CommunityEdge;
-import com.satlib.community.CommunityGraph;
-import com.satlib.community.CommunityNode;
 
 
 /**
@@ -105,24 +106,24 @@ public class NetUtilities {
     return comps;
   }
 
-public static SymettricMatrix getAllShortPathMatrix(Collection<CommunityNode> nodes) {
+public static SymettricMatrix getAllShortPathMatrix(Collection<Node> nodes) {
     int nNodes = nodes.size ();
     SymettricMatrix distMatrix = new SymettricMatrix(nNodes);
     distMatrix.assign(Double.POSITIVE_INFINITY);
 
     // index of nodes to there index in the
-    TObjectIntHashMap<CommunityNode> nodeIndexer = new TObjectIntHashMap<>();
-    ArrayList<Double> priorityList = new ArrayList<Double>();
-    ArrayList<CommunityNode> nodeQueue = new ArrayList<CommunityNode>();
-    HashSet<CommunityNode> checkedNodes = new HashSet<CommunityNode>();
+    TObjectIntHashMap<Node> nodeIndexer = new TObjectIntHashMap<>();
+    ArrayList<Double> priorityList = new ArrayList<>();
+    ArrayList<Node> nodeQueue = new ArrayList<>();
+    HashSet<Node> checkedNodes = new HashSet<>();
 
-    Iterator<CommunityNode> it = nodes.iterator();
+    Iterator<Node> it = nodes.iterator();
     int w = 0;
     
-    CommunityNode[] nds = new CommunityNode[nNodes];
+    Node[] nds = new Node[nNodes];
 
     while(it.hasNext()) {
-    	CommunityNode work = it.next();
+    	Node work = it.next();
     	nodeIndexer.put(work, new Integer(w));
     	nds[w] = work;
     	w++;
@@ -134,7 +135,7 @@ public static SymettricMatrix getAllShortPathMatrix(Collection<CommunityNode> no
       nodeQueue.clear();
       
       //find paths to all nodes connected to i
-      CommunityNode iNode = nds[i];
+      Node iNode = nds[i];
       distMatrix.setValue(i, i, 0.0);
       checkedNodes.add(iNode);
       priorityList.add(0.0);
@@ -151,7 +152,7 @@ public static SymettricMatrix getAllShortPathMatrix(Collection<CommunityNode> no
           }
         }
         
-        CommunityNode fringeNode = nodeQueue.get(fringeNodeIndex);
+        Node fringeNode = nodeQueue.get(fringeNodeIndex);
         double fringeNodeDist = priorityList.get(fringeNodeIndex);
         nodeQueue.remove(fringeNodeIndex);
         priorityList.remove(fringeNodeIndex);
@@ -164,8 +165,8 @@ public static SymettricMatrix getAllShortPathMatrix(Collection<CommunityNode> no
         //loop over its edges, adding nodes to queue
         Iterator<CommunityEdge> edgeEnum = fringeNode.getConnections();
         while(edgeEnum.hasNext()) {
-          CommunityEdge edge = edgeEnum.next();
-          CommunityNode workNode = edge.getOpposite(fringeNode);
+          Edge edge = edgeEnum.next();
+          Node workNode = edge.getOpposite(fringeNode);
           if (!checkedNodes.contains(workNode)) {
         	  double workNodeDist = fringeNodeDist + edge.getWeight();
         	  int prevDistIndex = nodeQueue.indexOf(workNode);

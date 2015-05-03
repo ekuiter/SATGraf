@@ -1,12 +1,15 @@
-package com.satgraf.community.placer;
+package com.satgraf.graph.placer;
 
-import com.satlib.community.CommunityEdge;
-import com.satlib.community.CommunityGraph;
-import com.satlib.community.CommunityNode;
-import com.satlib.community.placer.AbstractPlacer;
-import com.satlib.community.placer.CommunityPlacerFactory;
-import com.satlib.community.placer.Coordinates;
+import com.satgraf.community.placer.CommunityPlacerFactory;
+import com.satgraf.graph.placer.AbstractPlacer;
+import com.satgraf.graph.placer.Coordinates;
+import com.satgraf.graph.placer.NetUtilities;
+import com.satgraf.graph.placer.SymettricMatrix;
+import com.satlib.graph.Clause;
 import com.satlib.graph.DrawableNode;
+import com.satlib.graph.Edge;
+import com.satlib.graph.Graph;
+import com.satlib.graph.Node;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -16,9 +19,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 
-public class KKPlacer extends AbstractPlacer {
+public class KKPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>> {
   static{
-    CommunityPlacerFactory.getInstance().register("kk", KKPlacer.class);
+    PlacerFactory.getInstance().register("kk", KKPlacer.class);
   }
 	
 	//kamada-kawai algorithm vars
@@ -33,22 +36,22 @@ public class KKPlacer extends AbstractPlacer {
     private static int maxWidth = 3000;
     private static int maxHeight = 3000;
 
-    private HashMap<CommunityNode, Coordinates> locations = new HashMap<CommunityNode, Coordinates>();
+    private HashMap<Node, Coordinates> locations = new HashMap<>();
    
-    private static final Comparator<CommunityNode> NODE_SIZE_COMPARATOR = new Comparator<CommunityNode>() {
+    private static final Comparator<Node> NODE_SIZE_COMPARATOR = new Comparator<Node>() {
     	
    	 	@Override
-	   	public int compare(CommunityNode a, CommunityNode b) {
+	   	public int compare(Node a, Node b) {
 	   		 return (int) (b.getSize() - a.getSize());
 	   	}
    	 
     };
 
-    public KKPlacer(CommunityGraph g) {
+    public KKPlacer(Graph g) {
     	this(g, maxWidth, maxHeight);
     }
     
-    public KKPlacer(CommunityGraph g, int width, int height) {
+    public KKPlacer(Graph g, int width, int height) {
     	super(g);
 		this.width = width;
 		this.height = height;
@@ -110,7 +113,7 @@ public class KKPlacer extends AbstractPlacer {
      * @param index of current comp
      * @return x and y coordinates of bottom right corner of current comp
      */
-	private void communityLayout(Collection<CommunityNode> comp) {
+	private void layout(Collection<Node> comp) {
     	int nNodes = comp.size();
     	
     	// calculate the origin of the circle
@@ -125,10 +128,10 @@ public class KKPlacer extends AbstractPlacer {
 			radius = (int)(height / 2) - (pad);
 		}
 	      
-		Iterator<CommunityNode> nodes = comp.iterator();
+		Iterator<Node> nodes = comp.iterator();
         int i = 0;
         while(nodes.hasNext()){
-        	CommunityNode node = nodes.next();
+        	Node node = nodes.next();
             double x = radius * Math.cos(2 * Math.PI * i / nNodes) + originX;
             double y = radius * Math.sin(2 * Math.PI * i / nNodes) + originY;
             locations.put(node,new Coordinates(x, y));
@@ -218,19 +221,19 @@ public class KKPlacer extends AbstractPlacer {
      */
     public void advancePositions() {
 	    stop = false;
-	    communityLayout(graph.getNodes());
+	    layout(graph.getNodes());
 
 	    if (graph.getNodes().size() > 1) {
-	    	ArrayList<CommunityNode> comp = new ArrayList<CommunityNode>(graph.getNodes());
+	    	ArrayList<Node> comp = new ArrayList<>(graph.getNodes());
 	    	Collections.sort(comp, NODE_SIZE_COMPARATOR);
             runKamadaOn(comp);
             repositionBasedOnCommunitySize(comp);
             rescaleAndReposition(comp);
         }
         
-        Iterator<CommunityEdge> dummies = graph.getDummyEdges();
+        Iterator<Edge> dummies = graph.getDummyEdges();
         while(dummies.hasNext()){
-          CommunityEdge dummy = dummies.next();
+          Edge dummy = dummies.next();
           dummy.getStart().removeEdge(dummy);
           dummy.getEnd().removeEdge(dummy);
           graph.removeEdge(dummy);
@@ -239,7 +242,7 @@ public class KKPlacer extends AbstractPlacer {
         
 	}
     
-	private void runKamadaOn(Collection<CommunityNode> componentNodes) {
+	private void runKamadaOn(Collection<Node> componentNodes) {
 		int nNodes = componentNodes.size();
 		
 		//sets up the matrix of path distances
@@ -258,12 +261,12 @@ public class KKPlacer extends AbstractPlacer {
 		double[] xPos = new double[nNodes];
 		double[] yPos = new double[nNodes];
 	 
-		CommunityNode[] nList = new CommunityNode[nNodes];
-		Iterator<CommunityNode> it = componentNodes.iterator();
+		Node[] nList = new Node[nNodes];
+		Iterator<Node> it = componentNodes.iterator();
 		int w = 0;
 		
 		while(it.hasNext()) {
-		    CommunityNode workNode = it.next();
+		    Node workNode = it.next();
 		    Coordinates c = locations.get(workNode);
             xPos[w] = c.getX();
             yPos[w] = c.getY();
@@ -343,7 +346,7 @@ public class KKPlacer extends AbstractPlacer {
 	    
 		//System.out.print("\n");
 		for (int i = 0; i < nNodes; i++) {
-			CommunityNode node = nList[i];
+			Node node = nList[i];
 		    Coordinates c = locations.get(node);
             c.setX(xPos[i]);
             c.setY(yPos[i]);
@@ -459,7 +462,7 @@ public class KKPlacer extends AbstractPlacer {
         return(d2d.getX());
     }*/
 
-    public Coordinates getCoordinates(CommunityNode v) {
+    public Coordinates getCoordinates(Node v) {
     	return((Coordinates)locations.get(v));
     }
 
@@ -479,13 +482,13 @@ public class KKPlacer extends AbstractPlacer {
 	@Override
 	public void init() {		
       //ensure fully connected graph
-	  ArrayList<CommunityNode> coms = new ArrayList<CommunityNode>(graph.getNodes());
+	  ArrayList<Node> coms = new ArrayList<>(graph.getNodes());
 	  Collections.sort(coms, NODE_SIZE_COMPARATOR);
 	  
-      CommunityNode rootNode = coms.iterator().next();
-      Iterator<CommunityNode> nodes = graph.getNodeIterator();
+      Node rootNode = coms.iterator().next();
+      Iterator<Node> nodes = graph.getNodeIterator();
       while(nodes.hasNext()){
-        CommunityNode compNode = nodes.next();
+        Node compNode = nodes.next();
         if(!graph.connected(rootNode, compNode)){
           graph.connect(rootNode, compNode, true);
         }
@@ -494,38 +497,14 @@ public class KKPlacer extends AbstractPlacer {
 	}
 
 	@Override
-	public int getCommunityX(int community) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getCommunityY(int community) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getCommunityWidth(int community) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getCommunityHeight(int community) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getX(CommunityNode node) {
+	public int getX(Node node) {
             return (int)locations.get(node).getX();
 	}
 	
     public int getX(int id){
-      Iterator<CommunityNode> ls = locations.keySet().iterator();
+      Iterator<Node> ls = locations.keySet().iterator();
       while(ls.hasNext()){
-        CommunityNode next = ls.next();
+        Node next = ls.next();
         if(next.getId() == id){
           return getX(next);
         }
@@ -534,9 +513,9 @@ public class KKPlacer extends AbstractPlacer {
     }
 	
     public int getY(int id){
-      Iterator<CommunityNode> ls = locations.keySet().iterator();
+      Iterator<Node> ls = locations.keySet().iterator();
       while(ls.hasNext()){
-        CommunityNode next = ls.next();
+        Node next = ls.next();
         if(next.getId() == id){
           return getY(next);
         }
@@ -545,13 +524,13 @@ public class KKPlacer extends AbstractPlacer {
     }
     
 	@Override
-	public CommunityNode getNodeAtXY(int x, int y, double scale) {
+	public Node getNodeAtXY(int x, int y, double scale) {
 		x /= scale;
 		y /= scale;
-		Iterator<CommunityNode> nodes = graph.getNodes("All");
+		Iterator<Node> nodes = graph.getNodes("All");
 		Rectangle r = new Rectangle(0, 0, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER);
 		while(nodes.hasNext()){
-			CommunityNode node = (CommunityNode)nodes.next();
+			Node node = (Node)nodes.next();
 			r.x = getX(node);
 			r.y = getY(node);
 			if(r.contains(x, y)){
@@ -562,11 +541,11 @@ public class KKPlacer extends AbstractPlacer {
 	}
 
 	@Override
-	public int getY(CommunityNode node) {
+	public int getY(Node node) {
             return (int) locations.get(node).getY();
 	}
 	
-	public void rescaleAndReposition(Collection<CommunityNode> comp) {
+	public void rescaleAndReposition(Collection<Node> comp) {
 		int nNodes = comp.size();
 		if (nNodes <= 1) {
 		    return;
@@ -574,14 +553,14 @@ public class KKPlacer extends AbstractPlacer {
 	
 		double[] xPos = new double[nNodes];
 		double[] yPos = new double[nNodes];
-		CommunityNode[] nlist = new CommunityNode[nNodes];
+		Node[] nlist = new Node[nNodes];
 	
 		double xMax = Double.MIN_VALUE;
 		double yMax = Double.MIN_VALUE;
 		double xMin = Double.MAX_VALUE;
 		double yMin = Double.MAX_VALUE;
 		
-		Iterator<CommunityNode> it = comp.iterator();
+		Iterator<Node> it = comp.iterator();
 		int i = 0;
 		while(it.hasNext()) {
 		    nlist[i] = it.next();
@@ -604,24 +583,24 @@ public class KKPlacer extends AbstractPlacer {
 		}
     }
 	
-	private void repositionBasedOnCommunitySize(ArrayList<CommunityNode> comp) {
+	private void repositionBasedOnCommunitySize(ArrayList<Node> comp) {
 		int nNodes = comp.size();
 		if (nNodes <= 1) {
 		    return;
 		}
 		
-		Iterator<CommunityNode> it1 = comp.iterator();
-		Iterator<CommunityNode> it2;
+		Iterator<Node> it1 = comp.iterator();
+		Iterator<Node> it2;
 		
 		while(it1.hasNext()) {
-		    CommunityNode node1 = it1.next();
+		    Node node1 = it1.next();
 		    Coordinates c1 = locations.get(node1);
 		    double radius = node1.getSize()/2;
 		    
 		    if (radius > 0) {
 		    	it2 = comp.iterator();
 			    while (it2.hasNext()) {
-			    	CommunityNode node2 = it2.next();
+			    	Node node2 = it2.next();
 			    	if (node1 != node2) {
                                     Coordinates c2 = locations.get(node2);
 

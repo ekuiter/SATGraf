@@ -1,0 +1,50 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package com.satgraf.graph.placer;
+
+import com.satlib.graph.Graph;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+
+
+/**
+ *
+ * @author zacknewsham
+ */
+public class PlacerFactory {
+  private static final HashMap<String, Class<? extends Placer>> classes = new HashMap<>();
+  private static final PlacerFactory singleton = new PlacerFactory();
+  public static PlacerFactory getInstance(){
+    return singleton;
+  }
+  
+  public void register(String name, Class<? extends Placer> c){
+    classes.put(name, c);
+  }
+  public String[] getNames(){
+    String[] names = new String[classes.size()];
+    classes.keySet().toArray(names);
+    return names;
+  }
+  
+  public Placer getByName(String name, Graph graph){
+    if(classes.get(name) == null){
+      return null;
+    }
+    else{
+      try {
+        Constructor<? extends Placer> con = classes.get(name).getConstructor(Graph.class);
+        return con.newInstance(graph);
+      } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException | SecurityException ex) {
+        return null;
+      }
+    }
+  }
+  
+  private PlacerFactory(){}
+}

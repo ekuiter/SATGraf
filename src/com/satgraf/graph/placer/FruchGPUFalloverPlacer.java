@@ -4,27 +4,27 @@
  * and open the template in the editor.
  */
 
-package com.satgraf.community.placer;
+package com.satgraf.graph.placer;
 
-import com.satlib.community.CommunityGraph;
-import com.satlib.community.CommunityNode;
-import com.satlib.community.placer.AbstractPlacer;
-import com.satlib.community.placer.CommunityPlacer;
+import com.satlib.graph.Clause;
+import com.satlib.graph.Edge;
+import com.satlib.graph.Graph;
+import com.satlib.graph.Node;
 
 /**
  *
  * @author zacknewsham
  */
-public class FruchGPUFalloverPlacer extends AbstractPlacer{
-  private CommunityPlacer fruchImpl;
+public class FruchGPUFalloverPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>{
+  private AbstractPlacer fruchImpl;
   
-  public FruchGPUFalloverPlacer(CommunityGraph graph){
+  public FruchGPUFalloverPlacer(Graph graph){
     super(graph);
     fruchImpl = new FruchGPUPlacer(graph);
   }
   
   @Override
-  public CommunityNode getNodeAtXY(int x, int y, double scale) {
+  public Node getNodeAtXY(int x, int y, double scale) {
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
@@ -42,33 +42,13 @@ public class FruchGPUFalloverPlacer extends AbstractPlacer{
   }
 
   @Override
-  public int getX(CommunityNode node) {
+  public int getX(Node node) {
     return fruchImpl.getX(node);
   }
 
   @Override
-  public int getY(CommunityNode node) {
+  public int getY(Node node) {
     return fruchImpl.getY(node);
-  }
-
-  @Override
-  public int getCommunityX(int community) {
-    return fruchImpl.getCommunityX(community);
-  }
-
-  @Override
-  public int getCommunityY(int community) {
-    return fruchImpl.getCommunityY(community);
-  }
-
-  @Override
-  public int getCommunityWidth(int community) {
-    return fruchImpl.getCommunityWidth(community);
-  }
-
-  @Override
-  public int getCommunityHeight(int community) {
-    return fruchImpl.getCommunityHeight(community);
   }
 
   @Override

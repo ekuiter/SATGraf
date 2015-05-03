@@ -7,8 +7,8 @@
 package com.satgraf.evolution2.UI;
 
 import com.satgraf.community.UI.CommunityGraphFrame;
-import com.satlib.community.placer.CommunityPlacer;
-import com.satlib.community.placer.CommunityPlacerFactory;
+import com.satgraf.community.placer.CommunityPlacer;
+import com.satgraf.community.placer.CommunityPlacerFactory;
 import com.satlib.evolution.EvolutionGraphFactory;
 import java.io.BufferedReader;
 import java.io.File;

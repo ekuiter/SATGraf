@@ -47,17 +47,21 @@
  * wolfgang.hoschek@cern.ch
  * @author Hacked by Eytan Adar for Guess classes
  *$$*/
-package com.satgraf.community.placer;
+package com.satgraf.graph.placer;
 
+import com.satgraf.community.placer.CommunityPlacerFactory;
+import com.satgraf.graph.placer.AbstractPlacer;
+import com.satgraf.graph.placer.Coordinates;
 import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityGraphFactory;
 import com.satlib.community.CommunityGraphFactoryFactory;
 import com.satlib.community.CommunityNode;
-import com.satlib.community.placer.AbstractPlacer;
-import com.satlib.community.placer.CommunityPlacerFactory;
-import com.satlib.community.placer.Coordinates;
+import com.satlib.graph.Clause;
 import com.satlib.graph.DrawableNode;
+import com.satlib.graph.Edge;
+import com.satlib.graph.Graph;
+import com.satlib.graph.Node;
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -98,9 +102,9 @@ import static org.jocl.CL.*;
  * @version $Revision: 1.1 $ $Date: 2006/06/01 18:00:34 $
  * @author Skye Bender-deMoll email:skyebend@santafe.edu
  */
-public class FruchGPUPlacer extends AbstractPlacer {
+public class FruchGPUPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>> {
   static{
-    CommunityPlacerFactory.getInstance().register("fgpu", FruchGPUPlacer.class);
+    PlacerFactory.getInstance().register("fgpu", FruchGPUPlacer.class);
   }
   private int pad = 20;
   private static final int float_workers = 1;
@@ -765,7 +769,7 @@ public class FruchGPUPlacer extends AbstractPlacer {
   
   
 
-  public FruchGPUPlacer(CommunityGraph g) {
+  public FruchGPUPlacer(Graph g) {
     super(g);
     nodeList = g.getNodes();
   }
@@ -920,7 +924,7 @@ public class FruchGPUPlacer extends AbstractPlacer {
       edges = new int[2][graph.getEdgesList().size()];
       int count = 0;
       TIntObjectHashMap<TIntArrayList> edgeUsageIndexer = new TIntObjectHashMap<>();
-      for(CommunityEdge e : graph.getEdgesList()){
+      for(Edge e : graph.getEdgesList()){
         int v = nodeIndexer.get(e.getStart());
         int u = nodeIndexer.get(e.getEnd());
         if(edgeUsageIndexer.get(v) == null){
@@ -1119,7 +1123,7 @@ public class FruchGPUPlacer extends AbstractPlacer {
     update = doUpdate;
   }
 
-  public Coordinates getCoordinates(CommunityNode v) {
+  public Coordinates getCoordinates(Node v) {
     return ((Coordinates) locations.get(v));
   }
 
@@ -1133,7 +1137,7 @@ public class FruchGPUPlacer extends AbstractPlacer {
   public CommunityNode getNodeAtXY(int x, int y, double scale) {
     x /= scale;
     y /= scale;
-    Iterator<CommunityNode> nodes = graph.getNodes("All");
+    Iterator<Node> nodes = graph.getNodes("All");
     Rectangle r = new Rectangle(0, 0, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER);
     while (nodes.hasNext()) {
       CommunityNode node = (CommunityNode) nodes.next();
@@ -1153,34 +1157,15 @@ public class FruchGPUPlacer extends AbstractPlacer {
   }
 
   @Override
-  public int getX(CommunityNode node) {
+  public int getX(Node node) {
     return (int) getCoordinates(node).getX();
   }
 
   @Override
-  public int getY(CommunityNode node) {
+  public int getY(Node node) {
     return (int) getCoordinates(node).getY();
   }
 
-  @Override
-  public int getCommunityX(int community) {
-    return 0;
-  }
-
-  @Override
-  public int getCommunityY(int community) {
-    return 0;
-  }
-
-  @Override
-  public int getCommunityWidth(int community) {
-    return 0;
-  }
-
-  @Override
-  public int getCommunityHeight(int community) {
-    return 0;
-  }
   
   public static void main(String[] args) throws IOException{
     if(args.length == 0){

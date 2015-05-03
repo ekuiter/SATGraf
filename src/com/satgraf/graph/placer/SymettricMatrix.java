@@ -1,4 +1,4 @@
-package com.satgraf.community.placer;
+package com.satgraf.graph.placer;
 
 public class SymettricMatrix {
 	

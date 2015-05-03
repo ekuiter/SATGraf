@@ -1,7 +1,7 @@
 package com.satgraf.evolution2.UI;
 
 import com.satgraf.community.UI.CommunityGraphViewer;
-import com.satlib.community.placer.CommunityPlacer;
+import com.satgraf.community.placer.CommunityPlacer;
 import com.satlib.evolution.Evolution;
 import com.satlib.evolution.EvolutionGraph;
 import gnu.trove.map.hash.TIntObjectHashMap;

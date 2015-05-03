@@ -6,13 +6,13 @@
 
 package com.satgraf.community.placer;
 
+import com.satgraf.graph.placer.KKPlacer;
+import com.satgraf.graph.placer.AbstractPlacer;
 import com.satlib.community.Community;
 import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityGraphAdapter;
 import com.satlib.community.CommunityNode;
-import com.satlib.community.placer.AbstractPlacer;
-import com.satlib.community.placer.CommunityPlacerFactory;
 import com.satlib.graph.DrawableNode;
 import com.satlib.graph.UnionFind;
 import gnu.trove.list.array.TIntArrayList;
@@ -28,7 +28,7 @@ import java.util.Iterator;
  *
  * @author zacknewsham
  */
-public class GridKKPlacer extends AbstractPlacer{
+public class GridKKPlacer extends AbstractPlacer<CommunityNode, CommunityGraph> implements CommunityPlacer{
   static{
     CommunityPlacerFactory.getInstance().register("gkk", GridKKPlacer.class);
   }

@@ -8,8 +8,8 @@ package com.satgraf.community.UI;
 
 import com.satlib.community.CommunityGraphFactory;
 import com.satlib.community.CommunityGraphFactoryFactory;
-import com.satlib.community.placer.CommunityPlacer;
-import com.satlib.community.placer.CommunityPlacerFactory;
+import com.satgraf.community.placer.CommunityPlacer;
+import com.satgraf.community.placer.CommunityPlacerFactory;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;

@@ -8,8 +8,8 @@ package com.satgraf.community.UI;
 
 import com.satlib.community.CommunityGraphFactory;
 import com.satlib.community.CommunityGraphFactoryFactory;
-import com.satlib.community.placer.CommunityPlacer;
-import com.satlib.community.placer.CommunityPlacerFactory;
+import com.satgraf.community.placer.CommunityPlacer;
+import com.satgraf.community.placer.CommunityPlacerFactory;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;

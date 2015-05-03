@@ -8,12 +8,16 @@ package com.satgraf.community.UI;
 
 import static com.satgraf.ForceInit.forceInit;
 import com.satgraf.community.placer.CircularCommunityPlacer;
-import com.satgraf.community.placer.FruchGPUPlacer;
-import com.satgraf.community.placer.FruchPlacer;
+import com.satgraf.community.placer.CommunityPlacer;
+import com.satgraf.community.placer.CommunityPlacerFactory;
 import com.satgraf.community.placer.GridPlacer;
-import com.satgraf.community.placer.KKPlacer;
+import com.satgraf.community.placer.JSONCommunityPlacer;
 import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphFrame;
+import com.satgraf.graph.placer.FruchGPUPlacer;
+import com.satgraf.graph.placer.FruchPlacer;
+import com.satgraf.graph.placer.KKPlacer;
+import com.satgraf.graph.placer.PlacerFactory;
 import com.satlib.community.CNMCommunityMetric;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityGraphFactory;
@@ -23,8 +27,6 @@ import com.satlib.community.CommunityMetricFactory;
 import com.satlib.community.JSONCommunityGraph;
 import com.satlib.community.LouvianCommunityMetric;
 import com.satlib.community.OLCommunityMetric;
-import com.satlib.community.placer.CommunityPlacer;
-import com.satlib.community.placer.CommunityPlacerFactory;
 import com.validatedcl.validation.Help;
 import com.validatedcl.validation.ValidatedCommandLine;
 import com.validatedcl.validation.ValidatedOption;
@@ -92,7 +94,7 @@ public class CommunityGraphFrame extends GraphFrame{
   public void fromJson(JSONObject json){
     JSONCommunityGraph graph = new JSONCommunityGraph((JSONObject)json.get("graphViewer"));
     graph.init();
-    this.graphViewer = new CommunityGraphViewer(graph, graph.getNodeLists(), graph);
+    this.graphViewer = new CommunityGraphViewer(graph, graph.getNodeLists(), new JSONCommunityPlacer(graph));
     this.patterns = new HashMap<>();
     init();
     show();
@@ -134,7 +136,17 @@ public class CommunityGraphFrame extends GraphFrame{
     
     o = new ValidatedOption("l","layout",true,"The layout algorithm to use");
     o.setDefault("f");
-    o.addRule(new ListValidationRule(CommunityPlacerFactory.getInstance().getNames()));
+    String[] names = new String[CommunityPlacerFactory.getInstance().getNames().length + PlacerFactory.getInstance().getNames().length];
+    int i = 0;
+    for(String name : PlacerFactory.getInstance().getNames()){
+      names[i] = name;
+      i++;
+    }
+    for(String name : CommunityPlacerFactory.getInstance().getNames()){
+      names[i] = name;
+      i++;
+    }
+    o.addRule(new ListValidationRule(names));
     options.addOption(o);
     
     o = new ValidatedOption("p", "pattern",true,"A list of regex expressions to group variables (not yet implemented)");
