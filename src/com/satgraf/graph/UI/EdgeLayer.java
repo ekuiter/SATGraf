@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -90,6 +91,10 @@ public class EdgeLayer extends Layer {
       int startY = (int) (c.getStart().getY(graph) * scale);
       int endX = (int) (c.getEnd().getX(graph) * scale);
       int endY = (int) (c.getEnd().getY(graph) * scale);
+      /*Rectangle r = new Rectangle(startX, startY, endX, endY);
+      if(r.intersects(this.getVisibleRect())==false){
+        return;
+      }*/
       
       synchronized (graph) {
         g.setColor(getColor(c));

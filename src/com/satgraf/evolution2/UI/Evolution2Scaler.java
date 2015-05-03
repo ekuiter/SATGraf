@@ -1,5 +1,7 @@
 package com.satgraf.evolution2.UI;
 
+import com.satlib.community.CommunityEdge;
+import com.satlib.community.CommunityMetric;
 import com.satlib.evolution.Evolution2GraphViewer;
 import com.satlib.evolution.Evolution;
 import com.satlib.evolution.observers.EvolutionObserver;
@@ -37,6 +39,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
   private Timer changeSlideTimer = new Timer(10, this);
   private final JButton play = new JButton("Play");
   private boolean timerTriggered = false;
+  private CommunityMetric metric;
 
   public Evolution2Scaler(final Evolution2GraphViewer graphviewer) {
     this.graphviewer = graphviewer;
@@ -119,7 +122,12 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
     progress.revalidate();
     progress.repaint();
   }
-
+  
+  @Override
+  public void setCommunityMetric(CommunityMetric metric){
+    this.metric = metric;
+  }
+  
   @Override
   public void updateGraph() {
     graphviewer.setUpdatedNodes(new ArrayList<Node>(evolution.getUpdatedNodes()));
@@ -183,12 +191,19 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
     return evolution.getCurrentConflict();
   }
 
+  
   @Override
-  public void clauseAdded(Clause c) {
+  public void addEdge(CommunityEdge e){
+    
+  }
+  
+  @Override
+  public void removeEdge(CommunityEdge e){
+    
   }
 
   @Override
-  public void nodeAssigned(CommunityNode n, boolean isDecision) {
+  public void nodeAssigned(CommunityNode n, Node.NodeAssignmentState state, boolean isDecision) {
     if(isDecision){
       graphviewer.notifyObservers(GraphObserver.Action.decisionVariable);
     }

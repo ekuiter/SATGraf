@@ -8,11 +8,14 @@ package com.satgraf.evolution2.observers;
 
 import com.satlib.evolution.Evolution2GraphViewer;
 import com.satlib.community.Community;
+import com.satlib.community.CommunityEdge;
+import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityNode;
 import com.satlib.evolution.EvolutionGraph;
 import com.satlib.evolution.observers.EvolutionObserver;
 import com.satlib.evolution.observers.EvolutionObserverFactory;
 import com.satlib.graph.Clause;
+import com.satlib.graph.Node;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GradientPaint;
@@ -71,6 +74,7 @@ public class VSIDSSpacialLocalityEvolutionObserver extends JPanel implements Vis
   private final JRadioButton rdoDistributionRatio = new JRadioButton();
   private final JRadioButton rdoCommunity = new JRadioButton();
   private Comparator currentComparator = COMMUNITY_COMPARATOR;
+  private CommunityMetric metric;
   static{
     EvolutionObserverFactory.getInstance().register("VSIDSS", VSIDSSpacialLocalityEvolutionObserver.class);
   }
@@ -212,13 +216,28 @@ public class VSIDSSpacialLocalityEvolutionObserver extends JPanel implements Vis
     
   }
 
+  
   @Override
-  public void clauseAdded(Clause c) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  public void setCommunityMetric(CommunityMetric metric){
+    this.metric = metric;
+  }
+  
+  
+  @Override
+  public void addEdge(CommunityEdge e){
+    
+  }
+  
+  @Override
+  public void removeEdge(CommunityEdge e){
+    
   }
 
   @Override
-  public void nodeAssigned(CommunityNode n, boolean isDecision) {
+  public void nodeAssigned(CommunityNode n, Node.NodeAssignmentState state, boolean isDecision) {
+    if(state == Node.NodeAssignmentState.UNASSIGNED){
+      return;
+    }
     if(isDecision){
       while(dataset.getColumnCount() == 0){}
       synchronized(dataset){

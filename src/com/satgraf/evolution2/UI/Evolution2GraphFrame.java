@@ -1,6 +1,5 @@
 package com.satgraf.evolution2.UI;
 
-import com.satlib.evolution.Evolution2GraphViewer;
 import static com.satgraf.ForceInit.forceInit;
 import com.satgraf.community.UI.CommunityGraphFrame;
 import com.satgraf.community.placer.CircularCommunityPlacer;
@@ -10,12 +9,14 @@ import com.satgraf.community.placer.GridKKPlacer;
 import com.satgraf.community.placer.GridPlacer;
 import com.satgraf.community.placer.KKPlacer;
 import com.satgraf.evolution2.observers.EvolutionObserverFactory;
+import com.satgraf.evolution2.observers.QEvolutionObserver;
 import com.satgraf.evolution2.observers.VSIDSSpacialLocalityEvolutionObserver;
 import com.satgraf.evolution2.observers.VSIDSTemporalLocalityEvolutionObserver;
 import com.satgraf.evolution2.observers.VisualEvolutionObserver;
 import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphOptionsPanel;
 import com.satlib.community.CNMCommunityMetric;
+import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
 import com.satlib.community.LouvianCommunityMetric;
@@ -23,6 +24,7 @@ import com.satlib.community.OLCommunityMetric;
 import com.satlib.community.placer.CommunityPlacer;
 import com.satlib.community.placer.CommunityPlacerFactory;
 import com.satlib.evolution.DimacsEvolutionGraphFactory;
+import com.satlib.evolution.Evolution2GraphViewer;
 import com.satlib.evolution.EvolutionGraphFactory;
 import com.satlib.evolution.EvolutionGraphFactoryObserver;
 import com.satlib.evolution.observers.EvolutionObserver;
@@ -59,6 +61,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     forceInit(CNMCommunityMetric.class);
     forceInit(com.satgraf.evolution2.observers.EvolutionObserverFactory.class);
     forceInit(VSIDSTemporalLocalityEvolutionObserver.class);
+    forceInit(QEvolutionObserver.class);
     forceInit(VSIDSSpacialLocalityEvolutionObserver.class);
   }
   private EvolutionGraphFactory factory;
@@ -165,7 +168,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
         //"-f","./formula/27round.cnf",
         "-c","l",
         "-l","c",
-        //"-o","VSIDST"
+        "-o","Q"
       };
       System.out.print(Help.getHelp(options()));
       //return;
@@ -233,6 +236,8 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
       else{
         observer = EvolutionObserverFactory.getInstance().getByName(cl.getOptionValue("o"), factory.getGraph());
       }
+      CommunityMetric metric = CommunityMetricFactory.getInstance().getByName(comName);
+      observer.setCommunityMetric(metric);
       
       if(observer instanceof JPanel){
         panel.addPanel((JPanel)observer, observer.getName());

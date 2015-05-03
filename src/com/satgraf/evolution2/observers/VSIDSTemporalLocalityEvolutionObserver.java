@@ -6,11 +6,14 @@
 
 package com.satgraf.evolution2.observers;
 
+import com.satlib.community.CommunityEdge;
+import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityNode;
 import com.satlib.evolution.EvolutionGraph;
 import com.satlib.evolution.observers.EvolutionObserver;
 import com.satlib.evolution.observers.EvolutionObserverFactory;
 import com.satlib.graph.Clause;
+import com.satlib.graph.Node;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -48,6 +51,7 @@ public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements Ev
   private final JFreeChart objChart = ChartFactory.createXYLineChart("Communities used", "# Decision", "# Communities", dataset);
   private final ChartPanel chartPanel = new ChartPanel(objChart);
   private final JScrollPane chartScroll = new JScrollPane(chartPanel);
+  private CommunityMetric metric;
   static{
     EvolutionObserverFactory.getInstance().register("VSIDST", VSIDSTemporalLocalityEvolutionObserver.class);
   }
@@ -122,9 +126,15 @@ public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements Ev
   
   
   @Override
-  public void clauseAdded(Clause c) {
-    //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  public void addEdge(CommunityEdge e){
+    
   }
+  
+  @Override
+  public void removeEdge(CommunityEdge e){
+    
+  }
+  
   private synchronized void fullRedraw(){
     decisionSeries.clear();
     decisionSeries.add(0,0);
@@ -158,8 +168,17 @@ public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements Ev
     lblWorstCase.setText(String.valueOf(worstCase));
   }
 
+  
   @Override
-  public synchronized void nodeAssigned(CommunityNode n, boolean isDecision) {
+  public void setCommunityMetric(CommunityMetric metric){
+    this.metric = metric;
+  }
+  
+  @Override
+  public synchronized void nodeAssigned(CommunityNode n, Node.NodeAssignmentState state, boolean isDecision) {
+    if(state == Node.NodeAssignmentState.UNASSIGNED){
+      return;
+    }
     int windowSize = Integer.parseInt(txtWindowSize.getText());
     if(isDecision){
       decisions.add(n);
