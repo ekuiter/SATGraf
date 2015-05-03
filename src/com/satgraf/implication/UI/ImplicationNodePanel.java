@@ -7,7 +7,7 @@
 package com.satgraf.implication.UI;
 
 import com.satlib.graph.Edge;
-import com.satlib.graph.GraphViewer;
+import com.satgraf.graph.UI.GraphViewer;
 import com.satlib.implication.ImplicationNode;
 import java.awt.GridBagConstraints;
 import java.awt.event.ItemEvent;

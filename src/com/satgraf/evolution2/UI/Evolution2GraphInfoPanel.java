@@ -6,13 +6,12 @@
 
 package com.satgraf.evolution2.UI;
 
-import com.satlib.evolution.Evolution2GraphViewer;
 import com.satgraf.community.UI.CommunityGraphInfoPanel;
 import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityNode;
-import com.satlib.graph.GraphObserver;
-import com.satlib.graph.GraphViewer;
+import com.satgraf.graph.UI.GraphViewerObserver;
+import com.satgraf.graph.UI.GraphViewer;
 import java.awt.GridBagConstraints;
 import java.util.Collection;
 import javax.swing.JLabel;
@@ -22,7 +21,7 @@ import org.json.simple.JSONObject;
  *
  * @author zacknewsham
  */
-public class Evolution2GraphInfoPanel extends CommunityGraphInfoPanel implements GraphObserver{
+public class Evolution2GraphInfoPanel extends CommunityGraphInfoPanel implements GraphViewerObserver{
   private JLabel lblRatio1 = new JLabel("n/a");
   private JLabel lblRatio2 = new JLabel("n/a");
   private JLabel lblRatio3 = new JLabel("n/a");

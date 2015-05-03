@@ -1,20 +1,13 @@
 package com.satgraf.test;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import com.satlib.community.CommunityGraph;
 import com.satlib.community.OLCommunityMetric;
-import com.satgraf.evolution.UI.EvolutionGenerator;
 
 /*
  * To change this license header, choose License Headers in Project Properties.

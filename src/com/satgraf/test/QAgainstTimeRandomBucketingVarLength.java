@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.satlib.community.CommunityGraph;
-import com.satgraf.evolution.UI.EvolutionGenerator;
 
 /**
  *
@@ -26,7 +25,7 @@ import com.satgraf.evolution.UI.EvolutionGenerator;
 public class QAgainstTimeRandomBucketingVarLength extends com.satgraf.test.QAgainstTime{
   private String outdir;
   public void run(int vars, int clauses, int minLength, int maxLength, int rep, double avgLength) throws Exception{
-    CommunityGraph c = EvolutionGenerator.makeCommunity(vars, clauses, minLength, maxLength, avgLength);
+    CommunityGraph c = InstanceGenerator.makeCommunity(vars, clauses, minLength, maxLength, avgLength);
     f = new File(String.format(outdir + "/%d.%d.%d.%d.%f.%d.cnf", vars, clauses,minLength, maxLength, (double)Math.round(avgLength * 100) / 100, rep));
     if(f.exists()){
       return;

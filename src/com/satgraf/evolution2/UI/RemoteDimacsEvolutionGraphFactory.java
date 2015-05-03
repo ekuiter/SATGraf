@@ -7,8 +7,7 @@
 package com.satgraf.evolution2.UI;
 
 import com.satlib.NamedFifo;
-import com.satlib.community.CommunityGraph;
-import com.satlib.community.CommunityGraphViewer;
+import com.satgraf.community.UI.CommunityGraphViewer;
 import com.satlib.community.CommunityNode;
 import com.satlib.evolution.EvolutionGraph;
 import static com.satlib.evolution.EvolutionGraphFactoryFactory.pipeFileName;
@@ -75,16 +74,6 @@ public class RemoteDimacsEvolutionGraphFactory  extends com.satlib.evolution.Dim
     };
     Thread t = new Thread(r);
     t.start();
-  }
-
-  @Override
-  public void loadAdditionalGraphs()  throws FileNotFoundException, IOException{
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
-
-  @Override
-  public void addGraph(CommunityGraphViewer cg) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
   
 }

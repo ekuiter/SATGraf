@@ -12,7 +12,6 @@ import java.util.Iterator;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import com.satlib.graph.Clause;
-import com.satlib.graph.GraphViewer;
 import com.satlib.graph.Node;
 
 /**

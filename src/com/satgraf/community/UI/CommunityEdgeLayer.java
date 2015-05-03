@@ -6,7 +6,7 @@ import java.awt.Dimension;
 import com.satgraf.graph.UI.EdgeLayer;
 import com.satlib.community.CommunityEdge;
 import com.satlib.graph.Edge;
-import com.satlib.graph.GraphViewer;
+import com.satgraf.graph.UI.GraphViewer;
 
 
 public class CommunityEdgeLayer extends EdgeLayer {
@@ -22,7 +22,7 @@ public class CommunityEdgeLayer extends EdgeLayer {
 		if (ce.isConflictEdge()) {
 		  return Color.RED;
 	    } else if(ce.getStart().getCommunity() == ce.getEnd().getCommunity() && ce.getStart().getCommunity() != -1) {
-          return e.getColor(graph);
+          return graph.getColor(e);
 	    } else {
 	      return Color.WHITE;
 	    }

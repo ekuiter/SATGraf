@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.satlib.community.CommunityGraph;
-import com.satgraf.evolution.UI.EvolutionGenerator;
 
 /**
  *
@@ -24,7 +23,7 @@ import com.satgraf.evolution.UI.EvolutionGenerator;
  */
 public class QAgainstTimeRandomBucketingFixedCVR extends com.satgraf.test.QAgainstTime{
     public void run(int vars, int clauses, int buckets, double prob) throws Exception{
-    CommunityGraph c = EvolutionGenerator.makeCommunity(vars, clauses, buckets, prob);
+    CommunityGraph c = InstanceGenerator.makeCommunity(vars, clauses, buckets, prob);
     f = new File(String.format("/home/zacknewsham/results/%d.%d.%d.%f.dimacs", vars, clauses, buckets, prob));
     File f1 = new File(String.format("/home/zacknewsham/results/%d.%d.%d.%f.dist", vars, clauses, buckets, prob));
     c.writeDimacs(f);

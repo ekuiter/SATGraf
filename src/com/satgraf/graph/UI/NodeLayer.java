@@ -3,7 +3,6 @@ package com.satgraf.graph.UI;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -12,7 +11,6 @@ import java.util.concurrent.Future;
 
 import com.satgraf.UI.Layer;
 import com.satlib.graph.DrawableNode;
-import com.satlib.graph.GraphViewer;
 import com.satlib.graph.Node;
 
 public class NodeLayer extends Layer {
@@ -76,7 +74,7 @@ public class NodeLayer extends Layer {
 	}
 	
 	protected Color getColor(Node n) {
-		return n.getColor(graph);
+		return graph.getColor(n);
 	}
 	  
 	private void drawNode(Node n) {	  
@@ -88,8 +86,8 @@ public class NodeLayer extends Layer {
 		  
 	private void drawNodeWithColor(Node n, Color color, Color fillColor) {
 		int diameter = (int) (DrawableNode.NODE_DIAMETER * graph.getScale());
-		int x = (int) (n.getX(graph) * graph.getScale()) - diameter/2;
-		int y = (int) (n.getY(graph) * graph.getScale()) - diameter/2;
+		int x = (int) (graph.getX(n) * graph.getScale()) - diameter/2;
+		int y = (int) (graph.getY(n) * graph.getScale()) - diameter/2;
 			 
 		synchronized (graph) {
 			g.setColor(color);

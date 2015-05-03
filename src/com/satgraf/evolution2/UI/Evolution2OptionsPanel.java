@@ -1,6 +1,5 @@
 package com.satgraf.evolution2.UI;
 
-import com.satlib.evolution.Evolution2GraphViewer;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.Collection;

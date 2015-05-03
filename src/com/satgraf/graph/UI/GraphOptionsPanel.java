@@ -5,8 +5,6 @@
 package com.satgraf.graph.UI;
 
 import com.satgraf.UI.JAccordianPanel;
-import com.satlib.graph.GraphObserver;
-import com.satlib.graph.GraphViewer;
 import java.awt.Dimension;
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,7 +19,7 @@ import org.json.simple.JSONObject;
  *
  * @author zacknewsham
  */
-public abstract class GraphOptionsPanel extends JSplitPane implements GraphObserver{
+public abstract class GraphOptionsPanel extends JSplitPane implements GraphViewerObserver{
   private GraphViewer graph;
   protected OptionsPanel optionsPanel;
   protected GraphInfoPanel infoPanel;
@@ -129,7 +127,7 @@ public abstract class GraphOptionsPanel extends JSplitPane implements GraphObser
   }
   
   @Override
-  public void notify(GraphViewer graph, GraphObserver.Action action){
+  public void notify(GraphViewer graph, GraphViewerObserver.Action action){
     this.update();
     if(action == Action.selectnode){
       this.getNodePanel().setNode(graph.getSelectedNode());

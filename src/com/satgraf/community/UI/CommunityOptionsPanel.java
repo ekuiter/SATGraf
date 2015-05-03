@@ -22,7 +22,6 @@ import com.satgraf.graph.UI.GraphOptionsPanel;
 import com.satgraf.graph.UI.NodePanel;
 import com.satgraf.graph.UI.OptionsPanel;
 import com.satlib.community.CommunityEdge;
-import com.satlib.community.CommunityGraphViewer;
 import com.satlib.graph.Edge;
 
 /**

@@ -1,6 +1,5 @@
 package com.satgraf.evolution2.UI;
 
-import com.satlib.evolution.Evolution2GraphViewer;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -8,7 +7,7 @@ import java.awt.Graphics;
 import com.satgraf.UI.Layer;
 import com.satgraf.graph.UI.HighlightLayer;
 import com.satlib.graph.DrawableNode;
-import com.satlib.graph.GraphViewer;
+import com.satgraf.graph.UI.GraphViewer;
 import com.satlib.graph.Node;
 
 public class DecisionVariableLayer extends Layer {
@@ -38,8 +37,8 @@ public class DecisionVariableLayer extends Layer {
 	    int diameter_large = diameter*2 + 3;
 	    int disp_large = (diameter_large / 2) - diameter / 2;
 
-	    int x = (int) ((n.getX(graph)) * graph.getScale()) - diameter/2;
-	    int y = (int) ((n.getY(graph)) * graph.getScale()) - diameter/2;
+	    int x = (int) ((graph.getX(n)) * graph.getScale()) - diameter/2;
+	    int y = (int) ((graph.getY(n)) * graph.getScale()) - diameter/2;
 	    
 	    if (n.getActivity() > 0) {
 	    	g.setColor(Color.RED);

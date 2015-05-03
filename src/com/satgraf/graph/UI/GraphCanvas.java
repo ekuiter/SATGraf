@@ -18,15 +18,13 @@ import javax.swing.JLayeredPane;
 
 import org.json.simple.JSONObject;
 
-import com.satlib.graph.GraphObserver;
-import com.satlib.graph.GraphViewer;
 import com.satlib.graph.Node;
 
 /**
  *
  * @author zacknewsham
  */
-public class GraphCanvas extends JLayeredPane implements MouseListener, MouseMotionListener, GraphObserver {
+public class GraphCanvas extends JLayeredPane implements MouseListener, MouseMotionListener, GraphViewerObserver {
 
   protected GraphViewer graph;
   private Node clickedVariable = null;
@@ -171,7 +169,7 @@ public class GraphCanvas extends JLayeredPane implements MouseListener, MouseMot
   }
 
   @Override
-  public void notify(GraphViewer graph, GraphObserver.Action action) {
+  public void notify(GraphViewer graph, GraphViewerObserver.Action action) {
     if (action == Action.setscale) {
       revalidate();
     } else if (action == Action.updatedEdges || action == Action.updatedNodes) {

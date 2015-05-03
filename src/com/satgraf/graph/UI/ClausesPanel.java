@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import javax.swing.JPanel;
 import com.satlib.graph.Clause;
-import com.satlib.graph.GraphViewer;
 
 /**
  *

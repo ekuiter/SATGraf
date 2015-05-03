@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.satlib.community.CommunityGraph;
-import com.satgraf.evolution.UI.EvolutionGenerator;
 
 /**
  *
@@ -24,7 +23,7 @@ import com.satgraf.evolution.UI.EvolutionGenerator;
 public class QAgainstTimeRandomBucketingNoQ extends com.satgraf.test.QAgainstTime{
   private String outdir;
   public void run(int vars, int clauses, int rep) throws Exception{
-    CommunityGraph c = EvolutionGenerator.makeCommunity(vars, clauses, 3);
+    CommunityGraph c = InstanceGenerator.makeCommunity(vars, clauses, 3);
     f = new File(String.format(outdir + "/%d.%d.%d.cnf", vars, clauses, rep));
     c.writeDimacs(f);
     timeout = 60 * 15 * 1000;

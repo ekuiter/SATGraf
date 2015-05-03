@@ -6,7 +6,6 @@
 
 package com.satgraf.graph.UI;
 
-import com.satlib.graph.GraphViewer;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;

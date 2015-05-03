@@ -8,7 +8,6 @@ package com.satgraf.community.UI;
 
 import com.satgraf.graph.UI.GraphInfoPanel;
 import com.satlib.community.CommunityGraph;
-import com.satlib.community.CommunityGraphViewer;
 import java.awt.GridBagConstraints;
 import javax.swing.JLabel;
 

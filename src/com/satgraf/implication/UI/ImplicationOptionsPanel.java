@@ -6,8 +6,8 @@
 
 package com.satgraf.implication.UI;
 
-import com.satlib.graph.GraphObserver;
-import com.satlib.graph.GraphViewer;
+import com.satgraf.graph.UI.GraphViewerObserver;
+import com.satgraf.graph.UI.GraphViewer;
 import java.util.Collection;
 import org.json.simple.JSONObject;
 import com.satgraf.graph.UI.GraphFrame;
@@ -40,7 +40,7 @@ public class ImplicationOptionsPanel extends GraphOptionsPanel{
   }
 
   @Override
-  public void notify(GraphViewer graph, GraphObserver.Action action) {
+  public void notify(GraphViewer graph, GraphViewerObserver.Action action) {
     super.update();
     optionsPanel.update();
   }

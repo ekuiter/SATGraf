@@ -13,7 +13,6 @@ import java.util.Iterator;
 import com.satgraf.UI.Layer;
 import com.satlib.graph.DrawableNode;
 import com.satlib.graph.Edge;
-import com.satlib.graph.GraphViewer;
 import com.satlib.graph.Node;
 
 public class HighlightLayer<T extends GraphViewer> extends Layer {
@@ -82,10 +81,10 @@ public class HighlightLayer<T extends GraphViewer> extends Layer {
         g2.setColor(HIGHLIGHT_COLOR);
         Rectangle bounds = g.getClipBounds();
         g2.setStroke(new BasicStroke(5));
-        int x1 = (int) ((e.getStart().getX(graph)) * graph.getScale());
-        int y1 = (int) ((e.getStart().getY(graph)) * graph.getScale());
-        int x2 = (int) ((e.getEnd().getX(graph)) * graph.getScale());
-        int y2 = (int) ((e.getEnd().getY(graph)) * graph.getScale());
+        int x1 = (int) (graph.getX(e.getStart()) * graph.getScale());
+        int y1 = (int) (graph.getY(e.getStart()) * graph.getScale());
+        int x2 = (int) (graph.getX(e.getEnd()) * graph.getScale());
+        int y2 = (int) (graph.getY(e.getEnd()) * graph.getScale());
 
         g.drawLine(x1, y1, x2, y2);
         g2.setColor(Color.BLACK);
@@ -97,8 +96,8 @@ public class HighlightLayer<T extends GraphViewer> extends Layer {
     g2.setStroke(s);
     g.setColor(HIGHLIGHT_COLOR);
     scaled_diameter += 1;
-    int x = (int) ((n.getX(graph)) * graph.getScale()) - scaled_diameter / 2;
-    int y = (int) ((n.getY(graph)) * graph.getScale()) - scaled_diameter / 2;
+    int x = (int) (graph.getX(n) * graph.getScale()) - scaled_diameter / 2;
+    int y = (int) (graph.getY(n) * graph.getScale()) - scaled_diameter / 2;
     g.fillArc(x, y, scaled_diameter, scaled_diameter, 0, 360);
     g.setColor(Color.BLACK);
     g.drawArc(x, y, scaled_diameter, scaled_diameter, 0, 360);

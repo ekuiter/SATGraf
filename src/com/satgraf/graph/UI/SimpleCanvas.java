@@ -4,8 +4,6 @@
  */
 package com.satgraf.graph.UI;
 
-import com.satlib.graph.GraphViewer;
-
 /**
  *
  * @author zacknewsham

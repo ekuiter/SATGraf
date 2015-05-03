@@ -24,7 +24,6 @@ import com.satlib.community.OLCommunityMetric;
 import com.satlib.community.placer.CommunityPlacer;
 import com.satlib.community.placer.CommunityPlacerFactory;
 import com.satlib.evolution.DimacsEvolutionGraphFactory;
-import com.satlib.evolution.Evolution2GraphViewer;
 import com.satlib.evolution.EvolutionGraphFactory;
 import com.satlib.evolution.EvolutionGraphFactoryObserver;
 import com.satlib.evolution.observers.EvolutionObserver;

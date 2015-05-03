@@ -2,14 +2,13 @@ package com.satgraf.evolution2.UI;
 
 import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityMetric;
-import com.satlib.evolution.Evolution2GraphViewer;
 import com.satlib.evolution.Evolution;
 import com.satlib.evolution.observers.EvolutionObserver;
 import com.satlib.evolution.observers.EvolutionObserverFactory;
 import com.satlib.community.CommunityNode;
 import com.satlib.graph.Clause;
 import com.satlib.graph.Edge;
-import com.satlib.graph.GraphObserver;
+import com.satgraf.graph.UI.GraphViewerObserver;
 import com.satlib.graph.Node;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -205,7 +204,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
   @Override
   public void nodeAssigned(CommunityNode n, Node.NodeAssignmentState state, boolean isDecision) {
     if(isDecision){
-      graphviewer.notifyObservers(GraphObserver.Action.decisionVariable);
+      graphviewer.notifyObservers(GraphViewerObserver.Action.decisionVariable);
     }
   }
 

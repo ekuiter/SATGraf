@@ -8,7 +8,7 @@ package com.satgraf.community.UI;
 
 import com.satgraf.graph.UI.NodePanel;
 import com.satgraf.graph.UI.EdgeCheckBoxPanel;
-import com.satlib.graph.GraphViewer;
+import com.satgraf.graph.UI.GraphViewer;
 import com.satlib.community.CommunityNode;
 import com.satlib.community.CommunityEdge;
 import java.awt.BorderLayout;

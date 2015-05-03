@@ -19,7 +19,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import com.satlib.graph.Edge;
-import com.satlib.graph.GraphViewer;
 import com.satlib.graph.Node;
 
 /**

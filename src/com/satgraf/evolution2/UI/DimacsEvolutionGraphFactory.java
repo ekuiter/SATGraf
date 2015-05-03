@@ -6,10 +6,9 @@
 
 package com.satgraf.evolution2.UI;
 
-import com.satgraf.graph.UI.GraphFrame;
+import com.satgraf.community.UI.CommunityGraphViewer;
 import com.satlib.NamedFifo;
 import com.satlib.community.CommunityGraph;
-import com.satlib.community.CommunityGraphViewer;
 import com.satlib.community.CommunityNode;
 import com.satlib.evolution.EvolutionGraph;
 import static com.satlib.evolution.EvolutionGraphFactoryFactory.pipeFileName;
@@ -21,11 +20,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.SwingUtilities;
-import java.util.Timer;
 
 /**
  *
@@ -107,15 +105,5 @@ public class DimacsEvolutionGraphFactory extends com.satlib.evolution.DimacsEvol
     finally{
       watchdog.cancel();
     }
-  }
-
-  @Override
-  public void loadAdditionalGraphs()  throws FileNotFoundException, IOException{
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
-
-  @Override
-  public void addGraph(CommunityGraphViewer cg) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 }

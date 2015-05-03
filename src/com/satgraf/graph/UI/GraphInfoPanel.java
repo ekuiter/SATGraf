@@ -7,7 +7,6 @@
 package com.satgraf.graph.UI;
 
 import com.satlib.graph.Graph;
-import com.satlib.graph.GraphViewer;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;

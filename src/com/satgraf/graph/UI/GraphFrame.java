@@ -11,7 +11,6 @@ import com.satgraf.actions.ExportAction;
 import com.satgraf.actions.OpenAction;
 import com.satgraf.actions.SaveAction;
 import com.satlib.Progressive;
-import com.satlib.graph.GraphViewer;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;

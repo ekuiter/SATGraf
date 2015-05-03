@@ -6,7 +6,7 @@
 
 package com.satgraf.implication.UI;
 
-import com.satlib.graph.GraphViewer;
+import com.satgraf.graph.UI.GraphViewer;
 import com.satlib.implication.ImplicationNode;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;

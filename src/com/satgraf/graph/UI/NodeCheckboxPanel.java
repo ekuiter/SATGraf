@@ -17,7 +17,6 @@ import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.json.simple.JSONObject;
-import com.satlib.graph.GraphViewer;
 import com.satlib.graph.Node;
 
 /**

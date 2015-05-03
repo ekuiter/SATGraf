@@ -7,7 +7,6 @@ package com.satgraf.community.UI;
 import com.satgraf.graph.UI.EdgeLayer;
 import com.satgraf.graph.UI.GraphCanvas;
 import com.satgraf.graph.UI.HighlightLayer;
-import com.satlib.community.CommunityGraphViewer;
 import java.awt.Graphics;
 
 /**

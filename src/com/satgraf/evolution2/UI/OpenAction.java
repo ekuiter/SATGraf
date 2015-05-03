@@ -6,11 +6,10 @@
 
 package com.satgraf.evolution2.UI;
 
-import com.satlib.evolution.Evolution2GraphViewer;
 import com.satgraf.community.UI.CommunityGraphFrame;
 import com.satlib.community.CommunityGraphFactory;
 import com.satlib.community.CommunityGraphFactoryFactory;
-import com.satlib.community.CommunityGraphViewer;
+import com.satgraf.community.UI.CommunityGraphViewer;
 import com.satlib.community.placer.CommunityPlacer;
 import com.satlib.community.placer.CommunityPlacerFactory;
 import com.satlib.evolution.EvolutionGraphFactory;

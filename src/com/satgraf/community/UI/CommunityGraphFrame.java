@@ -12,14 +12,12 @@ import com.satgraf.community.placer.FruchGPUPlacer;
 import com.satgraf.community.placer.FruchPlacer;
 import com.satgraf.community.placer.GridPlacer;
 import com.satgraf.community.placer.KKPlacer;
-import com.satgraf.evolution.UI.EvolutionGraphFrame;
 import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphFrame;
 import com.satlib.community.CNMCommunityMetric;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityGraphFactory;
 import com.satlib.community.CommunityGraphFactoryFactory;
-import com.satlib.community.CommunityGraphViewer;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
 import com.satlib.community.JSONCommunityGraph;
@@ -92,15 +90,13 @@ public class CommunityGraphFrame extends GraphFrame{
   }
   
   public void fromJson(JSONObject json){
-    if(!(this instanceof EvolutionGraphFrame)){
-      JSONCommunityGraph graph = new JSONCommunityGraph((JSONObject)json.get("graphViewer"));
-      graph.init();
-      this.graphViewer = new CommunityGraphViewer(graph, graph.getNodeLists(), graph);
-      this.patterns = new HashMap<>();
-      init();
-      show();
-      this.graphViewer.fromJson((JSONObject)json.get("graphViewer"));
-    }
+    JSONCommunityGraph graph = new JSONCommunityGraph((JSONObject)json.get("graphViewer"));
+    graph.init();
+    this.graphViewer = new CommunityGraphViewer(graph, graph.getNodeLists(), graph);
+    this.patterns = new HashMap<>();
+    init();
+    show();
+    this.graphViewer.fromJson((JSONObject)json.get("graphViewer"));
     super.fromJson(json);
   }
   public String toJson(){

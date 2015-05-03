@@ -2,7 +2,6 @@ package com.satgraf.graph.UI;
 
 import com.satgraf.UI.Layer;
 import com.satlib.graph.Edge;
-import com.satlib.graph.GraphViewer;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -87,10 +86,10 @@ public class EdgeLayer extends Layer {
     }
 
     if(c.getStart().isVisible() && c.getEnd().isVisible()){
-      int startX = (int) (c.getStart().getX(graph) * scale);
-      int startY = (int) (c.getStart().getY(graph) * scale);
-      int endX = (int) (c.getEnd().getX(graph) * scale);
-      int endY = (int) (c.getEnd().getY(graph) * scale);
+      int startX = (int) (graph.getX(c.getStart()) * scale);
+      int startY = (int) (graph.getY(c.getStart()) * scale);
+      int endX = (int) (graph.getX(c.getEnd()) * scale);
+      int endY = (int) (graph.getY(c.getEnd()) * scale);
       /*Rectangle r = new Rectangle(startX, startY, endX, endY);
       if(r.intersects(this.getVisibleRect())==false){
         return;

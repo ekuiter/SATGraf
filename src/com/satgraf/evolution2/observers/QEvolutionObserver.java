@@ -12,7 +12,7 @@ import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityNode;
 import com.satlib.community.ConcreteCommunityGraph;
-import com.satlib.evolution.Evolution2GraphViewer;
+import com.satgraf.evolution2.UI.Evolution2GraphViewer;
 import com.satlib.evolution.EvolutionGraph;
 import com.satlib.graph.Clause;
 import com.satlib.graph.Node;
