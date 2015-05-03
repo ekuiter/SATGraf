@@ -48,7 +48,7 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   private Rectangle bounds = null;
 
   protected Collection<GraphViewerObserver> observers = new HashSet<>();
-  private Collection<Node> updatedNodes = null;
+  private final Collection<Node> updatedNodes = new ArrayList<Node>();
   private HashMap<Edge, List<Point[]>> updatedEdges = new HashMap<Edge, List<Point[]>>();
   
   private synchronized void edgeEvent(){
@@ -240,13 +240,9 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   }
 
   public void setUpdatedNodes(Collection<Node> updatedNodes) {
-    if (this.updatedNodes == null) {
-      this.updatedNodes = updatedNodes;
-    } else {
-      synchronized (this.updatedNodes) {
-        for (Node n : updatedNodes) {
-          this.updatedNodes.add(n);
-        }
+    synchronized (this.updatedNodes) {
+      for (Node n : updatedNodes) {
+        this.updatedNodes.add(n);
       }
     }
     notifyObservers(GraphViewerObserver.Action.updatedNodes);
@@ -254,10 +250,6 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
 
   public void addUpdatedNode(Node n, NodeState s, boolean updateCanvas) {
     n.setState(s);
-
-    if (this.updatedNodes == null) {
-      this.updatedNodes = new ArrayList<Node>();
-    }
 
     synchronized (this.updatedNodes) {
       this.updatedNodes.add(n);

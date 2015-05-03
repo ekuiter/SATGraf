@@ -89,7 +89,7 @@ public class CircularCommunityPlacer extends AbstractPlacer{
       Dimension d = new Dimension();
       d.setSize((radius * 2), (radius * 2));
       communitySizes.put(c, d);
-      FruchPlacer fr = new FruchPlacer(c, (int)d.getHeight(), (int)d.getWidth());
+      FruchPlacer fr = new FruchPlacer(c, (int)d.getWidth(), (int)d.getHeight());
       fr.init();
       /*for(CommunityNode n : c.getCommunityNodes()){
         double x = radius*Math.cos(inc) + 0;

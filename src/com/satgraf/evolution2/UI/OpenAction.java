@@ -7,9 +7,6 @@
 package com.satgraf.evolution2.UI;
 
 import com.satgraf.community.UI.CommunityGraphFrame;
-import com.satlib.community.CommunityGraphFactory;
-import com.satlib.community.CommunityGraphFactoryFactory;
-import com.satgraf.community.UI.CommunityGraphViewer;
 import com.satlib.community.placer.CommunityPlacer;
 import com.satlib.community.placer.CommunityPlacerFactory;
 import com.satlib.evolution.EvolutionGraphFactory;
@@ -45,7 +42,6 @@ public class OpenAction extends com.satgraf.actions.OpenAction<Evolution2GraphFr
       String[] parts = file.getAbsolutePath().split("\\.");
       if(parts[parts.length - 1].equals("cnf")){
         final EvolutionGraphFactory factory = (new Evolution2GraphFactoryFactory(frame.getCommunityName(), Evolution2GraphFrame.minisat)).getFactory(file,new HashMap<String, String>());
-        factory.addObserver(frame);
         OpenAction.this.frame.setFactory(factory);
         OpenAction.this.frame.setProgressive(factory);
         final SwingWorker worker1 = new SwingWorker<Void, Void>() {
@@ -127,6 +123,7 @@ public class OpenAction extends com.satgraf.actions.OpenAction<Evolution2GraphFr
         }
         JSONObject json = (JSONObject)JSONValue.parse(contents.toString());
         this.frame.fromJson(json);
+        reader.close();
       }
     } 
     catch (IOException ex) {

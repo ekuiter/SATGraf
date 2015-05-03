@@ -155,14 +155,14 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
   
   public Collection<CommunityEdge> getInterCommunityConnections(int community) {
     if(getGraph().getCommunity(community) == null){
-      return null;
+      return new ArrayList<>();
     }
     return getGraph().getCommunity(community).getInterCommunityEdges();
   }
 
   public Collection<CommunityEdge> getIntraCommunityConnections(int community) {
     if(getGraph().getCommunity(community) == null){
-      return null;
+      return new ArrayList<>();
     }
     return getGraph().getCommunity(community).getIntraCommunityEdges();
   }

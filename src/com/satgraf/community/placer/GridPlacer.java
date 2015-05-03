@@ -86,6 +86,8 @@ public class GridPlacer extends AbstractPlacer {
   public GridPlacer(CommunityGraph graph){
     super(graph);
   }
+  
+  @Override
   public int getCommunityAtXY(int x, int y){
     Iterator<Community> comms = graph.getCommunities().iterator();
     while(comms.hasNext()){
@@ -102,6 +104,8 @@ public class GridPlacer extends AbstractPlacer {
     }
     return -1;
   }
+  
+  @Override
   public CommunityNode getNodeAtXY(int x, int y, double scale) {
     x /= scale;
     y /= scale;

@@ -6,7 +6,6 @@ import com.satlib.evolution.Evolution;
 import com.satlib.evolution.observers.EvolutionObserver;
 import com.satlib.evolution.observers.EvolutionObserverFactory;
 import com.satlib.community.CommunityNode;
-import com.satlib.graph.Clause;
 import com.satlib.graph.Edge;
 import com.satgraf.graph.UI.GraphViewerObserver;
 import com.satlib.graph.Node;
@@ -32,7 +31,6 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 
   private final JSlider progress = new JSlider(0, 0, 0);
   private Evolution2GraphViewer graphviewer;
-  public final Evolution evolution;
   private JCheckBox showAssignedVarsBox = new JCheckBox("Show Assigned Variables");
 
   private Timer changeSlideTimer = new Timer(10, this);
@@ -42,7 +40,6 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 
   public Evolution2Scaler(final Evolution2GraphViewer graphviewer) {
     this.graphviewer = graphviewer;
-    this.evolution = new Evolution(this.graphviewer.getGraph());
     progress.setPreferredSize(new Dimension(100, 20));
     progress.setEnabled(false);
     EvolutionObserverFactory.getInstance().observers().add(this);
@@ -67,7 +64,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
       @Override
       public void mouseClicked(MouseEvent e) {
         updateShowAssignedVars(showAssignedVarsBox.isSelected());
-        evolution.getUpdatedNodes().addAll(graphviewer.getGraph().getNodes());
+        graphviewer.getEvolution().getUpdatedNodes().addAll(graphviewer.getGraph().getNodes());
         updateGraph();
       }
     });
@@ -78,8 +75,8 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
   private void stopTimer() {
     play.setText("Play");
     changeSlideTimer.stop();
-    evolution.setUpdateInProgress(false);
-    evolution.setDisplayDecisionVariableCount(0);
+    graphviewer.getEvolution().setUpdateInProgress(false);
+    graphviewer.getEvolution().setDisplayDecisionVariableCount(0);
     graphviewer.getGraph().clearDecisionVariable();
   }
 
@@ -100,12 +97,12 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 
   @Override
   public void stateChanged(ChangeEvent e) {
-    if (evolution.isUpdateInProgress()) {
+    if (graphviewer.getEvolution().isUpdateInProgress()) {
       return; // Wait until user is no longer dragging or there isn't a decision variable being drawn
     }
-    evolution.updatePosition(progress.getValue(), false);
+    graphviewer.getEvolution().updatePosition(progress.getValue(), false);
 
-    if (evolution.getCurrentPosition() == evolution.getTotalLines()) {
+    if (graphviewer.getEvolution().getCurrentPosition() == graphviewer.getEvolution().getTotalLines()) {
       graphviewer.getGraph().clearDecisionVariable();
       updateGraph();
     }
@@ -129,10 +126,10 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
   
   @Override
   public void updateGraph() {
-    graphviewer.setUpdatedNodes(new ArrayList<Node>(evolution.getUpdatedNodes()));
-    graphviewer.setUpdatedEdges(new ArrayList<Edge>(evolution.getUpdatedEdges()));
-    if (progress.getValue() != evolution.getCurrentPosition()) {
-      progress.setValue(evolution.getCurrentPosition());
+    graphviewer.setUpdatedNodes(new ArrayList<Node>(graphviewer.getEvolution().getUpdatedNodes()));
+    graphviewer.setUpdatedEdges(new ArrayList<Edge>(graphviewer.getEvolution().getUpdatedEdges()));
+    if (progress.getValue() != graphviewer.getEvolution().getCurrentPosition()) {
+      progress.setValue(graphviewer.getEvolution().getCurrentPosition());
     }
     this.timerTriggered = false;
   }
@@ -152,32 +149,32 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
     }
 
     if (graphviewer.getGraph().getDecisionVariable() != null) {
-      evolution.setDisplayDecisionVariableCount(evolution.getDisplayDecisionVariableCount()+1);
+      graphviewer.getEvolution().setDisplayDecisionVariableCount(graphviewer.getEvolution().getDisplayDecisionVariableCount()+1);
 
-      if (evolution.getDisplayDecisionVariableCount() >= graphviewer.getGraph().getDisplayDecisionVariableFor()) {
+      if (graphviewer.getEvolution().getDisplayDecisionVariableCount() >= graphviewer.getGraph().getDisplayDecisionVariableFor()) {
         graphviewer.getGraph().clearDecisionVariable();
-        evolution.setDisplayDecisionVariableCount(0);
-        evolution.setUpdateInProgress(false);
+        graphviewer.getEvolution().setDisplayDecisionVariableCount(0);
+        graphviewer.getEvolution().setUpdateInProgress(false);
       }
 
       return;
     }
 
-    if (evolution.getCurrentPosition() == -1) {
+    if (graphviewer.getEvolution().getCurrentPosition() == -1) {
       update = 1;
     } 
     else {
-      update = evolution.getCurrentPosition() + graphviewer.getGraph().getEvolutionSpeed();
+      update = graphviewer.getEvolution().getCurrentPosition() + graphviewer.getGraph().getEvolutionSpeed();
     }
 
-    if (update >= evolution.getTotalLines()) {
-      update = evolution.getTotalLines();
+    if (update >= graphviewer.getEvolution().getTotalLines()) {
+      update = graphviewer.getEvolution().getTotalLines();
     }
 
     timerTriggered = true;
-    evolution.updatePosition(update, timerTriggered);
+    graphviewer.getEvolution().updatePosition(update, timerTriggered);
 
-    if (evolution.getCurrentPosition() == evolution.getTotalLines()) {
+    if (graphviewer.getEvolution().getCurrentPosition() == graphviewer.getEvolution().getTotalLines()) {
       stopTimer();
     }
   }
@@ -187,7 +184,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
   }
 
   public int getCurrentConflict() {
-    return evolution.getCurrentConflict();
+    return graphviewer.getEvolution().getCurrentConflict();
   }
 
   
@@ -210,7 +207,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
 
   @Override
   public void newFileReady() {
-    progress.setMaximum(evolution.getTotalLines());
+    progress.setMaximum(graphviewer.getEvolution().getTotalLines());
     updateProgress();
     progress.setEnabled(true);
     play.setEnabled(true);

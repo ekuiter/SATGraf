@@ -29,17 +29,17 @@ public class Evolution2GraphFactoryFactory extends EvolutionGraphFactoryFactory{
   }
 
   public EvolutionGraphFactory getFactory(URL input, HashMap<String, String> patterns) {
-    if(DimacsEvolutionGraphFactory.current != null){
+    /*if(DimacsEvolutionGraphFactory.current != null){
       DimacsEvolutionGraphFactory.current.close();
-    }
+    }*/
     return instance = new RemoteDimacsEvolutionGraphFactory(this.metricName, patterns);
   }
 
   @Override
   public EvolutionGraphFactory getFactory(File input, HashMap<String, String> patterns) {
-    if(DimacsEvolutionGraphFactory.current != null){
+    /*if(DimacsEvolutionGraphFactory.current != null){
       DimacsEvolutionGraphFactory.current.close();
-    }
+    }*/
     return instance = new DimacsEvolutionGraphFactory(this.minisat, this.metricName, patterns);
   }
   

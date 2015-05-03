@@ -8,26 +8,25 @@ package com.satgraf.evolution2.UI;
 
 import com.satgraf.community.UI.CommunityGraphInfoPanel;
 import com.satlib.community.CommunityEdge;
-import com.satlib.community.CommunityGraph;
+import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityNode;
-import com.satgraf.graph.UI.GraphViewerObserver;
-import com.satgraf.graph.UI.GraphViewer;
+import com.satlib.evolution.observers.EvolutionObserver;
+import com.satlib.graph.Node;
 import java.awt.GridBagConstraints;
+import java.util.ArrayList;
 import java.util.Collection;
 import javax.swing.JLabel;
-import org.json.simple.JSONObject;
 
 /**
  *
  * @author zacknewsham
  */
-public class Evolution2GraphInfoPanel extends CommunityGraphInfoPanel implements GraphViewerObserver{
-  private JLabel lblRatio1 = new JLabel("n/a");
-  private JLabel lblRatio2 = new JLabel("n/a");
-  private JLabel lblRatio3 = new JLabel("n/a");
-  public Evolution2GraphInfoPanel(Evolution2GraphViewer graphViewwer) {
-    super(graphViewwer);
-    graphViewwer.addObserver(this);
+public class Evolution2GraphInfoPanel extends CommunityGraphInfoPanel implements EvolutionObserver{
+  private final JLabel lblRatio1 = new JLabel("n/a");
+  private final JLabel lblRatio2 = new JLabel("n/a");
+  private final JLabel lblRatio3 = new JLabel("n/a");
+  public Evolution2GraphInfoPanel(Evolution2GraphViewer graphViewer) {
+    super(graphViewer);
   }
   
   @Override
@@ -90,55 +89,63 @@ public class Evolution2GraphInfoPanel extends CommunityGraphInfoPanel implements
   }
 
   @Override
-  public void notify(GraphViewer graph, Action action) {
-    Collection<CommunityNode> decisions = ((Evolution2GraphViewer)graph).getGraph().getDecisionVariables();
-    if(action == Action.decisionVariable && decisions.size() % 10 == 0){
-      int lastCommunity = -1;
-      int interCom = 0;
-      int mostInterCom = 0;
-      int sameCom = 0;
-      for(CommunityNode n : decisions){
-        int interComEdges = 0;
-        for(CommunityEdge e : n.getEdgesList()){
-          if(e.getOpposite(n).getCommunity() != n.getCommunity()){
-            interComEdges++;
+  public void addEdge(CommunityEdge e) {
+  }
+
+  @Override
+  public void removeEdge(CommunityEdge e) {
+  }
+
+  private Collection<CommunityNode> decisions = new ArrayList<>();
+  @Override
+  public void nodeAssigned(CommunityNode node, Node.NodeAssignmentState state, boolean isDecision) {
+    if(isDecision){
+      decisions.add(node);
+      if(decisions.size() % 10 == 0){
+        int lastCommunity = -1;
+        int interCom = 0;
+        int mostInterCom = 0;
+        int sameCom = 0;
+        for(CommunityNode n : decisions){
+          int interComEdges = 0;
+          for(CommunityEdge e : n.getEdgesList()){
+            if(e.getOpposite(n).getCommunity() != n.getCommunity()){
+              interComEdges++;
+            }
           }
+          if(interComEdges != 0){
+            interCom++;
+          }
+          if(interComEdges > (double)n.getEdgesList().size() / 2.0){
+            mostInterCom++;
+          }
+          if(lastCommunity == n.getCommunity()){
+            sameCom++;
+          }
+          lastCommunity = n.getCommunity();
         }
-        if(interComEdges != 0){
-          interCom++;
-        }
-        if(interComEdges > (double)n.getEdgesList().size() / 2.0){
-          mostInterCom++;
-        }
-        if(lastCommunity == n.getCommunity()){
-          sameCom++;
-        }
-        lastCommunity = n.getCommunity();
+        Double d1 = (double)interCom/(double)decisions.size();
+        Double d2 = (double)mostInterCom/(double)decisions.size();
+        Double d3 = (double)sameCom/(double)(decisions.size() - 1);
+        lblRatio1.setText(d1.toString().substring(0, Math.min(d1.toString().length(), 5)));
+        lblRatio1.revalidate();
+        lblRatio2.setText(d2.toString().substring(0, Math.min(d2.toString().length(), 5)));
+        lblRatio2.revalidate();
+        lblRatio3.setText(d3.toString().substring(0, Math.min(d3.toString().length(), 5)));
+        lblRatio3.revalidate();
       }
-      Double d1 = (double)interCom/(double)decisions.size();
-      Double d2 = (double)mostInterCom/(double)decisions.size();
-      Double d3 = (double)sameCom/(double)(decisions.size() - 1);
-      lblRatio1.setText(d1.toString().substring(0, Math.min(d1.toString().length(), 5)));
-      lblRatio1.revalidate();
-      lblRatio2.setText(d2.toString().substring(0, Math.min(d2.toString().length(), 5)));
-      lblRatio2.revalidate();
-      lblRatio3.setText(d3.toString().substring(0, Math.min(d3.toString().length(), 5)));
-      lblRatio3.revalidate();
     }
   }
 
   @Override
-  public void initFromJson(JSONObject json) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  public void newFileReady() {
   }
 
   @Override
-  public String toJson() {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  public void setCommunityMetric(CommunityMetric metric) {
   }
 
   @Override
-  public String JsonName() {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  public void updateGraph() {
   }
 }

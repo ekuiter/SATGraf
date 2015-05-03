@@ -125,7 +125,7 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 				return;
 			}
 			
-			boolean scanWasApplied = scaler.evolution.scanToConflict(value, false);
+			boolean scanWasApplied = graph.getEvolution().scanToConflict(value, false);
 			
 			if (scanWasApplied) {
 				updateConflictDescription(value);

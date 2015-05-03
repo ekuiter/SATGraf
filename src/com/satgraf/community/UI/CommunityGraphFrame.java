@@ -187,10 +187,10 @@ public class CommunityGraphFrame extends GraphFrame{
       in = input;
       factory = ff.getFactory(input, patterns);
     }
-    
-    /*for (int i = 5; i < args.length; i += 2) {
-      patterns.put(args[i], args[i + 1]);
-    }*/
+    if(factory == null){
+      System.err.println("Factory is null");
+      return;
+    }
     
     CommunityGraphViewer graphViewer = new CommunityGraphViewer(null, factory.getNodeLists(), null);
     CommunityGraphFrame frmMain = new CommunityGraphFrame(graphViewer, factory.getPatterns(), factory.getMetric());

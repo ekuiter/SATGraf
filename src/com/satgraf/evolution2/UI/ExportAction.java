@@ -60,7 +60,7 @@ public class ExportAction extends com.satgraf.actions.ExportAction<Evolution2Gra
         for(line = 0; line < panel.scaler.getMaxLine(); line++){
           try {
             File tmp = new File(String.format("/tmp/satgraf/%d.jpg", line));
-            panel.scaler.evolution.advanceEvolution(line - 1, line, false);
+            frame.getGraphViewer().getEvolution().advanceEvolution(line - 1, line, false);
 
             if(line % FRAMES == 0){
               BufferedImage jpg = new BufferedImage(canvas.getFullWidth(), canvas.getFullHeight(), BufferedImage.TYPE_BYTE_INDEXED);
@@ -88,7 +88,7 @@ public class ExportAction extends com.satgraf.actions.ExportAction<Evolution2Gra
           Logger.getLogger(ExportAction.class.getName()).log(Level.SEVERE, null, ex);
         }
         frame.getGraphViewer().setScale(oldscale);
-        panel.scaler.evolution.advanceEvolution(panel.scaler.getMaxLine() - 1, 0, false);
+        frame.getGraphViewer().getEvolution().advanceEvolution(panel.scaler.getMaxLine() - 1, 0, false);
         return null;
       }
     };

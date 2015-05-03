@@ -6,18 +6,13 @@
 
 package com.satgraf.evolution2.UI;
 
-import com.satgraf.community.UI.CommunityGraphViewer;
 import com.satlib.NamedFifo;
-import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityNode;
 import com.satlib.evolution.EvolutionGraph;
 import static com.satlib.evolution.EvolutionGraphFactoryFactory.pipeFileName;
-import com.satlib.evolution.EvolutionGraphFactoryObserver;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Timer;
@@ -48,7 +43,6 @@ public class DimacsEvolutionGraphFactory extends com.satlib.evolution.DimacsEvol
     node_lists.put("All", list);
     buildEvolutionFile();
     graph = cg;
-    notifyObservers(EvolutionGraphFactoryObserver.Action.process);
   }  
 
   public void buildEvolutionFile() {

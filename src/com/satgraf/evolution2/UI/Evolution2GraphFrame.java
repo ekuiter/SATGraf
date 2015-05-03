@@ -16,7 +16,6 @@ import com.satgraf.evolution2.observers.VisualEvolutionObserver;
 import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphOptionsPanel;
 import com.satlib.community.CNMCommunityMetric;
-import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
 import com.satlib.community.LouvianCommunityMetric;
@@ -25,7 +24,6 @@ import com.satlib.community.placer.CommunityPlacer;
 import com.satlib.community.placer.CommunityPlacerFactory;
 import com.satlib.evolution.DimacsEvolutionGraphFactory;
 import com.satlib.evolution.EvolutionGraphFactory;
-import com.satlib.evolution.EvolutionGraphFactoryObserver;
 import com.satlib.evolution.observers.EvolutionObserver;
 import com.validatedcl.validation.Help;
 import com.validatedcl.validation.ValidatedCommandLine;
@@ -47,7 +45,7 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-public class Evolution2GraphFrame extends CommunityGraphFrame implements EvolutionGraphFactoryObserver {
+public class Evolution2GraphFrame extends CommunityGraphFrame {
   static{
     forceInit(FruchGPUPlacer.class);
     forceInit(FruchPlacer.class);
@@ -68,7 +66,6 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
   public Evolution2GraphFrame(EvolutionGraphFactory factory, Evolution2GraphViewer viewer, HashMap<String, Pattern> patterns, CommunityMetric metric) {
     super(viewer, patterns, metric);
     this.factory = factory;
-    factory.addObserver(this);
     
     this.addWindowListener(new WindowAdapter() {
     	public void windowClosing(WindowEvent e) {
@@ -95,7 +92,6 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     if (graphViewer != null && graphViewer.graph != null && panel == null) {
       canvasPanel = new GraphCanvasPanel(new Evolution2GraphCanvas((Evolution2GraphViewer)graphViewer));
       panel = new Evolution2OptionsPanel(this, getGraphViewer(), patterns.keySet());
-      factory.buildEvolutionFile();
       super.show();
     } else {
       super.show();
@@ -202,15 +198,13 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
       in = input;
       factory = factoryfactory.getFactory(input, patterns);
     }
-    
-    
     Evolution2GraphViewer graphViewer = new Evolution2GraphViewer(null, factory.getNodeLists(), null);
+    
     Evolution2GraphFrame frmMain = new Evolution2GraphFrame(factory, graphViewer, factory.getPatterns(), factory.getMetric());
     frmMain.setPlacerName(cl.getOptionValue("l", o.getOption("l").getValue()));
     frmMain.setCommunityName(comName);
     frmMain.setProgressive(factory);
     frmMain.preinit();
-    
     frmMain.setVisible(true);
     if(in instanceof File){
       factory.makeGraph((File)in);
@@ -218,12 +212,15 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
     else if(in instanceof URL){
       factory.makeGraph((URL)in);
     }
+    graphViewer.setEvolution(factory.getEvolution());
+    
     CommunityPlacer p = CommunityPlacerFactory.getInstance().getByName(frmMain.getPlacerName(), factory.getGraph());
     frmMain.setProgressive(p);
     graphViewer.graph = factory.getGraph();
     frmMain.init();
     graphViewer.setPlacer(p);
     frmMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    factory.buildEvolutionFile();
     frmMain.show();
     GraphOptionsPanel panel = frmMain.panel;
     if(cl.getOptionValue("o") != null){
@@ -252,15 +249,5 @@ public class Evolution2GraphFrame extends CommunityGraphFrame implements Evoluti
   public static String help() {
     return "\"formula\" \"community algorithm\" \"layout algorithm\" \"dump frequency\" \"path to modified solver + options\"\n"
             + "View the evolution of the community VIG of a SAT formula while being solved, dumping after every [dumpfreq] variable assignments";
-  }
-
-  @Override
-  public void notifyObserver(EvolutionGraphFactory factory, Action action) {
-    if(action == Action.newline){
-      ((Evolution2OptionsPanel)panel).scaler.evolution.newFileReady(factory.getLineNumber());
-    }
-    else if(action == Action.process){
-      show();
-    }
   }
 }

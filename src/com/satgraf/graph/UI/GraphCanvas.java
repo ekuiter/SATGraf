@@ -71,8 +71,12 @@ public class GraphCanvas extends JLayeredPane implements MouseListener, MouseMot
     return new EdgeLayer(this.getSize(), graph);
   }
 
+  @Override
   public Dimension getPreferredSize() {
     Dimension d = super.getPreferredSize();
+    if(d == null){
+      d = new Dimension();
+    }
     Dimension canvasBounds = GraphCanvasPanel.getCanvasDimensions();
 
     d.height = (int) (graph.getScale() * d.height);

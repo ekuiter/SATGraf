@@ -6,8 +6,6 @@
 
 package com.satgraf.community.UI;
 
-import com.satgraf.community.placer.FruchPlacer;
-import com.satgraf.graph.UI.GraphFrame;
 import com.satlib.community.CommunityGraphFactory;
 import com.satlib.community.CommunityGraphFactoryFactory;
 import com.satlib.community.placer.CommunityPlacer;
@@ -21,7 +19,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -122,7 +119,11 @@ public class OpenAction extends com.satgraf.actions.OpenAction<CommunityGraphFra
         while((line = reader.readLine()) != null){
           contents.append(line).append("\n");
         }
+        reader.close();
         JSONObject json = (JSONObject)JSONValue.parse(contents.toString());
+        if(json == null){
+          throw new NullPointerException("INVALID JSON STRING");
+        }
         this.frame.fromJson(json);
       }
     } 
