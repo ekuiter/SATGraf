@@ -7,7 +7,7 @@ cd ../../
 Notes:   
 Either -f or -u must be specified.   
     
-Usage: java -jar SatGraf.jar [com|imp|evo] <options>::
+Usage: java -jar SatGraf.jar [com|imp|evo] <options>
 --------------------------------   
     com - View the static community representation of the formula.   
 	-f --file(default = null) The file (either .cnf or .sb)   
@@ -30,7 +30,7 @@ Usage: java -jar SatGraf.jar [com|imp|evo] <options>::
 	   
 --------------------------------   
 --------------------------------   
-imp - View the graph and manually set the values of nodes to see how they propagate.   
+    imp - View the graph and manually set the values of nodes to see how they propagate.   
 	-f --file(default = null) The file (either .cnf or .sb)   
 	Must be an existing file For which you have: read permissions   
 	-u --url(default = null) A file URL (either .cnf or .sb)   
@@ -43,7 +43,7 @@ imp - View the graph and manually set the values of nodes to see how they propag
 	   
 --------------------------------   
 --------------------------------   
-evo - View the evolution of the structure of the graph, with other evolution properties presented.   
+    evo - View the evolution of the structure of the graph, with other evolution properties presented.   
 	-f --file(default = null) The file (either .cnf or .sb)   
 	Must be an existing file For which you have: read permissions   
 	-u --url(default = null) A file URL (either .cnf or .sb)   
