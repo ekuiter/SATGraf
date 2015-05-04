@@ -50,12 +50,6 @@
 
 package com.satgraf.graph.placer;
 
-import com.satgraf.community.placer.CommunityPlacerFactory;
-import com.satgraf.graph.placer.AbstractPlacer;
-import com.satgraf.graph.placer.Coordinates;
-import com.satlib.community.CommunityEdge;
-import com.satlib.community.CommunityGraph;
-import com.satlib.community.CommunityNode;
 import com.satlib.graph.Clause;
 import com.satlib.graph.DrawableNode;
 import com.satlib.graph.Edge;
@@ -117,7 +111,7 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
     private int seed = 123712382;
     private boolean isSeedSet = false;
 
-    private Collection<CommunityNode> nodeList;
+    private Collection<Node> nodeList;
     public int width = 2500;
     public int height = 2500;
     private boolean update = true;
@@ -125,7 +119,7 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
     private HashMap locations = new HashMap();
 
     public String getProgressionName(){
-      return "Placing Communities";
+      return "Placing Nodes";
     }
     public double getProgress(){
       return progress;
@@ -225,9 +219,9 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
 	
 		int xLimit = width - pad;
 		int yLimit = height - pad;
-		Iterator<CommunityNode> it = nodeList.iterator();
+		Iterator<Node> it = nodeList.iterator();
 		while(it.hasNext()) {
-		    CommunityNode node = it.next();
+		    Node node = it.next();
 		    Coordinates c = (Coordinates)locations.get(node);
 	        if(c == null){
 	          c = new Coordinates(0, 0);
@@ -351,9 +345,9 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
                progress = 0.1;
 		    }
 	
-		    Iterator<CommunityNode> it = nodeList.iterator();
+		    Iterator<Node> it = nodeList.iterator();
 		    while(it.hasNext()) {
-	          CommunityNode workNode = it.next();
+	          Node workNode = it.next();
 	          locations.put(workNode,new Coordinates(getX(workNode), getY(workNode)));
 		    }
 	
@@ -361,9 +355,9 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
 		    double[] xPos = new double[nNodes];
 		    double[] yPos = new double[nNodes];
 		    boolean[] fixed = new boolean[nNodes];
-            edges.addAll(graph.getEdgesList());
+            edges.addAll(graph.getEdges());
 		    for (int i = 0; i < nNodes; i++) {
-				CommunityNode workNode = (CommunityNode)nl[i];
+				Node workNode = (Node)nl[i];
 				xPos[i] = getX(workNode);
 				yPos[i] = getY(workNode);
 				maxWidth = Math.max(maxWidth,DrawableNode.NODE_DIAMETER + DrawableNode.NODE_X_SPACING);
@@ -427,7 +421,7 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
 				int z = 0;
 				while (iter.hasNext() && noBreak) {
 					z++;
-				    CommunityEdge edge = (CommunityEdge) iter.next();
+				    Edge edge = (Edge) iter.next();
 				    int vIndex = ((Integer) nodeIndexer.get(edge.getStart())).intValue();
 				    int uIndex = ((Integer) nodeIndexer.get(edge.getEnd())).intValue();
 		
@@ -499,7 +493,7 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
 	    boolean[][] cells = new boolean[(int)width/(int)Math.rint(maxWidth)+10][(int)height/(int)Math.rint(maxHeight)+10];
 	    
 	    for (int i = 0; i < nNodes; i++) {
-			CommunityNode node = (CommunityNode) nl[i];
+			Node node = (Node) nl[i];
 			//System.out.println("updating..." + node.getX() + " " + xPos[i]);
 			int ci = (int)xPos[i]/(int)Math.rint(maxWidth);
 			int cj = (int)yPos[i]/(int)Math.rint(maxHeight);
@@ -584,7 +578,7 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
 		for (int i = 0; i < nNodes; i++) {
 		    xPos[i] = ((xPos[i] - xMin) / xDiff) * xPadVal;
 		    yPos[i] = ((yPos[i] - yMin) / yDiff) * yPadVal;
-		    CommunityNode node = (CommunityNode)nList[i];
+		    Node node = (Node)nList[i];
 		    Coordinates c = (Coordinates)locations.get(node);
 		    c.setX(xPos[i]);
 		    c.setY(yPos[i]);
@@ -596,7 +590,7 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
 		HashSet returnList = new HashSet();
 		Iterator edgeIter = edges.iterator();
 		while (edgeIter.hasNext()) {
-		    CommunityEdge edge = (CommunityEdge)edgeIter.next();
+		    Edge edge = (Edge)edgeIter.next();
 		    if (edge == null) {
 			continue;
 		    }
@@ -645,15 +639,15 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
     }
 
   @Override
-  public CommunityNode getNodeAtXY(int x, int y, double scale) {
+  public Node getNodeAtXY(int x, int y, double scale) {
 	    x /= scale;
 		y /= scale;
-		Iterator<Node> nodes = graph.getNodes("All");
+		Iterator<Node> nodes = graph.getNodes("All").iterator();
 		Rectangle r = new Rectangle(0, 0, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER);
 		while(nodes.hasNext()){
-			CommunityNode node = (CommunityNode)nodes.next();
-			r.x = getX(node);
-			r.y = getY(node);
+			Node node = (Node)nodes.next();
+			r.x = getX(node) - DrawableNode.NODE_DIAMETER / 2;
+			r.y = getY(node) - DrawableNode.NODE_DIAMETER / 2;
 			if(r.contains(x, y)){
 				return node;
 			}

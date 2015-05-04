@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.satgraf.evolution2.observers;
+package com.satgraf.evolution.observers;
 
 import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityMetric;

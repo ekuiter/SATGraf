@@ -1,4 +1,4 @@
-package com.satgraf.evolution2.UI;
+package com.satgraf.evolution.UI;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -20,7 +20,7 @@ public class DecisionVariableLayer extends Layer {
 	}
 	
 	public void paintComponent(final Graphics g) {
-		Evolution2GraphViewer graph = (Evolution2GraphViewer) this.graph;
+		EvolutionGraphViewer graph = (EvolutionGraphViewer) this.graph;
 		
 		if (graph.getGraph().getShowDecisionVariable()) {
 		    Node decisionVariable = graph.getGraph().getDecisionVariable();

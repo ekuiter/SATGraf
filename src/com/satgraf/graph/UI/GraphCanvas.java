@@ -93,7 +93,7 @@ public class GraphCanvas extends JLayeredPane implements MouseListener, MouseMot
   }
 
   boolean drawnAll = false;
-
+  private Node lastHighlighted = null;
   private void mouseHighlight(MouseEvent e) {
     boolean clicked = e.getClickCount() == 1;
     Node n = highlightLayer.getNodeAroundXY(e.getX(), e.getY());
@@ -112,6 +112,11 @@ public class GraphCanvas extends JLayeredPane implements MouseListener, MouseMot
     if (clicked) {
       this.clickedVariable = n;
     }
+    if(lastHighlighted != n){
+      highlightLayer.highligted = n;
+      repaint();
+    }
+    lastHighlighted = n;
   }
 
   @Override

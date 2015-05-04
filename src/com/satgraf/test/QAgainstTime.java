@@ -30,7 +30,7 @@ public class QAgainstTime {
     
     CommunityMetric metric = new OLCommunityMetric();
     double Q = metric.getCommunities(c);
-    System.out.printf("\"%s\",%d,%d,%d,%d,", f.getAbsolutePath(), c.getNodes().size(), c.getClausesCount(), c.getCommunities().size(),c.getEdgesList().size());
+    System.out.printf("\"%s\",%d,%d,%d,%d,", f.getAbsolutePath(), c.getNodes().size(), c.getClausesCount(), c.getCommunities().size(),c.getEdges().size());
     
     if(satCompTime == 0.0){
       Runtime run = Runtime.getRuntime();

@@ -4,10 +4,9 @@
  * and open the template in the editor.
  */
 
-package com.satgraf.evolution2.UI;
+package com.satgraf.evolution.UI;
 
 import com.satlib.evolution.EvolutionGraphFactory;
-import com.satlib.evolution.EvolutionGraphFactoryFactory;
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
@@ -16,7 +15,7 @@ import java.util.HashMap;
  *
  * @author zacknewsham
  */
-public class Evolution2GraphFactoryFactory extends EvolutionGraphFactoryFactory{
+public class EvolutionGraphFactoryFactory extends com.satlib.evolution.EvolutionGraphFactoryFactory{
 
   
 
@@ -24,7 +23,7 @@ public class Evolution2GraphFactoryFactory extends EvolutionGraphFactoryFactory{
   public static EvolutionGraphFactory getInstance(){
     return instance;
   }
-  public Evolution2GraphFactoryFactory(String metricName, String minisat) {
+  public EvolutionGraphFactoryFactory(String metricName, String minisat) {
     super(metricName, minisat);
   }
 

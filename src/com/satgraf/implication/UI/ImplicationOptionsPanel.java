@@ -11,19 +11,22 @@ import com.satgraf.graph.UI.GraphViewer;
 import java.util.Collection;
 import org.json.simple.JSONObject;
 import com.satgraf.graph.UI.GraphFrame;
+import com.satgraf.graph.UI.GraphInfoPanel;
 import com.satgraf.graph.UI.GraphOptionsPanel;
 import com.satgraf.graph.UI.NodePanel;
 import com.satgraf.graph.UI.OptionsPanel;
+import com.satlib.graph.Graph;
 
 /**
  *
  * @author zacknewsham
  */
 public class ImplicationOptionsPanel extends GraphOptionsPanel{
-  public ImplicationOptionsPanel(GraphFrame frame, GraphViewer graph, Collection<String> groups) {
+  public ImplicationOptionsPanel(GraphFrame frame, ImplicationGraphViewer graph, Collection<String> groups) {
     super(graph, groups);
     NodePanel nodePanel = new ImplicationNodePanel(graph);
     optionsPanel = new OptionsPanel(frame, graph,nodePanel);
+    infoPanel = new ImplicationGraphInfoPanel(graph);
     this.setTopComponent(optionsPanel);
     setGraph(graph);
   }

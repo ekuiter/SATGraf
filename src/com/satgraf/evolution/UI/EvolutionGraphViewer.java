@@ -1,4 +1,4 @@
-package com.satgraf.evolution2.UI;
+package com.satgraf.evolution.UI;
 
 import com.satgraf.community.UI.CommunityGraphViewer;
 import com.satgraf.community.placer.CommunityPlacer;
@@ -7,9 +7,9 @@ import com.satlib.evolution.EvolutionGraph;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.HashMap;
 
-public class Evolution2GraphViewer extends CommunityGraphViewer {
+public class EvolutionGraphViewer extends CommunityGraphViewer {
   Evolution evolution;
-  public Evolution2GraphViewer(EvolutionGraph graph, HashMap<String, TIntObjectHashMap<String>> node_lists, CommunityPlacer pl) {
+  public EvolutionGraphViewer(EvolutionGraph graph, HashMap<String, TIntObjectHashMap<String>> node_lists, CommunityPlacer pl) {
       super(graph, node_lists, pl);
   }
 

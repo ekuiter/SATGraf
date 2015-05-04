@@ -7,15 +7,16 @@
 package com.satgraf.community.UI;
 
 import com.satgraf.community.placer.CommunityPlacer;
-import static com.satlib.graph.DrawableNode.COMMUNITY_COLORS;
-import com.satlib.graph.Edge;
-import com.satlib.graph.Edge.EdgeState;
-import com.satgraf.graph.UI.GraphViewerObserver;
 import com.satgraf.graph.UI.GraphViewer;
+import com.satgraf.graph.UI.GraphViewerObserver;
+import com.satgraf.graph.placer.Placer;
 import com.satlib.community.Community;
 import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityNode;
+import static com.satlib.graph.DrawableNode.COMMUNITY_COLORS;
+import com.satlib.graph.Edge;
+import com.satlib.graph.Edge.EdgeState;
 import com.satlib.graph.Node.NodeAssignmentState;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import java.awt.Color;
@@ -31,14 +32,9 @@ import org.json.simple.JSONObject;
  */
 public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEdge>{
 
-  protected CommunityPlacer placer;
   private Community selectedCommunity;
-  public CommunityGraphViewer(CommunityGraph graph, HashMap<String, TIntObjectHashMap<String>> node_lists, CommunityPlacer pl) {
-    super(graph, node_lists);
-    placer = pl;
-    if(placer != null){
-      init();
-    }
+  public CommunityGraphViewer(CommunityGraph graph, HashMap<String, TIntObjectHashMap<String>> node_lists, Placer placer) {
+    super(graph, node_lists, placer);
   }
   
   public void selectCommunity(int communityId){
@@ -56,11 +52,6 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
 
   public Community getSelectedCommunity(){
     return selectedCommunity;
-  }
-  
-  public void setPlacer(CommunityPlacer placer){
-    this.placer = placer;
-    init();
   }
   
   public CommunityGraph getGraph(){
@@ -95,7 +86,7 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
     }
     json.setCharAt(json.length() - 1, ']');
     json.append(",\"edges\":[");
-    for(CommunityEdge edge : getGraph().getEdgesList()){
+    for(CommunityEdge edge : getGraph().getEdges()){
       json.append(edge.toJson());
       json.append(",");
     }
@@ -116,12 +107,13 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
   }
   
   public void init(){
-    setUpdatedNodes(graph.getNodesList());
+    setUpdatedNodes(graph.getNodes());
     long start = System.currentTimeMillis();
     placer.init();
     long end = System.currentTimeMillis();
     System.out.printf("%f Seconds\n", ((double)end -(double) start) /(double) 1000);
   }
+  
   public Collection<CommunityNode> getCommunityNodes(int community){
 	Community com = getGraph().getCommunity(community);
     return (com == null ? null : (Collection<CommunityNode>)com.getCommunityNodes());
@@ -172,7 +164,7 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
     	addUpdatedEdge(conn, EdgeState.SHOW, true);
     }
     else if((conn.getType() & CommunityEdge.INTER_COMMUNITY) == CommunityEdge.INTER_COMMUNITY && (conn.getType() & Edge.DUMMY) == Edge.DUMMY){
-      Iterator<CommunityEdge> conns = graph.getEdges();
+      Iterator<CommunityEdge> conns = graph.getEdges().iterator();
       while(conns.hasNext()){
         CommunityEdge conn1 = conns.next();
         if(conn1.getStart().getCommunity() != conn1.getEnd().getCommunity()){
@@ -188,7 +180,7 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
       }
     }
     else if((conn.getType() & CommunityEdge.INTRA_COMMUNITY) == CommunityEdge.INTRA_COMMUNITY && (conn.getType() & Edge.DUMMY) == Edge.DUMMY){
-      Iterator<CommunityEdge> conns = graph.getEdges();
+      Iterator<CommunityEdge> conns = graph.getEdges().iterator();
       while(conns.hasNext()){
         CommunityEdge conn1 = conns.next();
         if(conn1.getStart().getCommunity() == conn1.getEnd().getCommunity()){
@@ -210,7 +202,7 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
     	addUpdatedEdge(conn, EdgeState.HIDE, true);
     }
     else if((conn.getType() & CommunityEdge.INTER_COMMUNITY) == CommunityEdge.INTER_COMMUNITY && (conn.getType() & Edge.DUMMY) == Edge.DUMMY){
-      Iterator<CommunityEdge> conns = graph.getEdges();
+      Iterator<CommunityEdge> conns = graph.getEdges().iterator();
       while(conns.hasNext()){
         Edge<CommunityNode> conn1 = conns.next();
         if(conn1.getStart().getCommunity() != conn1.getEnd().getCommunity()){
@@ -226,7 +218,7 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
       }
     }
     else if((conn.getType() & CommunityEdge.INTRA_COMMUNITY) == CommunityEdge.INTRA_COMMUNITY && (conn.getType() & Edge.DUMMY) == Edge.DUMMY){
-      Iterator<CommunityEdge> conns = graph.getEdges();
+      Iterator<CommunityEdge> conns = graph.getEdges().iterator();
       while(conns.hasNext()){
         Edge<CommunityNode> conn1 = conns.next();
         if(conn1.getStart().getCommunity() == conn1.getEnd().getCommunity()){
@@ -256,18 +248,18 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
     }
   }
   
-	@Override
-	public CommunityNode getNodeAtXY(int x, int y) {
-		return placer.getNodeAtXY(x, y, getScale());
-	}
+  @Override
+  public CommunityNode getNodeAtXY(int x, int y) {
+      return (CommunityNode)placer.getNodeAtXY(x, y, getScale());
+  }
 
-	@Override
-	public int getX(CommunityNode node) {
-		return placer.getX(node);
-	}
-	
-	@Override
-	public int getY(CommunityNode node) {
-		return placer.getY(node);
-	}
+  @Override
+  public int getX(CommunityNode node) {
+      return placer.getX(node);
+  }
+
+  @Override
+  public int getY(CommunityNode node) {
+      return placer.getY(node);
+  }
 }

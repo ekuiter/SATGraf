@@ -4,6 +4,7 @@
  */
 package com.satgraf.graph.UI;
 
+import com.satgraf.graph.placer.Placer;
 import com.satlib.graph.Edge;
 import com.satlib.graph.Edge.EdgeState;
 import com.satlib.graph.Graph;
@@ -33,6 +34,7 @@ import org.json.simple.JSONObject;
  */
 public abstract class GraphViewer<T extends Node, T1 extends Edge> implements ActionListener {
 
+  protected Placer placer;
   public Graph graph;
   private T selectedNode;
   //protected GraphCanvas canvas;
@@ -55,9 +57,13 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
 	  notifyObservers(GraphViewerObserver.Action.updatedEdges);
   }
   
-  public GraphViewer(Graph graph, HashMap<String, TIntObjectHashMap<String>> node_lists) {
+  public GraphViewer(Graph graph, HashMap<String, TIntObjectHashMap<String>> node_lists, Placer placer) {
     this.node_lists = node_lists;
     this.graph = graph;
+    placer = placer;
+    if(placer != null){
+      init();
+    }
   }
 
   public abstract String toJson();
@@ -151,10 +157,10 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   }
 
   public void showEdgeSet(String set) {
-    Iterator<T> ns = graph.getNodes(set);
+    Iterator<T> ns = graph.getNodes(set).iterator();
     while (ns.hasNext()) {
       T n = ns.next();
-      Iterator<T1> edges = n.getEdges();
+      Iterator<T1> edges = n.getEdges().iterator();
       while (edges.hasNext()) {
         T1 e = edges.next();
         addUpdatedEdge(e, EdgeState.SHOW, false);
@@ -164,10 +170,10 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   }
 
   public void hideEdgeSet(String set) {
-    Iterator<T> ns = graph.getNodes(set);
+    Iterator<T> ns = graph.getNodes(set).iterator();
     while (ns.hasNext()) {
       T n = ns.next();
-      Iterator<T1> edges = n.getEdges();
+      Iterator<T1> edges = n.getEdges().iterator();
       while (edges.hasNext()) {
         T1 e = edges.next();
         addUpdatedEdge(e, EdgeState.HIDE, false);
@@ -175,9 +181,13 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
     }
     edgeEvent();
   }
+  
+  public Collection<T1> getEdges(){
+    return graph.getEdges();
+  }
 
   public void showNodeSet(String set) {
-    Iterator<T> ns = graph.getNodes(set);
+    Iterator<T> ns = graph.getNodes(set).iterator();
     while (ns.hasNext()) {
       T n = ns.next();
       addUpdatedNode(n, NodeState.SHOW, false);
@@ -186,7 +196,7 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   }
 
   public void hideNodeSet(String set) {
-    Iterator<T> ns = graph.getNodes(set);
+    Iterator<T> ns = graph.getNodes(set).iterator();
     while (ns.hasNext()) {
       T n = ns.next();
       addUpdatedNode(n, NodeState.HIDE, false);
@@ -230,8 +240,8 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
 
   public void setScale(double scale) {
     this.scale = scale;
-    setUpdatedNodes(this.graph.getNodesList());
-    setUpdatedEdges(this.graph.getEdgesList());
+    setUpdatedNodes(this.graph.getNodes());
+    setUpdatedEdges(this.graph.getEdges());
     notifyObservers(GraphViewerObserver.Action.setscale);
   }
 
@@ -287,13 +297,6 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
     }
   }
 
-  public Iterator<Edge> getEdgeIterator() {
-    return graph.getEdges();
-  }
-
-  public Iterator<Node> getNodeIterator() {
-    return graph.getNodeIterator();
-  }
 
   public Rectangle getBounds() {
     if (bounds == null) {
@@ -316,11 +319,11 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
     return (Rectangle) bounds.clone();
   }
 
-  public Iterator<T> getNodes(String group) {
+  public Collection<T> getNodes(String group) {
     if (nodeGroups.get(group) == null) {
       TIntObjectHashMap<T> nodes = new TIntObjectHashMap<T>();
       nodeGroups.put(group, nodes);
-      Iterator<T> gnodes = graph.getNodeIterator();
+      Iterator<T> gnodes = graph.getNodes().iterator();
       while (gnodes.hasNext()) {
         T next = gnodes.next();
         if (next.inGroup(group)) {
@@ -328,7 +331,7 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
         }
       }
     }
-    return nodeGroups.get(group).valueCollection().iterator();
+    return nodeGroups.get(group).valueCollection();
   }
 
   private void initOrderedNodes() {
@@ -375,6 +378,13 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   public void clearUpdatedEdges() {
 	  this.updatedEdges.clear();
   }
+  
+  
+  public void setPlacer(Placer placer){
+    this.placer = placer;
+    init();
+  }
+  
   public static class NodeXComparator implements Comparator <Node>{
     private GraphViewer graph;
     public NodeXComparator(GraphViewer graph){

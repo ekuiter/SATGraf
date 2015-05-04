@@ -1,4 +1,4 @@
-package com.satgraf.evolution2.UI;
+package com.satgraf.evolution.UI;
 
 import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityMetric;
@@ -27,10 +27,10 @@ import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-public class Evolution2Scaler extends JPanel implements ChangeListener, ActionListener, EvolutionObserver{
+public class EvolutionScaler extends JPanel implements ChangeListener, ActionListener, EvolutionObserver{
 
   private final JSlider progress = new JSlider(0, 0, 0);
-  private Evolution2GraphViewer graphviewer;
+  private EvolutionGraphViewer graphviewer;
   private JCheckBox showAssignedVarsBox = new JCheckBox("Show Assigned Variables");
 
   private Timer changeSlideTimer = new Timer(10, this);
@@ -38,7 +38,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
   private boolean timerTriggered = false;
   private CommunityMetric metric;
 
-  public Evolution2Scaler(final Evolution2GraphViewer graphviewer) {
+  public EvolutionScaler(final EvolutionGraphViewer graphviewer) {
     this.graphviewer = graphviewer;
     progress.setPreferredSize(new Dimension(100, 20));
     progress.setEnabled(false);
@@ -134,7 +134,7 @@ public class Evolution2Scaler extends JPanel implements ChangeListener, ActionLi
     this.timerTriggered = false;
   }
 
-  void setGraphViewer(Evolution2GraphViewer graph) {
+  void setGraphViewer(EvolutionGraphViewer graph) {
     this.graphviewer = graph;
     updateProgress();
   }

@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.satgraf.evolution2.UI;
+package com.satgraf.evolution.UI;
 
 import com.satgraf.community.UI.CommunityGraphFrame;
 import com.satgraf.community.placer.CommunityPlacer;
@@ -27,9 +27,9 @@ import org.json.simple.JSONValue;
  *
  * @author zacknewsham
  */
-public class OpenAction extends com.satgraf.actions.OpenAction<Evolution2GraphFrame>{
+public class OpenAction extends com.satgraf.actions.OpenAction<EvolutionGraphFrame>{
 
-  public OpenAction(Evolution2GraphFrame frame) {
+  public OpenAction(EvolutionGraphFrame frame) {
     super(frame);
   }
 
@@ -41,7 +41,7 @@ public class OpenAction extends com.satgraf.actions.OpenAction<Evolution2GraphFr
     try {
       String[] parts = file.getAbsolutePath().split("\\.");
       if(parts[parts.length - 1].equals("cnf")){
-        final EvolutionGraphFactory factory = (new Evolution2GraphFactoryFactory(frame.getCommunityName(), Evolution2GraphFrame.minisat)).getFactory(file,new HashMap<String, String>());
+        final EvolutionGraphFactory factory = (new EvolutionGraphFactoryFactory(frame.getCommunityName(), EvolutionGraphFrame.minisat)).getFactory(file,new HashMap<String, String>());
         OpenAction.this.frame.setFactory(factory);
         OpenAction.this.frame.setProgressive(factory);
         final SwingWorker worker1 = new SwingWorker<Void, Void>() {
@@ -88,7 +88,7 @@ public class OpenAction extends com.satgraf.actions.OpenAction<Evolution2GraphFr
             catch (InterruptedException | ExecutionException ex) {
               Logger.getLogger(OpenAction.class.getName()).log(Level.SEVERE, null, ex);
             }
-            OpenAction.this.frame.setGraphViewer(new Evolution2GraphViewer(factory.getGraph(), factory.getNodeLists(), placer));
+            OpenAction.this.frame.setGraphViewer(new EvolutionGraphViewer(factory.getGraph(), factory.getNodeLists(), placer));
 
             return null;
           }

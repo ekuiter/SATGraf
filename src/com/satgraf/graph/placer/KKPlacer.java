@@ -1,10 +1,5 @@
 package com.satgraf.graph.placer;
 
-import com.satgraf.community.placer.CommunityPlacerFactory;
-import com.satgraf.graph.placer.AbstractPlacer;
-import com.satgraf.graph.placer.Coordinates;
-import com.satgraf.graph.placer.NetUtilities;
-import com.satgraf.graph.placer.SymettricMatrix;
 import com.satlib.graph.Clause;
 import com.satlib.graph.DrawableNode;
 import com.satlib.graph.Edge;
@@ -101,8 +96,9 @@ public class KKPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>> {
     
   
     public String getProgressionName(){
-      return "Placing Communities";
+      return "Placing Nodes";
     }
+    
     public double getProgress(){
       return 0.0;
     }
@@ -486,7 +482,7 @@ public class KKPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>> {
 	  Collections.sort(coms, NODE_SIZE_COMPARATOR);
 	  
       Node rootNode = coms.iterator().next();
-      Iterator<Node> nodes = graph.getNodeIterator();
+      Iterator<Node> nodes = graph.getNodes().iterator();
       while(nodes.hasNext()){
         Node compNode = nodes.next();
         if(!graph.connected(rootNode, compNode)){
@@ -527,7 +523,7 @@ public class KKPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>> {
 	public Node getNodeAtXY(int x, int y, double scale) {
 		x /= scale;
 		y /= scale;
-		Iterator<Node> nodes = graph.getNodes("All");
+		Iterator<Node> nodes = graph.getNodes("All").iterator();
 		Rectangle r = new Rectangle(0, 0, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER);
 		while(nodes.hasNext()){
 			Node node = (Node)nodes.next();

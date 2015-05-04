@@ -77,7 +77,7 @@ public class GridKKPlacer extends AbstractPlacer<CommunityNode, CommunityGraph> 
       if(com == null){
         continue;
       }
-      Iterator<CommunityNode> nodes = com.getNodeIterator();
+      Iterator<CommunityNode> nodes = com.getNodes().iterator();
       Rectangle r = new Rectangle(0, 0, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER);
       while(nodes.hasNext()){
         CommunityNode node = (CommunityNode)nodes.next();
@@ -311,14 +311,10 @@ public class GridKKPlacer extends AbstractPlacer<CommunityNode, CommunityGraph> 
     }
 
     @Override
-    public Iterator<CommunityNode> getNodes(String set) {
-      return nodes.valueCollection().iterator();
+    public Collection<CommunityNode> getNodes(String set) {
+      return nodes.valueCollection();
     }
 
-    @Override
-    public Iterator<CommunityNode> getNodeIterator() {
-      return nodes.valueCollection().iterator();
-    }
 
     @Override
     public Collection<CommunityNode> getNodes() {
@@ -331,13 +327,9 @@ public class GridKKPlacer extends AbstractPlacer<CommunityNode, CommunityGraph> 
     }
 
     @Override
-    public Iterator<CommunityEdge> getEdges() {
-      return edges.values().iterator();
-    }
-
-    @Override
-    public Collection<CommunityEdge> getEdgesList() {
+    public Collection<CommunityEdge> getEdges() {
       return edges.values();
     }
+
   }
 }

@@ -8,15 +8,14 @@ package com.satgraf.community.UI;
 
 import static com.satgraf.ForceInit.forceInit;
 import com.satgraf.community.placer.CircularCommunityPlacer;
-import com.satgraf.community.placer.CommunityPlacer;
 import com.satgraf.community.placer.CommunityPlacerFactory;
 import com.satgraf.community.placer.GridPlacer;
 import com.satgraf.community.placer.JSONCommunityPlacer;
 import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphFrame;
-import com.satgraf.graph.placer.FruchGPUPlacer;
 import com.satgraf.graph.placer.FruchPlacer;
 import com.satgraf.graph.placer.KKPlacer;
+import com.satgraf.graph.placer.Placer;
 import com.satgraf.graph.placer.PlacerFactory;
 import com.satlib.community.CNMCommunityMetric;
 import com.satlib.community.CommunityGraph;
@@ -50,7 +49,7 @@ import org.json.simple.JSONObject;
  */
 public class CommunityGraphFrame extends GraphFrame{
   static{
-    forceInit(FruchGPUPlacer.class);
+    //forceInit(FruchGPUPlacer.class);
     forceInit(FruchPlacer.class);
     forceInit(KKPlacer.class);
     forceInit(GridPlacer.class);
@@ -160,14 +159,14 @@ public class CommunityGraphFrame extends GraphFrame{
       args = new String[]{
         //"formula/satcomp/dimacs/toybox.cnf",
         //"-f","/home/zacknewsham/aes.sb",
-        "-f","/home/zacknewsham/toybox.sb",
+        "-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/aes_16_10_keyfind_3.cnf",
         //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
         //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "-c","ol",
         "-l","f"
       };
       System.out.print(Help.getHelp(options()));
-      return;
+      //return;
     }
     CommandLineParser clp = new GnuParser();
     Options o = options();
@@ -217,13 +216,16 @@ public class CommunityGraphFrame extends GraphFrame{
     }
     
     frmMain.setVisible(true);
-    CommunityPlacer p = null;
+    Placer p = null;
     frmMain.setPlacerName(cl.getOptionValue("l", o.getOption("l").getValue()));
-    if(factory.getGraph() instanceof CommunityPlacer){
-      p = (CommunityPlacer)factory.getGraph();
+    if(factory.getGraph() instanceof Placer){
+      p = (Placer)factory.getGraph();
     }
     else{
       p = CommunityPlacerFactory.getInstance().getByName(frmMain.getPlacerName(), factory.getGraph());
+      if( p == null){
+        p = PlacerFactory.getInstance().getByName(frmMain.getPlacerName(), factory.getGraph());
+      }
     }
     frmMain.setProgressive(p);
     graphViewer.graph = factory.getGraph();

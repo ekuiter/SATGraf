@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.satgraf.evolution2.UI;
+package com.satgraf.evolution.UI;
 
 import com.satgraf.community.UI.CommunityGraphInfoPanel;
 import com.satlib.community.CommunityEdge;
@@ -21,11 +21,11 @@ import javax.swing.JLabel;
  *
  * @author zacknewsham
  */
-public class Evolution2GraphInfoPanel extends CommunityGraphInfoPanel implements EvolutionObserver{
+public class EvolutionGraphInfoPanel extends CommunityGraphInfoPanel implements EvolutionObserver{
   private final JLabel lblRatio1 = new JLabel("n/a");
   private final JLabel lblRatio2 = new JLabel("n/a");
   private final JLabel lblRatio3 = new JLabel("n/a");
-  public Evolution2GraphInfoPanel(Evolution2GraphViewer graphViewer) {
+  public EvolutionGraphInfoPanel(EvolutionGraphViewer graphViewer) {
     super(graphViewer);
   }
   

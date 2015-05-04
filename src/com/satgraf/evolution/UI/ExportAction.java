@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.satgraf.evolution2.UI;
+package com.satgraf.evolution.UI;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -27,10 +27,10 @@ import javax.swing.SwingWorker;
  *
  * @author zacknewsham
  */
-public class ExportAction extends com.satgraf.actions.ExportAction<Evolution2GraphFrame> implements Progressive{
+public class ExportAction extends com.satgraf.actions.ExportAction<EvolutionGraphFrame> implements Progressive{
   public static int FRAMES = 10;
   private int line = 0;
-  public ExportAction(Evolution2GraphFrame frame) {
+  public ExportAction(EvolutionGraphFrame frame) {
     super(frame);
   }
   @Override
@@ -41,7 +41,7 @@ public class ExportAction extends com.satgraf.actions.ExportAction<Evolution2Gra
 
       @Override
       protected Void doInBackground() throws Exception {
-        Evolution2OptionsPanel panel = (Evolution2OptionsPanel)frame.getOptionsPanel();
+        EvolutionOptionsPanel panel = (EvolutionOptionsPanel)frame.getOptionsPanel();
         GraphCanvasPanel canvas = frame.getCanvasPanel();
         double oldscale = frame.getGraphViewer().getScale();
         //frame.getGraphViewer().setScale(0.5);
@@ -102,7 +102,7 @@ public class ExportAction extends com.satgraf.actions.ExportAction<Evolution2Gra
 
   @Override
   public double getProgress() {
-    return (double) line / (double)((Evolution2OptionsPanel)frame.getOptionsPanel()).scaler.getMaxLine();
+    return (double) line / (double)((EvolutionOptionsPanel)frame.getOptionsPanel()).scaler.getMaxLine();
   }
   
 }

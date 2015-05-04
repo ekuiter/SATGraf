@@ -6,11 +6,14 @@
 
 package com.satgraf.graph.UI;
 
+import com.satlib.graph.Clause;
+import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import javax.swing.JPanel;
-import com.satlib.graph.Clause;
+import javax.swing.JScrollPane;
 
 /**
  *
@@ -19,20 +22,31 @@ import com.satlib.graph.Clause;
 public class ClausesPanel<T extends Clause> extends JPanel{
   protected GraphViewer graph;
   private int count = 0;
+  private int longestClausePanelLength = 0;
   public ClausesPanel(){
     
   }
   public ClausesPanel(GraphViewer graph, HashSet<T> clauses) {
     this.graph = graph;
-    Iterator<T> cs = clauses.iterator();
-    while(cs.hasNext()){
-      addClause(cs.next());
+    addAll(clauses);
+  }
+  public void clear(){
+    count = 0; 
+    this.removeAll();
+  }
+  public void addAll(Collection<T> c){
+    for(T clause: c){
+      addClause(clause);
     }
     this.setLayout(new GridLayout(count, 1));
+    this.setPreferredSize(new Dimension(longestClausePanelLength, count * 20));
   }
-  
   public final void addClause(T c){
     ClausePanel l = getClausePanel(c);
+    if(longestClausePanelLength < l.getPreferredSize().width){
+      longestClausePanelLength = l.getPreferredSize().width;
+    }
+    
     this.add(l);
     count++;
   }

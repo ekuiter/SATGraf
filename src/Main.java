@@ -1,6 +1,6 @@
 
 import com.satgraf.community.UI.CommunityGraphFrame;
-import com.satgraf.evolution2.UI.Evolution2GraphFrame;
+import com.satgraf.evolution.UI.EvolutionGraphFrame;
 import com.satgraf.implication.UI.ImplicationGraphFrame;
 import com.satgraf.test.QAgainstTimeRandomBucketing;
 import com.satgraf.test.QAgainstTimeRandomBucketingFixedCVR;
@@ -42,7 +42,7 @@ public class Main {
       ImplicationGraphFrame.main(newargs);
     }
     else if(args[0].equals("evo")){
-      Evolution2GraphFrame.main(newargs);
+      EvolutionGraphFrame.main(newargs);
     }
     else if(args[0].equals("q")){
       QAgainstTimeRandomBucketing.main(newargs);
@@ -64,7 +64,7 @@ public class Main {
     builder.append("Usage: java -jar SatGraf.jar [com|imp|evo|evo2] <options>\n");
     builder.append(dashes).append("\ncom\n").append("\t".concat(Help.getHelp(CommunityGraphFrame.options()).replace("\n","\n\t"))).append("\n").append(dashes).append("\n");
     builder.append(dashes).append("\nimp\n").append("\tNot currently supported\n".replace("\n","\n\t\n")).append(dashes).append("\n");
-    builder.append(dashes).append("\nevo\n").append("\t".concat(Help.getHelp(Evolution2GraphFrame.options()).replace("\n","\n\t"))).append("\n").append(dashes).append("\n");
+    builder.append(dashes).append("\nevo\n").append("\t".concat(Help.getHelp(EvolutionGraphFrame.options()).replace("\n","\n\t"))).append("\n").append(dashes).append("\n");
     /*builder.append("com ").append(CommunityGraphFrame.usage()).append("\n").append(CommunityGraphFrame.help()).append("\n\n");
     builder.append("imp ").append(ImplicationGraphFrame.usage()).append("\n").append(ImplicationGraphFrame.help()).append("\n\n");
     builder.append("evo ").append(EvolutionGraphFrame.usage()).append("\n").append(EvolutionGraphFrame.help()).append("\n\n");

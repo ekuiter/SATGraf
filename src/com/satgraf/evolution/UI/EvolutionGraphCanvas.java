@@ -1,12 +1,12 @@
-package com.satgraf.evolution2.UI;
+package com.satgraf.evolution.UI;
 
 import com.satgraf.community.UI.CommunityCanvas;
 
-public class Evolution2GraphCanvas extends CommunityCanvas {
+public class EvolutionGraphCanvas extends CommunityCanvas {
 	
 	private DecisionVariableLayer decisionVariableLayer;
 	
-	public Evolution2GraphCanvas(Evolution2GraphViewer graph) {
+	public EvolutionGraphCanvas(EvolutionGraphViewer graph) {
 		super(graph);
 	}
 	

@@ -24,7 +24,9 @@ public abstract class GraphInfoPanel <T extends GraphViewer> extends JPanel{
     this.graphViewer = graphViewer;
     this.graph = graphViewer.graph;
   }
-  public abstract Graph getGraph();
+  public Graph getGraph(){
+    return graph;
+  }
   
   public void init(){
     this.setLayout(new GridBagLayout());
@@ -100,7 +102,7 @@ public abstract class GraphInfoPanel <T extends GraphViewer> extends JPanel{
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_END;
     try{
-    this.add(new JLabel(String.valueOf(graph.getEdgesList().size())), c);
+    this.add(new JLabel(String.valueOf(graph.getEdges().size())), c);
     }
     catch(UnsupportedOperationException | NullPointerException e){
       

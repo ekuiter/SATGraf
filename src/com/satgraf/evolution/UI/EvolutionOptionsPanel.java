@@ -1,4 +1,4 @@
-package com.satgraf.evolution2.UI;
+package com.satgraf.evolution.UI;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -18,10 +18,10 @@ import com.satgraf.community.UI.CommunityOptionsPanel;
 import com.satgraf.graph.UI.GraphFrame;
 import com.satgraf.graph.UI.OptionsPanel;
 
-public class Evolution2OptionsPanel extends CommunityOptionsPanel implements TextRockerListener {
+public class EvolutionOptionsPanel extends CommunityOptionsPanel implements TextRockerListener {
 	
-	Evolution2Scaler scaler;
-	Evolution2GraphViewer graph;
+	EvolutionScaler scaler;
+	EvolutionGraphViewer graph;
 	
 	// Options
 	private JCheckBox hideDecisionVariable = new JCheckBox("Decision Variable", true);
@@ -31,9 +31,9 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 	private JLabel conflictDescription = new JLabel("Conflict Description");
 	private boolean evolutionTriggeredConflict = false;
 	
-	public Evolution2OptionsPanel(GraphFrame frame, Evolution2GraphViewer graph, Collection<String> groups) {
+	public EvolutionOptionsPanel(GraphFrame frame, EvolutionGraphViewer graph, Collection<String> groups) {
 		super(frame, graph, groups, false);
-        infoPanel = new Evolution2GraphInfoPanel(graph);
+        infoPanel = new EvolutionGraphInfoPanel(graph);
 		setGraph(graph);
 		this.graph = graph;
 		
@@ -41,14 +41,14 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 		this.setTopComponent(checkBoxPanel);
 	}
 	
-	private void buildLayout(Evolution2GraphViewer graph) {
+	private void buildLayout(EvolutionGraphViewer graph) {
 		OptionsPanel op = getOptionsPanel();
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		panel.setPreferredSize(new Dimension(250, 500));
 		
 		// Scaler
-		scaler = new Evolution2Scaler(graph);
+		scaler = new EvolutionScaler(graph);
 		panel.add(scaler);
 		
 		// Evolution speed
@@ -70,7 +70,7 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 		hideDecisionVariable.addChangeListener(new ChangeListener() {
 	      @Override
 	      public void stateChanged(ChangeEvent e) {
-	        Evolution2OptionsPanel.this.graph.getGraph().setShowDecisionVariable(hideDecisionVariable.isSelected());
+	        EvolutionOptionsPanel.this.graph.getGraph().setShowDecisionVariable(hideDecisionVariable.isSelected());
 	        if (!hideDecisionVariable.isSelected()) {
 	        	int o = 0;
 	        }
@@ -89,7 +89,7 @@ public class Evolution2OptionsPanel extends CommunityOptionsPanel implements Tex
 		op.setCustomComponent(panel);
 	}
 	
-	public void setGraph(Evolution2GraphViewer graph) {
+	public void setGraph(EvolutionGraphViewer graph) {
 		checkBoxPanel.removeBars();
         checkboxPanels.clear();
         checkBoxPanel.addBar("General Options", optionsPanel);

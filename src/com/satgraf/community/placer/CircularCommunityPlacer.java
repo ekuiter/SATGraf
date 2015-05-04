@@ -63,12 +63,12 @@ public class CircularCommunityPlacer extends AbstractPlacer<CommunityNode, Commu
     if(c == null){
       return null;
     }
-    Iterator<CommunityNode> nodes = c.getNodeIterator();
+    Iterator<CommunityNode> nodes = c.getNodes().iterator();
     Rectangle r = new Rectangle(0, 0, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER);
     while(nodes.hasNext()){
         CommunityNode node = (CommunityNode)nodes.next();
-        r.x = getX(node);
-        r.y = getY(node);
+        r.x = getX(node) - DrawableNode.NODE_DIAMETER / 2;
+        r.y = getY(node) - DrawableNode.NODE_DIAMETER / 2;
         if(r.contains(x, y)){
             return node;
         }

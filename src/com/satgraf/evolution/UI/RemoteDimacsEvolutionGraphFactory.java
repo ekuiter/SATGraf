@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.satgraf.evolution2.UI;
+package com.satgraf.evolution.UI;
 
 import com.satlib.NamedFifo;
 import com.satlib.community.CommunityNode;
@@ -29,7 +29,7 @@ public class RemoteDimacsEvolutionGraphFactory  extends com.satlib.evolution.Dim
   public void process(EvolutionGraph cg) {
     node_lists = new HashMap<>();
     TIntObjectHashMap<String> list = new TIntObjectHashMap<>();
-    Iterator<CommunityNode> nodes = cg.getNodeIterator();
+    Iterator<CommunityNode> nodes = cg.getNodes().iterator();
 
     while (nodes.hasNext()) {
       CommunityNode node = nodes.next();

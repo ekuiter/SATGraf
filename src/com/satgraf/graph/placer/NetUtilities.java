@@ -163,7 +163,7 @@ public static SymettricMatrix getAllShortPathMatrix(Collection<Node> nodes) {
         distMatrix.setValue(i, index, fringeNodeDist);
         
         //loop over its edges, adding nodes to queue
-        Iterator<CommunityEdge> edgeEnum = fringeNode.getConnections();
+        Iterator<CommunityEdge> edgeEnum = fringeNode.getConnections().iterator();
         while(edgeEnum.hasNext()) {
           Edge edge = edgeEnum.next();
           Node workNode = edge.getOpposite(fringeNode);

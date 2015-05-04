@@ -7,6 +7,7 @@
 package com.satgraf.graph.UI;
 
 import com.satgraf.graph.UI.GraphViewer;
+import com.satgraf.graph.placer.Placer;
 import com.satlib.graph.DrawableNode;
 import com.satlib.graph.Edge;
 import com.satlib.graph.Graph;
@@ -24,15 +25,18 @@ import org.json.simple.JSONObject;
  * @author zacknewsham
  */
 public class SimpleGraphViewer extends GraphViewer<Node, Edge>{
-  protected HashMap<Node, Point> nodePositions = new HashMap<Node, Point>();
   private ArrayList<Node> temp_nodes;
-  public SimpleGraphViewer(Graph graph, HashMap node_lists) {
-    super(graph, node_lists);
+  public SimpleGraphViewer(Graph graph, HashMap node_lists, Placer placer) {
+    super(graph, node_lists, placer);
   }
 
   @Override
   public void init() {
-    
+    setUpdatedNodes(graph.getNodes());
+    long start = System.currentTimeMillis();
+    placer.init();
+    long end = System.currentTimeMillis();
+    System.out.printf("%f Seconds\n", ((double)end -(double) start) /(double) 1000);
   }
   
   public void fromJson(JSONObject json){
@@ -47,78 +51,20 @@ public class SimpleGraphViewer extends GraphViewer<Node, Edge>{
 
   @Override
   public Node getNodeAtXY(int x, int y) {
-    x /= getScale();
-    y /= getScale();
-    Iterator<Node> nodes = graph.getNodeIterator();
-    Rectangle r = new Rectangle(0, 0, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER);
-    while(nodes.hasNext()){
-      Node node = nodes.next();
-      r.x = getX(node);
-      r.y = getY(node);
-      if(r.contains(x, y)){
-        return node;
-      }
-    }
-    return null;
+    return placer.getNodeAtXY(x, y, getScale());
   }
 
   
+  @Override
   public int getY(Node node){
-    return getY(node, false);
+    return placer.getY(node);
   }
   
-  private int getY(Node node, boolean fromX) {
-    if(sqrt_size == 0){
-      sqrt_size = (int)Math.round(Math.sqrt(getGraph().getNodesList().size()));
-    }
-    if(nodePositions.get(node) == null || fromX){
-      int index = node.getId();
-      int offset =  50 + (int)(index / sqrt_size) * (DrawableNode.NODE_DIAMETER + DrawableNode.NODE_X_SPACING);
-      
-      Point p;
-      
-      if(!fromX){
-        p = new Point();
-        nodePositions.put(node, p);
-        p.x = getX(node, true);
-      }
-      else{
-        p = nodePositions.get(node);
-      }
-      p.y = offset;
-      return p.y;
-    }
-    return nodePositions.get(node).y;
-  }
   @Override
   public int getX(Node node){
-    return getX(node, false);
+    return placer.getX(node);
   }
-  
-  private int sqrt_size = 0;
-  protected int getX(Node node, boolean fromY) {
-    if(sqrt_size == 0){
-      sqrt_size = (int)Math.round(Math.sqrt(getGraph().getNodesList().size()));
-    }
-    if(nodePositions.get(node) == null || fromY){
-      int index = node.getId();
-      int offset = 50 + (int)(index % sqrt_size) * (DrawableNode.NODE_DIAMETER + DrawableNode.NODE_X_SPACING);
-      
-      Point p;
-      if(!fromY){
-        p = new Point();
-        nodePositions.put(node, p);
-        p.y = getY(node, true);
-      }
-      else{
-        p = nodePositions.get(node);
-      }
-      p.x = offset;
-      return p.x;
-    }
-    return nodePositions.get(node).x;
-  }
-  
+    
   @Override
   public Color getFillColor(Node node){
     return getColor(node);

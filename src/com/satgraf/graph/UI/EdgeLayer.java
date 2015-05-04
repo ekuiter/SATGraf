@@ -36,7 +36,7 @@ public class EdgeLayer extends Layer {
   public synchronized void paintComponent(final Graphics g) {
     this.g = g;
     int taskCount = threadCount;
-    int edgeCount = graph.getGraph().getEdgesList().size();
+    int edgeCount = graph.getGraph().getEdges().size();
     Graphics2D g2d = (Graphics2D) g.create();
 
     ArrayList<Future> threads = new ArrayList();
@@ -64,7 +64,7 @@ public class EdgeLayer extends Layer {
   }
 
   private void drawEdges(int from, int to) {
-    ArrayList<Edge> edges = new ArrayList<Edge>(graph.getGraph().getEdgesList());
+    ArrayList<Edge> edges = new ArrayList<Edge>(graph.getGraph().getEdges());
     scale = graph.getScale();
     for (int i = from; i < to; i++) {
       Edge e = edges.get(i);

@@ -19,6 +19,7 @@ public class HighlightLayer<T extends GraphViewer> extends Layer {
 
   protected T graph;
   public static Color HIGHLIGHT_COLOR = new Color(0xe4, 0xfd, 0x03);
+  Node highligted;
 
   public HighlightLayer(Dimension size, T graph) {
     super(size);
@@ -29,12 +30,11 @@ public class HighlightLayer<T extends GraphViewer> extends Layer {
     Graphics2D g2 = (Graphics2D) g;
     g2.setRenderingHints(GraphCanvas.getRenderingHints());
     Node n = graph.getSelectedNode();
-    Point pos = getMousePosition();
 
     Node n1 = null;
-    if (pos != null) {
-      getNodeAroundXY(pos.x, pos.y);
-    }
+    if(highligted != null){
+      n1 = highligted;
+  }
     if ((n == null || !drawNode(n))) {
       n = n1;
     }
@@ -71,7 +71,7 @@ public class HighlightLayer<T extends GraphViewer> extends Layer {
     }
     int scaled_diameter = (int) Math.ceil(DrawableNode.NODE_DIAMETER * graph.getScale());
     Stroke s = g2.getStroke();
-    Iterator<Edge> es = n.getEdges();
+    Iterator<Edge> es = n.getEdges().iterator();
     if(edges){
       while (es.hasNext()) {
         Edge e = es.next();

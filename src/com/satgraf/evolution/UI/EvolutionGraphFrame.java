@@ -1,4 +1,4 @@
-package com.satgraf.evolution2.UI;
+package com.satgraf.evolution.UI;
 
 import static com.satgraf.ForceInit.forceInit;
 import com.satgraf.community.UI.CommunityGraphFrame;
@@ -8,11 +8,11 @@ import com.satgraf.graph.placer.FruchPlacer;
 import com.satgraf.community.placer.GridKKPlacer;
 import com.satgraf.community.placer.GridPlacer;
 import com.satgraf.graph.placer.KKPlacer;
-import com.satgraf.evolution2.observers.EvolutionObserverFactory;
-import com.satgraf.evolution2.observers.QEvolutionObserver;
-import com.satgraf.evolution2.observers.VSIDSSpacialLocalityEvolutionObserver;
-import com.satgraf.evolution2.observers.VSIDSTemporalLocalityEvolutionObserver;
-import com.satgraf.evolution2.observers.VisualEvolutionObserver;
+import com.satgraf.evolution.observers.EvolutionObserverFactory;
+import com.satgraf.evolution.observers.QEvolutionObserver;
+import com.satgraf.evolution.observers.VSIDSSpacialLocalityEvolutionObserver;
+import com.satgraf.evolution.observers.VSIDSTemporalLocalityEvolutionObserver;
+import com.satgraf.evolution.observers.VisualEvolutionObserver;
 import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphOptionsPanel;
 import com.satlib.community.CNMCommunityMetric;
@@ -45,7 +45,7 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-public class Evolution2GraphFrame extends CommunityGraphFrame {
+public class EvolutionGraphFrame extends CommunityGraphFrame {
   static{
     forceInit(FruchGPUPlacer.class);
     forceInit(FruchPlacer.class);
@@ -56,14 +56,14 @@ public class Evolution2GraphFrame extends CommunityGraphFrame {
     forceInit(LouvianCommunityMetric.class);
     forceInit(OLCommunityMetric.class);
     forceInit(CNMCommunityMetric.class);
-    forceInit(com.satgraf.evolution2.observers.EvolutionObserverFactory.class);
+    forceInit(com.satgraf.evolution.observers.EvolutionObserverFactory.class);
     forceInit(VSIDSTemporalLocalityEvolutionObserver.class);
     forceInit(QEvolutionObserver.class);
     forceInit(VSIDSSpacialLocalityEvolutionObserver.class);
   }
   private EvolutionGraphFactory factory;
   public static String minisat;
-  public Evolution2GraphFrame(EvolutionGraphFactory factory, Evolution2GraphViewer viewer, HashMap<String, Pattern> patterns, CommunityMetric metric) {
+  public EvolutionGraphFrame(EvolutionGraphFactory factory, EvolutionGraphViewer viewer, HashMap<String, Pattern> patterns, CommunityMetric metric) {
     super(viewer, patterns, metric);
     this.factory = factory;
     
@@ -84,14 +84,14 @@ public class Evolution2GraphFrame extends CommunityGraphFrame {
     return json.toString();
   }
   
-  public Evolution2GraphViewer getGraphViewer(){
-	 return (Evolution2GraphViewer)graphViewer;
+  public EvolutionGraphViewer getGraphViewer(){
+	 return (EvolutionGraphViewer)graphViewer;
   }
 
   public void show() {
     if (graphViewer != null && graphViewer.graph != null && panel == null) {
-      canvasPanel = new GraphCanvasPanel(new Evolution2GraphCanvas((Evolution2GraphViewer)graphViewer));
-      panel = new Evolution2OptionsPanel(this, getGraphViewer(), patterns.keySet());
+      canvasPanel = new GraphCanvasPanel(new EvolutionGraphCanvas((EvolutionGraphViewer)graphViewer));
+      panel = new EvolutionOptionsPanel(this, getGraphViewer(), patterns.keySet());
       super.show();
     } else {
       super.show();
@@ -180,7 +180,7 @@ public class Evolution2GraphFrame extends CommunityGraphFrame {
     String comName = cl.getOptionValue("c", o.getOption("c").getValue());
     HashMap<String, String> patterns = new HashMap<String, String>();
     minisat = cl.getOptionValue("s",o.getOption("s").getValue());
-    Evolution2GraphFactoryFactory factoryfactory = new Evolution2GraphFactoryFactory(comName, minisat);
+    EvolutionGraphFactoryFactory factoryfactory = new EvolutionGraphFactoryFactory(comName, minisat);
     EvolutionGraphFactory factory;
     Object in;
     if(cl.getOptionValue("f") == null && cl.getOptionValue("u") == null){
@@ -198,9 +198,9 @@ public class Evolution2GraphFrame extends CommunityGraphFrame {
       in = input;
       factory = factoryfactory.getFactory(input, patterns);
     }
-    Evolution2GraphViewer graphViewer = new Evolution2GraphViewer(null, factory.getNodeLists(), null);
+    EvolutionGraphViewer graphViewer = new EvolutionGraphViewer(null, factory.getNodeLists(), null);
     
-    Evolution2GraphFrame frmMain = new Evolution2GraphFrame(factory, graphViewer, factory.getPatterns(), factory.getMetric());
+    EvolutionGraphFrame frmMain = new EvolutionGraphFrame(factory, graphViewer, factory.getPatterns(), factory.getMetric());
     frmMain.setPlacerName(cl.getOptionValue("l", o.getOption("l").getValue()));
     frmMain.setCommunityName(comName);
     frmMain.setProgressive(factory);

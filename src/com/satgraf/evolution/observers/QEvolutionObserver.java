@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.satgraf.evolution2.observers;
+package com.satgraf.evolution.observers;
 
 import com.satlib.community.Community;
 import com.satlib.community.CommunityEdge;
@@ -12,7 +12,7 @@ import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityNode;
 import com.satlib.community.ConcreteCommunityGraph;
-import com.satgraf.evolution2.UI.Evolution2GraphViewer;
+import com.satgraf.evolution.UI.EvolutionGraphViewer;
 import com.satlib.evolution.EvolutionGraph;
 import com.satlib.graph.Clause;
 import com.satlib.graph.Node;
@@ -57,17 +57,19 @@ public class QEvolutionObserver extends JPanel implements VisualEvolutionObserve
     com.satlib.evolution.observers.EvolutionObserverFactory.getInstance().register("Q", QEvolutionObserver.class);
   }
 
-  public QEvolutionObserver(Evolution2GraphViewer graphViewer){
+  public QEvolutionObserver(EvolutionGraphViewer graphViewer){
     this.graph = graphViewer.getGraph();
     tmpGraph = new ConcreteCommunityGraph(){
-      
-      public Iterator<CommunityNode> getNodesIterator(){
-        return getNodes().iterator();
-      }
-      
       @Override
-      public Iterator<CommunityEdge> getEdges(){
-        return getEdgesList().iterator();
+      public Collection<CommunityEdge> getEdges(){
+        Collection<CommunityEdge> edges = new ArrayList<>();
+        for(CommunityEdge e : super.getEdges()){
+          if((e.getStart().getAssignmentState() == null || e.getStart().getAssignmentState() == Node.NodeAssignmentState.UNASSIGNED) &&
+                  (e.getEnd().getAssignmentState() == null || e.getEnd().getAssignmentState() == Node.NodeAssignmentState.UNASSIGNED)){
+            edges.add(e);
+          }
+        }
+        return edges;
       }
       
       @Override
@@ -81,22 +83,11 @@ public class QEvolutionObserver extends JPanel implements VisualEvolutionObserve
         return nodes;
       }
       
-      @Override
-      public Collection<CommunityEdge> getEdgesList(){
-        Collection<CommunityEdge> edges = new ArrayList<>();
-        for(CommunityEdge e : super.getEdgesList()){
-          if((e.getStart().getAssignmentState() == null || e.getStart().getAssignmentState() == Node.NodeAssignmentState.UNASSIGNED) &&
-                  (e.getEnd().getAssignmentState() == null || e.getEnd().getAssignmentState() == Node.NodeAssignmentState.UNASSIGNED)){
-            edges.add(e);
-          }
-        }
-        return edges;
-      }
     };
     for(CommunityNode n : graph.getNodes()){
       tmpGraph.createNode(n.getId(), n.getName());
     }
-    for(CommunityEdge e : graph.getEdgesList()){
+    for(CommunityEdge e : graph.getEdges()){
      tmpGraph.createEdge(tmpGraph.getNode(e.getStart().getId()), tmpGraph.getNode(e.getEnd().getId()), false);
     }
     

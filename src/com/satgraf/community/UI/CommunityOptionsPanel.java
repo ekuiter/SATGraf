@@ -85,10 +85,10 @@ public class CommunityOptionsPanel extends GraphOptionsPanel{
       communityScroll = new JScrollPane(communityPanel);
       checkBoxPanel.addBar("Communities", communityScroll);
       
-      HashSet<CommunityEdge> interConnections = new HashSet<CommunityEdge>();
-      HashSet<CommunityEdge> intraConnections = new HashSet<CommunityEdge>();
+      HashSet<CommunityEdge> interConnections = new HashSet<>();
+      HashSet<CommunityEdge> intraConnections = new HashSet<>();
       
-      Iterator<Edge> eit = graph.getEdgeIterator();
+      Iterator<CommunityEdge> eit = graph.getEdges().iterator();
       while (eit.hasNext()) {
     	  CommunityEdge e = (CommunityEdge) eit.next();
     	  

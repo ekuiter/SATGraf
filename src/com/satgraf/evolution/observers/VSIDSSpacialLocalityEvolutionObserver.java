@@ -4,9 +4,9 @@
  * and open the template in the editor.
  */
 
-package com.satgraf.evolution2.observers;
+package com.satgraf.evolution.observers;
 
-import com.satgraf.evolution2.UI.Evolution2GraphViewer;
+import com.satgraf.evolution.UI.EvolutionGraphViewer;
 import com.satlib.community.Community;
 import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityMetric;
@@ -55,7 +55,7 @@ import org.jfree.data.general.DatasetChangeEvent;
  */
 public class VSIDSSpacialLocalityEvolutionObserver extends JPanel implements VisualEvolutionObserver, ChartMouseListener{
   private final EvolutionGraph graph;
-  private final Evolution2GraphViewer graphViewer;
+  private final EvolutionGraphViewer graphViewer;
   private final SortableCategoryDataset dataset = new SortableCategoryDataset();
   private final JFreeChart objChart = ChartFactory.createStackedAreaChart("Communities used", "Community ID", "# Decision", dataset);
   private final ChartPanel chartPanel = new ChartPanel(objChart);
@@ -71,7 +71,7 @@ public class VSIDSSpacialLocalityEvolutionObserver extends JPanel implements Vis
     EvolutionObserverFactory.getInstance().register("VSIDSS", VSIDSSpacialLocalityEvolutionObserver.class);
   }
   
-  public VSIDSSpacialLocalityEvolutionObserver(Evolution2GraphViewer graph){
+  public VSIDSSpacialLocalityEvolutionObserver(EvolutionGraphViewer graph){
     this.graph = graph.getGraph();
     this.graphViewer = graph;
     init();

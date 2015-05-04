@@ -89,7 +89,7 @@ public class CommunityNodePanel extends NodePanel<CommunityNode>{
     community.setText(String.format("%d", node.getCommunity()));
     HashSet<CommunityEdge> inter = new HashSet<CommunityEdge>();
     HashSet<CommunityEdge> intra = new HashSet<CommunityEdge>();
-    Iterator<CommunityEdge> cons = node.getEdges();
+    Iterator<CommunityEdge> cons = node.getEdges().iterator();
     while(cons.hasNext()){
       CommunityEdge con = (CommunityEdge)cons.next();
       if(con.getStart().getCommunity() == con.getEnd().getCommunity()){
