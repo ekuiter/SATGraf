@@ -5,6 +5,7 @@ cd solvers/minisat
 make   
 cd ../../   
 Notes:   
+The fgpu option is under development and may not work fully. 
 Either -f or -u must be specified.   
     
 Usage: java -jar SatGraf.jar [com|imp|evo] <options>
