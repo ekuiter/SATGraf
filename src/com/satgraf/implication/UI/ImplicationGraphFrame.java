@@ -92,7 +92,7 @@ public class ImplicationGraphFrame extends GraphFrame{
     
     o = new ValidatedOption("l","layout",true,"The layout algorithm to use");
     o.setDefault("f");
-    o.addRule(new ListValidationRule(PlacerFactory.getInstance().getNames()));
+    o.addRule(new ListValidationRule(PlacerFactory.getInstance().getNames(),PlacerFactory.getInstance().getDescriptions()));
     options.addOption(o);
     
     o = new ValidatedOption("p", "pattern",true,"A list of regex expressions to group variables (not yet implemented)");

@@ -22,6 +22,7 @@ import com.satlib.community.LouvianCommunityMetric;
 import com.satlib.community.OLCommunityMetric;
 import com.satgraf.community.placer.CommunityPlacer;
 import com.satgraf.community.placer.CommunityPlacerFactory;
+import com.satgraf.graph.placer.PlacerFactory;
 import com.satlib.evolution.DimacsEvolutionGraphFactory;
 import com.satlib.evolution.EvolutionGraphFactory;
 import com.satlib.evolution.observers.EvolutionObserver;
@@ -47,15 +48,6 @@ import org.apache.commons.cli.ParseException;
 
 public class EvolutionGraphFrame extends CommunityGraphFrame {
   static{
-    forceInit(FruchGPUPlacer.class);
-    forceInit(FruchPlacer.class);
-    forceInit(KKPlacer.class);
-    forceInit(GridKKPlacer.class);
-    forceInit(GridPlacer.class);
-    forceInit(CircularCommunityPlacer.class);
-    forceInit(LouvianCommunityMetric.class);
-    forceInit(OLCommunityMetric.class);
-    forceInit(CNMCommunityMetric.class);
     forceInit(com.satgraf.evolution.observers.EvolutionObserverFactory.class);
     forceInit(VSIDSTemporalLocalityEvolutionObserver.class);
     forceInit(QEvolutionObserver.class);
@@ -133,12 +125,32 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     
     o = new ValidatedOption("c", "community", true,"The community detection algorithm");
     o.setDefault("ol");
-    o.addRule(new ListValidationRule(CommunityMetricFactory.getInstance().getNames()));
+    o.addRule(new ListValidationRule(CommunityMetricFactory.getInstance().getNames(), CommunityMetricFactory.getInstance().getDescriptions()));
     options.addOption(o);
     
     o = new ValidatedOption("l","layout",true,"The layout algorithm to use");
     o.setDefault("f");
-    o.addRule(new ListValidationRule(CommunityPlacerFactory.getInstance().getNames()));
+    String[] names = new String[CommunityPlacerFactory.getInstance().getNames().length + PlacerFactory.getInstance().getNames().length];
+    String[] descriptions = new String[CommunityPlacerFactory.getInstance().getDescriptions().length + PlacerFactory.getInstance().getDescriptions().length];
+    int i = 0;
+    for(String name : PlacerFactory.getInstance().getNames()){
+      names[i] = name;
+      i++;
+    }
+    for(String name : CommunityPlacerFactory.getInstance().getNames()){
+      names[i] = name;
+      i++;
+    }
+    i = 0;
+    for(String description : PlacerFactory.getInstance().getDescriptions()){
+      descriptions[i] = description;
+      i++;
+    }
+    for(String description : CommunityPlacerFactory.getInstance().getDescriptions()){
+      descriptions[i] = description;
+      i++;
+    }
+    o.addRule(new ListValidationRule(names, descriptions));
     options.addOption(o);
     
     o = new ValidatedOption("p", "pattern",true,"A list of regex expressions to group variables (not yet implemented)");
@@ -150,7 +162,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     options.addOption(o);
     
     o = new ValidatedOption("o", "observers", true, "A named evolution observer");
-    o.addRule(new ListValidationRule(EvolutionObserverFactory.getInstance().getNames()));
+    o.addRule(new ListValidationRule(EvolutionObserverFactory.getInstance().getNames(),EvolutionObserverFactory.getInstance().getDescriptions()));
     options.addOption(o);
     return options;
   }

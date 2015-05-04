@@ -30,7 +30,7 @@ import java.util.Iterator;
  */
 public class GridKKPlacer extends AbstractPlacer<CommunityNode, CommunityGraph> implements CommunityPlacer{
   static{
-    CommunityPlacerFactory.getInstance().register("gkk", GridKKPlacer.class);
+    CommunityPlacerFactory.getInstance().register("gkk", "A basic layout algorithm, nodes are layed out within a community using the KK algorithm. The communities are then layed out on a grid", GridKKPlacer.class);
   }
   private TIntObjectHashMap<KKPlacer> kkPlacers = new TIntObjectHashMap<KKPlacer>();
   private KKPlacer communityKKPlacer;

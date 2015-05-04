@@ -33,7 +33,7 @@ import java.util.Random;
  */
 public class CircularCommunityPlacer extends AbstractPlacer<CommunityNode, CommunityGraph> implements CommunityPlacer{
   static{
-    CommunityPlacerFactory.getInstance().register("c", CircularCommunityPlacer.class);
+    CommunityPlacerFactory.getInstance().register("c", "A basic layout algorithm, nodes are layed out within a community using the FR layout algorithm. The communities are then layed out in a circle, with those most connected next to each other.", CircularCommunityPlacer.class);
   }
   private double progress = 0.0;
   private static final int NODE_WIDTH = 10;

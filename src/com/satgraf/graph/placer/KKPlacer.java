@@ -16,7 +16,7 @@ import java.util.Iterator;
 
 public class KKPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>> {
   static{
-    PlacerFactory.getInstance().register("kk", KKPlacer.class);
+    PlacerFactory.getInstance().register("kk", "An implementation of the Kamada-Kawai placement algorithm", KKPlacer.class);
   }
 	
 	//kamada-kawai algorithm vars

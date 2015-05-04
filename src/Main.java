@@ -61,10 +61,10 @@ public class Main {
   public static String usage(){
     String dashes = "--------------------------------";
     StringBuilder builder = new StringBuilder();
-    builder.append("Usage: java -jar SatGraf.jar [com|imp|evo|evo2] <options>\n");
-    builder.append(dashes).append("\ncom\n").append("\t".concat(Help.getHelp(CommunityGraphFrame.options()).replace("\n","\n\t"))).append("\n").append(dashes).append("\n");
-    builder.append(dashes).append("\nimp\n").append("\tNot currently supported\n".replace("\n","\n\t\n")).append(dashes).append("\n");
-    builder.append(dashes).append("\nevo\n").append("\t".concat(Help.getHelp(EvolutionGraphFrame.options()).replace("\n","\n\t"))).append("\n").append(dashes).append("\n");
+    builder.append("Usage: java -jar SatGraf.jar [com|imp|evo] <options>\n");
+    builder.append(dashes).append("\ncom - View the static community representation of the formula.\n").append("\t".concat(Help.getHelp(CommunityGraphFrame.options()).replace("\n","\n\t"))).append("\n").append(dashes).append("\n");
+    builder.append(dashes).append("\nimp - View the graph and manually set the values of nodes to see how they propagate.\n").append("\t".concat(Help.getHelp(ImplicationGraphFrame.options()).replace("\n","\n\t"))).append("\n").append(dashes).append("\n");
+    builder.append(dashes).append("\nevo - View the evolution of the structure of the graph, with other evolution properties presented.\n").append("\t".concat(Help.getHelp(EvolutionGraphFrame.options()).replace("\n","\n\t"))).append("\n").append(dashes).append("\n");
     /*builder.append("com ").append(CommunityGraphFrame.usage()).append("\n").append(CommunityGraphFrame.help()).append("\n\n");
     builder.append("imp ").append(ImplicationGraphFrame.usage()).append("\n").append(ImplicationGraphFrame.help()).append("\n\n");
     builder.append("evo ").append(EvolutionGraphFrame.usage()).append("\n").append(EvolutionGraphFrame.help()).append("\n\n");

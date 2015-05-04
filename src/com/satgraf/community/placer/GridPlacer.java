@@ -27,7 +27,7 @@ import java.util.Iterator;
  */
 public class GridPlacer extends AbstractPlacer<CommunityNode, CommunityGraph> implements CommunityPlacer {
   static{
-    CommunityPlacerFactory.getInstance().register("grid", GridPlacer.class);
+    CommunityPlacerFactory.getInstance().register("grid", "A basic layout algorithm, nodes are layed out within a community in a grid pattern. The communities are then layed out on a grid", GridPlacer.class);
   }
 	
   private HashMap<CommunityNode, Point> nodePositions = new HashMap<CommunityNode, Point>();

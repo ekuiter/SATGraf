@@ -94,7 +94,7 @@ import java.util.*;
 
 public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>> {
   static{
-    PlacerFactory.getInstance().register("f", FruchPlacer.class);
+    PlacerFactory.getInstance().register("f", "An implementation of the Fruchtermon and Reingold force directed layout algorithm", FruchPlacer.class);
   }
 
     private int pad = 20;

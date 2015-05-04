@@ -9,10 +9,12 @@ package com.satgraf.community.UI;
 import static com.satgraf.ForceInit.forceInit;
 import com.satgraf.community.placer.CircularCommunityPlacer;
 import com.satgraf.community.placer.CommunityPlacerFactory;
+import com.satgraf.community.placer.GridKKPlacer;
 import com.satgraf.community.placer.GridPlacer;
 import com.satgraf.community.placer.JSONCommunityPlacer;
 import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphFrame;
+import com.satgraf.graph.placer.FruchGPUPlacer;
 import com.satgraf.graph.placer.FruchPlacer;
 import com.satgraf.graph.placer.KKPlacer;
 import com.satgraf.graph.placer.Placer;
@@ -52,6 +54,7 @@ public class CommunityGraphFrame extends GraphFrame{
     //forceInit(FruchGPUPlacer.class);
     forceInit(FruchPlacer.class);
     forceInit(KKPlacer.class);
+    forceInit(GridKKPlacer.class);
     forceInit(GridPlacer.class);
     forceInit(CircularCommunityPlacer.class);
     forceInit(LouvianCommunityMetric.class);
@@ -130,12 +133,13 @@ public class CommunityGraphFrame extends GraphFrame{
     
     o = new ValidatedOption("c", "community", true,"The community detection algorithm");
     o.setDefault("ol");
-    o.addRule(new ListValidationRule(CommunityMetricFactory.getInstance().getNames()));
+    o.addRule(new ListValidationRule(CommunityMetricFactory.getInstance().getNames(), CommunityMetricFactory.getInstance().getDescriptions()));
     options.addOption(o);
     
     o = new ValidatedOption("l","layout",true,"The layout algorithm to use");
     o.setDefault("f");
     String[] names = new String[CommunityPlacerFactory.getInstance().getNames().length + PlacerFactory.getInstance().getNames().length];
+    String[] descriptions = new String[CommunityPlacerFactory.getInstance().getDescriptions().length + PlacerFactory.getInstance().getDescriptions().length];
     int i = 0;
     for(String name : PlacerFactory.getInstance().getNames()){
       names[i] = name;
@@ -145,7 +149,16 @@ public class CommunityGraphFrame extends GraphFrame{
       names[i] = name;
       i++;
     }
-    o.addRule(new ListValidationRule(names));
+    i = 0;
+    for(String description : PlacerFactory.getInstance().getDescriptions()){
+      descriptions[i] = description;
+      i++;
+    }
+    for(String description : CommunityPlacerFactory.getInstance().getDescriptions()){
+      descriptions[i] = description;
+      i++;
+    }
+    o.addRule(new ListValidationRule(names, descriptions));
     options.addOption(o);
     
     o = new ValidatedOption("p", "pattern",true,"A list of regex expressions to group variables (not yet implemented)");

@@ -17,15 +17,24 @@ import java.util.HashMap;
  * @author zacknewsham
  */
 public class PlacerFactory {
-  private static final HashMap<String, Class<? extends Placer>> classes = new HashMap<>();
   private static final PlacerFactory singleton = new PlacerFactory();
+  private final HashMap<String, Class<? extends Placer>> classes = new HashMap<>();
+  private final HashMap<String, String> descriptions = new HashMap<>();
   public static PlacerFactory getInstance(){
     return singleton;
   }
   
-  public void register(String name, Class<? extends Placer> c){
+  public void register(String name, String description, Class<? extends Placer> c){
     classes.put(name, c);
+    descriptions.put(name, description);
   }
+  
+  public String[] getDescriptions(){
+    String[] names = new String[classes.size()];
+    descriptions.values().toArray(names);
+    return names;
+  }
+  
   public String[] getNames(){
     String[] names = new String[classes.size()];
     classes.keySet().toArray(names);

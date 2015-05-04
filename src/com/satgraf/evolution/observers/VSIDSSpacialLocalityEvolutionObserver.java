@@ -68,7 +68,7 @@ public class VSIDSSpacialLocalityEvolutionObserver extends JPanel implements Vis
   private Comparator currentComparator = COMMUNITY_COMPARATOR;
   private CommunityMetric metric;
   static{
-    EvolutionObserverFactory.getInstance().register("VSIDSS", VSIDSSpacialLocalityEvolutionObserver.class);
+    EvolutionObserverFactory.getInstance().register("VSIDSS", "A graphical representation of the spacial locailty of the VSIDS decision heuristic", VSIDSSpacialLocalityEvolutionObserver.class);
   }
   
   public VSIDSSpacialLocalityEvolutionObserver(EvolutionGraphViewer graph){

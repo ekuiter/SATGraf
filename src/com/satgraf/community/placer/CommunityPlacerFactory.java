@@ -17,14 +17,23 @@ import java.util.HashMap;
  */
 public class CommunityPlacerFactory {
   private static final CommunityPlacerFactory singleton = new CommunityPlacerFactory();
+  private final HashMap<String, String> descriptions = new HashMap<>();
+  private final HashMap<String, Class<? extends CommunityPlacer>> classes = new HashMap<>();
   public static CommunityPlacerFactory getInstance(){
     return singleton;
   }
   
-  private static final HashMap<String, Class<? extends CommunityPlacer>> classes = new HashMap<>();
     
-  public void register(String name, Class<? extends CommunityPlacer> c){
+  
+  public void register(String name, String description, Class<? extends CommunityPlacer> c){
     classes.put(name, c);
+    descriptions.put(name, description);
+  }
+  
+  public String[] getDescriptions(){
+    String[] names = new String[classes.size()];
+    descriptions.values().toArray(names);
+    return names;
   }
   
   public String[] getNames(){

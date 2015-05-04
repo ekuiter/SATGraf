@@ -53,7 +53,7 @@ public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements Ev
   private final JScrollPane chartScroll = new JScrollPane(chartPanel);
   private CommunityMetric metric;
   static{
-    EvolutionObserverFactory.getInstance().register("VSIDST", VSIDSTemporalLocalityEvolutionObserver.class);
+    EvolutionObserverFactory.getInstance().register("VSIDST", "A graphical representation of the temporal locailty of the VSIDS decision heuristic", VSIDSTemporalLocalityEvolutionObserver.class);
   }
   
   public VSIDSTemporalLocalityEvolutionObserver(EvolutionGraph graph){

@@ -96,7 +96,7 @@ import static org.jocl.CL.*;
  */
 public class FruchGPUPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>> {
   static{
-    PlacerFactory.getInstance().register("fgpu", FruchGPUPlacer.class);
+    PlacerFactory.getInstance().register("fgpu", "A GPU implementation of the Fruchtermon and Reingold force directed layout algorithm",FruchGPUPlacer.class);
   }
   private int pad = 20;
   private static final int float_workers = 1;
