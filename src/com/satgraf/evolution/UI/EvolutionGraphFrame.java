@@ -166,7 +166,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
        //"-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/unif-k3-r4.267-v421-c1796-S4839562527790587617.cnf",
         "-f","/home/zacknewsham/Sites/satgraf/demo/satgraf/formula/aes_16_10_keyfind_3.cnf",
         //"-f","./formula/27round.cnf",
-        "-c","ol",
+        "-c","l",
         "-l","c",
         "-o","Q"
       };

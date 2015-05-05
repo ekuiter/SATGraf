@@ -60,12 +60,16 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   public GraphViewer(Graph graph, HashMap<String, TIntObjectHashMap<String>> node_lists, Placer placer) {
     this.node_lists = node_lists;
     this.graph = graph;
-    placer = placer;
+    this.placer = placer;
     if(placer != null){
       init();
     }
   }
 
+  public Placer getPlacer(){
+    return placer;
+  }
+  
   public abstract String toJson();
 
   public abstract void fromJson(JSONObject json);

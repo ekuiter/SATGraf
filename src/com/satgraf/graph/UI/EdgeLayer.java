@@ -36,7 +36,7 @@ public class EdgeLayer extends Layer implements Progressive{
     return Color.WHITE;
   }
 
-  public synchronized void paint(final Graphics g) {
+  public synchronized void paintComponent(final Graphics g) {
     this.g = g;
     int taskCount = threadCount;
     int edgeCount = graph.getGraph().getEdges().size();
