@@ -4,27 +4,29 @@
  */
 package com.satgraf.graph.UI;
 
+import com.satlib.Progressive;
+import com.satlib.graph.Node;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
-
 import javax.swing.JLayeredPane;
-
 import org.json.simple.JSONObject;
-
-import com.satlib.graph.Node;
 
 /**
  *
  * @author zacknewsham
  */
-public class GraphCanvas extends JLayeredPane implements MouseListener, MouseMotionListener, GraphViewerObserver {
+public class GraphCanvas extends JLayeredPane implements MouseListener, MouseMotionListener, GraphViewerObserver, Progressive{
 
   protected GraphViewer graph;
   private Node clickedVariable = null;
@@ -162,19 +164,32 @@ public class GraphCanvas extends JLayeredPane implements MouseListener, MouseMot
 
   }
 
-  @Override
-  protected void paintChildren(Graphics g) {
-    if (!graph.isUpdateRequired()) {
-      g.drawImage(buffer, 0, 0, Color.BLACK, null);
-      highlightLayer.paintComponent(g);
-    } else {
-      BufferedImage image = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
-      Graphics g2 = image.createGraphics();
-      super.paintChildren(g2);
-      g.drawImage(image, 0, 0, Color.BLACK, null);
-      buffer = image;
-      highlightLayer.paintComponent(g);
+  private Area currentClip;
+  private boolean isLocalUpdateRequired(){
+    if(currentClip == null){
+      return true;
     }
+    else{
+      return !currentClip.contains(this.getVisibleRect());
+    }
+  }
+  
+  @Override
+  public void paint(Graphics g) {
+    if (graph.isUpdateRequired() || isLocalUpdateRequired()) {
+      if(currentClip == null){
+        currentClip = new Area();
+      }
+      currentClip.add(new Area(g.getClipBounds()));
+      if(buffer == null){
+        buffer = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
+      }
+      Graphics g2 = buffer.createGraphics();
+      g2.setClip(g.getClip());
+      super.paint(g2);
+    }
+    g.drawImage(buffer, 0, 0, Color.BLACK, null);
+    highlightLayer.paintComponent(g);
   }
 
   @Override
@@ -192,5 +207,16 @@ public class GraphCanvas extends JLayeredPane implements MouseListener, MouseMot
     RenderingHints hints = new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
     hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     return hints;
+  }
+
+  @Override
+  public String getProgressionName() {
+    return "Drawing Nodes";
+  }
+
+  @Override
+  public double getProgress() {
+    double avg = (nodeLayer.getProgress() + edgeLayer.getProgress()) / 2;
+    return avg;
   }
 }

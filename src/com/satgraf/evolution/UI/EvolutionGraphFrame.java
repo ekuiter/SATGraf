@@ -2,12 +2,8 @@ package com.satgraf.evolution.UI;
 
 import static com.satgraf.ForceInit.forceInit;
 import com.satgraf.community.UI.CommunityGraphFrame;
-import com.satgraf.community.placer.CircularCommunityPlacer;
-import com.satgraf.graph.placer.FruchGPUPlacer;
-import com.satgraf.graph.placer.FruchPlacer;
-import com.satgraf.community.placer.GridKKPlacer;
-import com.satgraf.community.placer.GridPlacer;
-import com.satgraf.graph.placer.KKPlacer;
+import com.satgraf.community.placer.CommunityPlacer;
+import com.satgraf.community.placer.CommunityPlacerFactory;
 import com.satgraf.evolution.observers.EvolutionObserverFactory;
 import com.satgraf.evolution.observers.QEvolutionObserver;
 import com.satgraf.evolution.observers.VSIDSSpacialLocalityEvolutionObserver;
@@ -15,14 +11,10 @@ import com.satgraf.evolution.observers.VSIDSTemporalLocalityEvolutionObserver;
 import com.satgraf.evolution.observers.VisualEvolutionObserver;
 import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphOptionsPanel;
-import com.satlib.community.CNMCommunityMetric;
+import com.satgraf.graph.placer.Placer;
+import com.satgraf.graph.placer.PlacerFactory;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
-import com.satlib.community.LouvianCommunityMetric;
-import com.satlib.community.OLCommunityMetric;
-import com.satgraf.community.placer.CommunityPlacer;
-import com.satgraf.community.placer.CommunityPlacerFactory;
-import com.satgraf.graph.placer.PlacerFactory;
 import com.satlib.evolution.DimacsEvolutionGraphFactory;
 import com.satlib.evolution.EvolutionGraphFactory;
 import com.satlib.evolution.observers.EvolutionObserver;
@@ -84,6 +76,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     if (graphViewer != null && graphViewer.graph != null && panel == null) {
       canvasPanel = new GraphCanvasPanel(new EvolutionGraphCanvas((EvolutionGraphViewer)graphViewer));
       panel = new EvolutionOptionsPanel(this, getGraphViewer(), patterns.keySet());
+      setProgressive(getGraphCanvas());
       super.show();
     } else {
       super.show();
@@ -170,10 +163,10 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
   public static void main(String[] args) throws IOException, ParseException {
     if (args.length == 0) {
       args = new String[]{
-        //"-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/unif-k3-r4.267-v421-c1796-S4839562527790587617.cnf",
-        "-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/aes_16_10_keyfind_3.cnf",
+       //"-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/unif-k3-r4.267-v421-c1796-S4839562527790587617.cnf",
+        "-f","/home/zacknewsham/Sites/satgraf/demo/satgraf/formula/aes_16_10_keyfind_3.cnf",
         //"-f","./formula/27round.cnf",
-        "-c","l",
+        "-c","ol",
         "-l","c",
         "-o","Q"
       };
@@ -226,7 +219,11 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     }
     graphViewer.setEvolution(factory.getEvolution());
     
-    CommunityPlacer p = CommunityPlacerFactory.getInstance().getByName(frmMain.getPlacerName(), factory.getGraph());
+    Placer p = null;
+    p = CommunityPlacerFactory.getInstance().getByName(frmMain.getPlacerName(), factory.getGraph());
+    if( p == null){
+      p = PlacerFactory.getInstance().getByName(frmMain.getPlacerName(), factory.getGraph());
+    }
     frmMain.setProgressive(p);
     graphViewer.graph = factory.getGraph();
     frmMain.init();

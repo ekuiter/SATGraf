@@ -191,16 +191,18 @@ public class QEvolutionObserver extends JPanel implements VisualEvolutionObserve
     if(isDecision){
       decisions.add(n);
       if(decisions.size() % windowSize == 0 && decisions.size() != 1){
-        double Q = metric.getCommunities(tmpGraph);
-        double worstCase = Double.parseDouble(lblWorstCase.getText());
-        double bestCase = Double.parseDouble(lblBestCase.getText());
-        if(Q < worstCase){
-          lblWorstCase.setText(String.format("%.03f", Q));
+        if(tmpGraph.getNodes().size() > 1){
+          double Q = metric.getCommunities(tmpGraph);
+          double worstCase = Double.parseDouble(lblWorstCase.getText());
+          double bestCase = Double.parseDouble(lblBestCase.getText());
+          if(Q < worstCase){
+            lblWorstCase.setText(String.format("%.03f", Q));
+          }
+          if(Q > bestCase){
+            lblBestCase.setText(String.format("%.03f", Q));
+          }
+          qSeries.add(decisions.size(), Q);
         }
-        if(Q > bestCase){
-          lblBestCase.setText(String.format("%.03f", Q));
-        }
-        qSeries.add(decisions.size(), Q);
       }
     }
   }

@@ -9,21 +9,19 @@ import java.util.concurrent.Executors;
 import javax.swing.JPanel;
 
 public abstract class Layer extends JPanel {
-	
-	protected ExecutorService pool;
-	protected int threadCount;
-	protected int currentThreadCount;
-	
-	public Layer(Dimension size) {
-		setLayout(new BorderLayout());
-		setOpaque(false);
-		setSize(size);
-		setPreferredSize(size);
-		
-		threadCount = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
-		pool = Executors.newFixedThreadPool(threadCount);
-	    currentThreadCount = threadCount;
-	}
 
-	public abstract void paintComponent(final Graphics g);
+  protected ExecutorService pool;
+  protected int threadCount;
+  protected int currentThreadCount;
+
+  public Layer(Dimension size) {
+    setLayout(new BorderLayout());
+    setOpaque(false);
+    setSize(size);
+    setPreferredSize(size);
+    setDoubleBuffered(true);
+    threadCount = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
+    pool = Executors.newFixedThreadPool(threadCount);
+    currentThreadCount = threadCount;
+  }
 }

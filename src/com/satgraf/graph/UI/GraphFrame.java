@@ -179,6 +179,7 @@ public abstract class GraphFrame extends JFrame{
     if(graphViewer != null && canvasPanel != null){
       mainPane.setLeftComponent(canvasPanel);
       mainPane.setRightComponent(panel);
+      canvasPanel.init();
     }
     super.show();
   }

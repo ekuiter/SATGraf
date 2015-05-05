@@ -8,6 +8,7 @@ package com.satgraf.UI;
 
 import com.satlib.Progressive;
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JLabel;
@@ -38,7 +39,14 @@ public class ProgressionViewer extends JPanel{
         synchronized(label){
           final int value = ProgressionViewer.this.item == null ? 0 : (int)(100 * ProgressionViewer.this.item.getProgress());
           if(value >= 100.0 && ProgressionViewer.this.getParent() != null){
-            ProgressionViewer.this.getParent().remove(ProgressionViewer.this);
+            SwingUtilities.invokeLater ( new Runnable (){
+              public void run (){
+                Container parent = ProgressionViewer.this.getParent();
+                parent.remove(ProgressionViewer.this);
+                parent.revalidate();
+                parent.repaint();
+              }
+            });
           }
           SwingUtilities.invokeLater ( new Runnable (){
               public void run (){

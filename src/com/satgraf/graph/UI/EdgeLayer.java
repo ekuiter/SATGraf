@@ -1,6 +1,7 @@
 package com.satgraf.graph.UI;
 
 import com.satgraf.UI.Layer;
+import com.satlib.Progressive;
 import com.satlib.graph.Edge;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -15,12 +16,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class EdgeLayer extends Layer {
+public class EdgeLayer extends Layer implements Progressive{
 	
   protected final GraphViewer graph;
-  private ExecutorService pool;
+  private final ExecutorService pool;
   private int threadCount;
   private Graphics g;
+  private int drawn = 0;
+  private int total = 0;
 
   public EdgeLayer(Dimension size, GraphViewer graph) {
     super(size);
@@ -33,12 +36,13 @@ public class EdgeLayer extends Layer {
     return Color.WHITE;
   }
 
-  public synchronized void paintComponent(final Graphics g) {
+  public synchronized void paint(final Graphics g) {
     this.g = g;
     int taskCount = threadCount;
     int edgeCount = graph.getGraph().getEdges().size();
     Graphics2D g2d = (Graphics2D) g.create();
-
+    drawn = 0;
+    total = edgeCount;
     ArrayList<Future> threads = new ArrayList();
     for (int t = taskCount; t > 0; t--) {
         final int from = (int) Math.floor(edgeCount * (t - 1) / taskCount);
@@ -74,6 +78,9 @@ public class EdgeLayer extends Layer {
       }
 
       drawConnection(e);
+      synchronized(pool){
+        drawn++;
+      }
     }
   }
 
@@ -90,10 +97,10 @@ public class EdgeLayer extends Layer {
       int startY = (int) (graph.getY(c.getStart()) * scale);
       int endX = (int) (graph.getX(c.getEnd()) * scale);
       int endY = (int) (graph.getY(c.getEnd()) * scale);
-      /*Rectangle r = new Rectangle(startX, startY, endX, endY);
-      if(r.intersects(this.getVisibleRect())==false){
+      Rectangle r = new Rectangle(Math.min(startX, endX), Math.min(startY, endY), Math.abs(startX-endX), Math.abs(startY-endY));
+      if(!r.intersects(g.getClipBounds()) && !g.getClipBounds().intersects(r)){
         return;
-      }*/
+      }
       
       synchronized (graph) {
         g.setColor(getColor(c));
@@ -103,5 +110,15 @@ public class EdgeLayer extends Layer {
         g2d.drawLine(startX, startY, endX, endY);
       }
     }
+  }
+
+  @Override
+  public String getProgressionName() {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  public double getProgress() {
+    return 1 / (double) total * (double) drawn;
   }
 }

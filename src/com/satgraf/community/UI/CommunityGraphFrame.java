@@ -179,7 +179,7 @@ public class CommunityGraphFrame extends GraphFrame{
         "-l","f"
       };
       System.out.print(Help.getHelp(options()));
-      //return;
+      return;
     }
     CommandLineParser clp = new GnuParser();
     Options o = options();
@@ -242,8 +242,8 @@ public class CommunityGraphFrame extends GraphFrame{
     }
     frmMain.setProgressive(p);
     graphViewer.graph = factory.getGraph();
-    graphViewer.setPlacer(p);
     frmMain.init();
+    graphViewer.setPlacer(p);
     frmMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frmMain.show();
   }

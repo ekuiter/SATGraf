@@ -58,13 +58,15 @@ public class DimacsEvolutionGraphFactory extends com.satlib.evolution.DimacsEvol
             fifo.getFile().delete();
           }
     	  fifo.create();
-
+          Thread.sleep(1000);
           Runtime.getRuntime().exec(String.format(getMinisat().concat(" %s"), input.getAbsolutePath()));
+          Thread.sleep(1000);
           BufferedReader reader = openPipedFile();
           String line;
-
+          int i = 0;
           while ((line = reader.readLine()) != null) {
             outputLine(line);
+            i++;
           }
 
           closeWriter();

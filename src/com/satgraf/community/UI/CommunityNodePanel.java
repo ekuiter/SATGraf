@@ -14,9 +14,13 @@ import com.satlib.community.CommunityEdge;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -78,50 +82,64 @@ public class CommunityNodePanel extends NodePanel<CommunityNode>{
   @Override
   public void update(){
     super.update();
-    if(node == null){
-    	community.setText("");
-    	interLabel.setText("");
-    	intraLabel.setText("");
-        panel.remove(interPanel);
-        panel.remove(intraPanel);
-      return;
-    }
-    community.setText(String.format("%d", node.getCommunity()));
-    HashSet<CommunityEdge> inter = new HashSet<CommunityEdge>();
-    HashSet<CommunityEdge> intra = new HashSet<CommunityEdge>();
-    Iterator<CommunityEdge> cons = node.getEdges().iterator();
-    while(cons.hasNext()){
-      CommunityEdge con = (CommunityEdge)cons.next();
-      if(con.getStart().getCommunity() == con.getEnd().getCommunity()){
-        intra.add(con);
+    Runnable t = new Runnable(){
+        public void run(){
+          if(node == null){
+            community.setText("");
+            interLabel.setText("");
+            intraLabel.setText("");
+            panel.remove(interPanel);
+            panel.remove(intraPanel);
+            return;
+          }
+          community.setText(String.format("%d", node.getCommunity()));
+          HashSet<CommunityEdge> inter = new HashSet<CommunityEdge>();
+          HashSet<CommunityEdge> intra = new HashSet<CommunityEdge>();
+          Iterator<CommunityEdge> cons = node.getEdges().iterator();
+          while(cons.hasNext()){
+            CommunityEdge con = (CommunityEdge)cons.next();
+            if(con.getStart().getCommunity() == con.getEnd().getCommunity()){
+              intra.add(con);
+            }
+            else{
+              inter.add(con);
+            }
+          }
+          interLabel.setText(String.format("Inter Edges (%d)", inter.size()));
+          intraLabel.setText(String.format("Intra Edges (%d)", intra.size()));
+          
+          GridBagConstraints c = new GridBagConstraints();
+          c.fill = GridBagConstraints.HORIZONTAL;
+          
+          panel.remove(interPanel);
+          panel.remove(intraPanel);
+          interPanel = new EdgeCheckBoxPanel(graph, inter);
+          intraPanel = new EdgeCheckBoxPanel(graph, intra);
+          
+          c.weightx = 0.0;
+          c.gridx = 0;
+          c.gridwidth = 2;
+          c.gridy = 4;
+          c.weighty = 0.45;
+          panel.add(interPanel, c);
+          
+          c.weightx = 0.0;
+          c.gridx = 0;
+          c.gridwidth = 2;
+          c.gridy = 6;
+          c.weighty = 0.45;
+          panel.add(intraPanel, c);
+        }
+      };
+    try {
+      if(SwingUtilities.isEventDispatchThread()){
+        t.run();
       }
       else{
-        inter.add(con);
+        SwingUtilities.invokeAndWait(t);
       }
+    } catch (InterruptedException | InvocationTargetException ex) {
+      Logger.getLogger(CommunityNodePanel.class.getName()).log(Level.SEVERE, null, ex);
     }
-    interLabel.setText(String.format("Inter Edges (%d)", inter.size()));
-    intraLabel.setText(String.format("Intra Edges (%d)", intra.size()));
-    
-    GridBagConstraints c = new GridBagConstraints();
-    c.fill = GridBagConstraints.HORIZONTAL;
-    
-    panel.remove(interPanel);
-    panel.remove(intraPanel);
-    interPanel = new EdgeCheckBoxPanel(graph, inter);
-    intraPanel = new EdgeCheckBoxPanel(graph, intra);
-    
-    c.weightx = 0.0;
-    c.gridx = 0;
-    c.gridwidth = 2;
-    c.gridy = 4;
-    c.weighty = 0.45;
-    panel.add(interPanel, c);
-    
-    c.weightx = 0.0;
-    c.gridx = 0;
-    c.gridwidth = 2;
-    c.gridy = 6;
-    c.weighty = 0.45;
-    panel.add(intraPanel, c);
   }
 }
