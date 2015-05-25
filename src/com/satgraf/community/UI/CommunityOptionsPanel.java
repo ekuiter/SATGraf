@@ -8,17 +8,21 @@ package com.satgraf.community.UI;
 
 
 
-import com.satlib.community.CommunityEdge;
-import com.satlib.community.CommunityGraphViewer;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
+
 import javax.swing.JScrollPane;
+
 import org.json.simple.JSONObject;
+
 import com.satgraf.graph.UI.EdgeCheckBoxPanel;
 import com.satgraf.graph.UI.GraphFrame;
 import com.satgraf.graph.UI.GraphOptionsPanel;
 import com.satgraf.graph.UI.NodePanel;
 import com.satgraf.graph.UI.OptionsPanel;
+import com.satlib.community.CommunityEdge;
+import com.satlib.graph.Edge;
 
 /**
  *
@@ -72,30 +76,34 @@ public class CommunityOptionsPanel extends GraphOptionsPanel{
   }
   
   protected void setGraph(CommunityGraphViewer graph, boolean clearPanel){
-    infoPanel = new CommunityGraphInfoPanel(graph.getGraph());
+    if(infoPanel == null){
+      infoPanel = new CommunityGraphInfoPanel(graph);
+    }
     super.setGraph(graph, clearPanel);
     synchronized(checkBoxPanel){
       communityPanel = new CommunityCheckBoxPanel(graph);
       communityScroll = new JScrollPane(communityPanel);
       checkBoxPanel.addBar("Communities", communityScroll);
-      int community = 0;
-      Collection<CommunityEdge> interConnections = graph.getInterCommunityConnections(community);
-
-      HashSet<CommunityEdge> interConnectionForCheckboxes = new HashSet<CommunityEdge>();
-      interConnectionForCheckboxes.add(new CommunityEdge(true));
-      HashSet<CommunityEdge> intraConnectionForCheckboxes = new HashSet<CommunityEdge>();
-      intraConnectionForCheckboxes.add(new CommunityEdge(false));
-      while(interConnections != null && !interConnections.isEmpty()){
-        interConnectionForCheckboxes.add(new CommunityEdge(true, community));
-        intraConnectionForCheckboxes.add(new CommunityEdge(false, community));
-        community++;
-        interConnections = graph.getInterCommunityConnections(community);
+      
+      HashSet<CommunityEdge> interConnections = new HashSet<>();
+      HashSet<CommunityEdge> intraConnections = new HashSet<>();
+      
+      Iterator<CommunityEdge> eit = graph.getEdges().iterator();
+      while (eit.hasNext()) {
+    	  CommunityEdge e = (CommunityEdge) eit.next();
+    	  
+    	  if (e.isInterCommunityEdge()) {
+    		  interConnections.add(e);
+    	  } else {
+    		  intraConnections.add(e);
+    	  }
       }
-      interConnectionPanel = new EdgeCheckBoxPanel(graph, interConnectionForCheckboxes);
+      
+      interConnectionPanel = new EdgeCheckBoxPanel(graph, interConnections);
       interConncetionScroll = new JScrollPane(interConnectionPanel);
       checkBoxPanel.addBar("Inter Connections", interConncetionScroll);
 
-      intraConnectionPanel = new EdgeCheckBoxPanel(graph, intraConnectionForCheckboxes);
+      intraConnectionPanel = new EdgeCheckBoxPanel(graph, intraConnections);
       intraConncetionScroll = new JScrollPane(intraConnectionPanel);
       checkBoxPanel.addBar("Intra Connections", intraConncetionScroll);
     }

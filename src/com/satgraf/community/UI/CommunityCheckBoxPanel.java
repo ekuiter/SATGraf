@@ -18,7 +18,6 @@ import org.json.simple.JSONObject;
 import com.satlib.community.CommunityNode;
 import com.satlib.graph.Node;
 import com.satlib.community.Community;
-import com.satlib.community.CommunityGraphViewer;
 
 /**
  *

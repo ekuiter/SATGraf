@@ -6,28 +6,29 @@
 
 package com.satgraf.community.UI;
 
-import com.satgraf.community.placer.FruchPlacer;
-import com.satlib.community.CommunityGraphViewer;
+import com.satlib.community.CommunityGraphFactory;
+import com.satlib.community.CommunityGraphFactoryFactory;
+import com.satgraf.community.placer.CommunityPlacer;
+import com.satgraf.community.placer.CommunityPlacerFactory;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javax.swing.SwingWorker;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import com.satgraf.graph.UI.GraphFrame;
-import com.satlib.community.CommunityGraphFactory;
-import com.satlib.community.CommunityGraphFactoryFactory;
 
 /**
  *
  * @author zacknewsham
  */
 public class OpenAction extends com.satgraf.actions.OpenAction<CommunityGraphFrame>{
-
+  
   public OpenAction(CommunityGraphFrame frame) {
     super(frame);
   }
@@ -35,17 +36,81 @@ public class OpenAction extends com.satgraf.actions.OpenAction<CommunityGraphFra
   
   
   @Override
-  public void open(File file) {
+  public void open(final File file) {
     try {
       String[] parts = file.getAbsolutePath().split("\\.");
       if(parts[parts.length - 1].equals("cnf")){
-        CommunityGraphFactory factory = (new CommunityGraphFactoryFactory("ol")).getFactory(file,new HashMap<String, String>());
-        factory.makeGraph(file);
-        this.frame.setGraphViewer(new CommunityGraphViewer(factory.getGraph(), factory.getNodeLists(), new FruchPlacer(factory.getGraph())));
-        this.frame.setPatterns(new HashMap<String, Pattern>());
-        this.frame.init();
-        this.frame.setPanel(null);
-        this.frame.show();
+        final CommunityGraphFactory factory = (new CommunityGraphFactoryFactory(frame.getCommunityName())).getFactory(file,new HashMap<String, String>());
+        OpenAction.this.frame.setProgressive(factory);
+        final SwingWorker worker1 = new SwingWorker<Void, Void>() {
+          @Override
+          protected Void doInBackground() throws Exception {
+            try {
+              factory.makeGraph(file);
+            } catch (IOException ex) {
+              Logger.getLogger(OpenAction.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return null;
+          }
+        };
+
+
+        final SwingWorker worker2 = new SwingWorker<Void, Void>() {
+          @Override
+          protected Void doInBackground() throws Exception {
+            try {
+              worker1.get();
+            } 
+            catch (InterruptedException | ExecutionException ex) {
+              Logger.getLogger(OpenAction.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            factory.getMetric().getCommunities(factory.getGraph());
+            return null;
+          }
+        };
+        final SwingWorker worker3 = new SwingWorker<Void, Void>(){
+          @Override
+          protected Void doInBackground() throws Exception {
+            try {
+              worker1.get();
+            } 
+            catch (InterruptedException | ExecutionException ex) {
+              Logger.getLogger(OpenAction.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            CommunityPlacer placer = CommunityPlacerFactory.getInstance().getByName(frame.getPlacerName(),factory.getGraph());
+            OpenAction.this.frame.setPatterns(new HashMap<String, Pattern>());
+            OpenAction.this.frame.setProgressive(placer);
+            try {
+              worker2.get();
+            } 
+            catch (InterruptedException | ExecutionException ex) {
+              Logger.getLogger(OpenAction.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            OpenAction.this.frame.setGraphViewer(new CommunityGraphViewer(factory.getGraph(), factory.getNodeLists(), placer));
+
+            return null;
+          }
+        };
+        final SwingWorker worker4 = new SwingWorker<Void, Void>(){
+          @Override
+          protected Void doInBackground() throws Exception {
+            try {
+              worker3.get();
+            } 
+            catch (InterruptedException | ExecutionException ex) {
+              Logger.getLogger(OpenAction.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            OpenAction.this.frame.init();
+            OpenAction.this.frame.setPanel(null);
+            OpenAction.this.frame.show();
+            return null;
+          }
+        };
+        
+        worker1.execute();
+        worker2.execute();
+        worker3.execute();
+        worker4.execute();
       }
       else{
         BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -54,7 +119,11 @@ public class OpenAction extends com.satgraf.actions.OpenAction<CommunityGraphFra
         while((line = reader.readLine()) != null){
           contents.append(line).append("\n");
         }
+        reader.close();
         JSONObject json = (JSONObject)JSONValue.parse(contents.toString());
+        if(json == null){
+          throw new NullPointerException("INVALID JSON STRING");
+        }
         this.frame.fromJson(json);
       }
     } 

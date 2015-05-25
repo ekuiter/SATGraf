@@ -10,7 +10,6 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
-import com.satlib.graph.GraphViewer;
 import com.satlib.graph.Node;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -69,7 +68,7 @@ public class NodePanel<T extends Node> extends JPanel{
         location.setText("");
     } else {
     	name.setText(node.toString());
-        location.setText(String.format("(%d, %d)", node.getX(graph), node.getY(graph)));
+        location.setText(String.format("(%d, %d)", graph.getX(node), graph.getY(node)));
     }
   }
 }

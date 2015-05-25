@@ -11,18 +11,11 @@ package com.satgraf.test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import com.satlib.community.CNMCommunityMetric;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.OLCommunityMetric;
-import com.satgraf.evolution.UI.EvolutionGenerator;
 
 /**
  *
@@ -37,11 +30,11 @@ public class QAgainstTime {
     
     CommunityMetric metric = new OLCommunityMetric();
     double Q = metric.getCommunities(c);
-    long startTime = System.currentTimeMillis();
-    System.out.printf("%d,%d,%d,%d,", c.getNodes().size(), c.getClausesCount(), c.getCommunities().size(),c.getEdgesList().size());
+    System.out.printf("\"%s\",%d,%d,%d,%d,", f.getAbsolutePath(), c.getNodes().size(), c.getClausesCount(), c.getCommunities().size(),c.getEdges().size());
     
     if(satCompTime == 0.0){
       Runtime run = Runtime.getRuntime();
+      long startTime = System.currentTimeMillis();
       Process minipure = run.exec(String.format("/usr/bin/minisat %s", f.getAbsolutePath()));
       try {
         synchronized(minipure){

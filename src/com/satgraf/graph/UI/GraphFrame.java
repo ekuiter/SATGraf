@@ -11,7 +11,6 @@ import com.satgraf.actions.ExportAction;
 import com.satgraf.actions.OpenAction;
 import com.satgraf.actions.SaveAction;
 import com.satlib.Progressive;
-import com.satlib.graph.GraphViewer;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -37,9 +36,9 @@ public abstract class GraphFrame extends JFrame{
   protected JMenu menu = new JMenu("File");
   protected JMenuBar menuBar = new JMenuBar();
   
-  private JMenuItem open = new JMenuItem("Open");
-  private JMenuItem save = new JMenuItem("Save");
-  private JMenuItem export = new JMenuItem("Export");
+  private final JMenuItem open = new JMenuItem("Open");
+  private final JMenuItem save = new JMenuItem("Save");
+  private final JMenuItem export = new JMenuItem("Export");
   
   private final JPanel newMain = new JPanel();
   private ProgressionViewer progress;
@@ -47,6 +46,12 @@ public abstract class GraphFrame extends JFrame{
   protected GraphCanvasPanel canvasPanel;
   protected GraphOptionsPanel panel;
   protected GraphViewer graphViewer;
+  private String placerName;
+  private String metricName;
+  
+  public static boolean isUrl(String file){
+    return file.substring(0, "http://".length()).equals("http://");
+  }
   public GraphOptionsPanel getOptionsPanel(){
     return panel;
   }
@@ -72,6 +77,21 @@ public abstract class GraphFrame extends JFrame{
   public abstract OpenAction getOpenAction();
   public abstract ExportAction getExportAction();
   
+  public String getPlacerName(){
+    return placerName;
+  }
+  
+  public String getCommunityName(){
+    return metricName;
+  }
+  
+  public void setPlacerName(String name){
+    placerName = name;
+  }
+  
+  public void setCommunityName(String name){
+    metricName = name;
+  }
   public GraphCanvasPanel getCanvasPanel(){
     return canvasPanel;
   }
@@ -112,6 +132,10 @@ public abstract class GraphFrame extends JFrame{
       progress = new ProgressionViewer();
     }
     progress.setProgressive(item);
+    if(progress.getParent() == null){
+      newMain.add(progress, BorderLayout.NORTH);
+      this.revalidate();
+    }
   }
   public void preinit(){
     if(getContentPane() != newMain){
@@ -155,6 +179,7 @@ public abstract class GraphFrame extends JFrame{
     if(graphViewer != null && canvasPanel != null){
       mainPane.setLeftComponent(canvasPanel);
       mainPane.setRightComponent(panel);
+      canvasPanel.init();
     }
     super.show();
   }

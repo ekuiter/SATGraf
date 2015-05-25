@@ -6,111 +6,100 @@
 
 package com.satgraf.evolution.UI;
 
-import com.satgraf.community.placer.FruchPlacer;
 import com.satlib.NamedFifo;
-import com.satlib.community.CommunityGraph;
-import com.satlib.community.CommunityGraphViewer;
 import com.satlib.community.CommunityNode;
-import com.satlib.community.ConcreteCommunityGraph;
-import com.satlib.evolution.EvolutionGraphFactoryObserver;
+import com.satlib.evolution.EvolutionGraph;
+import static com.satlib.evolution.EvolutionGraphFactoryFactory.pipeFileName;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author zacknewsham
  */
-public class DimacsEvolutionGraphFactory  extends com.satlib.evolution.DimacsEvolutionGraphFactory{
-  private File dimacsFile;
-  private List<CommunityGraph> graphs;
-  private GraphBuilderExecutor gbe = new GraphBuilderExecutor(this);
+public class DimacsEvolutionGraphFactory extends com.satlib.evolution.DimacsEvolutionGraphFactory{
   public DimacsEvolutionGraphFactory(String minisat, String metricName, HashMap<String, String> patterns) {
     super(minisat, metricName, patterns);
   }
+
   
-      
-  public void process(CommunityGraph cg){
-    node_lists = new HashMap<String, TIntObjectHashMap<String>>();
-    TIntObjectHashMap<String> list = new TIntObjectHashMap<String>();
-    Iterator<CommunityNode> nodes = cg.getNodeIterator();
-    while(nodes.hasNext()){
+  public void process(EvolutionGraph cg) {
+    node_lists = new HashMap<>();
+    TIntObjectHashMap<String> list = new TIntObjectHashMap<>();
+    Iterator<CommunityNode> nodes = cg.getNodes().iterator();
+
+    while (nodes.hasNext()) {
       CommunityNode node = nodes.next();
       list.put(node.getId(), node.getName());
     }
+
     node_lists.put("All", list);
-    try{
-      graph = cg;
-      double d = Math.random();
-      dimacsFile = new File(String.format("/tmp/%f.dimacs", d));
-      dimacsFile.createNewFile();
-      graph.writeDimacs(dimacsFile);
+    buildEvolutionFile();
+    graph = cg;
+  }  
 
-      dumpFile = new File(String.format("/tmp/%f.dump", d));
-      dumpFile.createNewFile();
-    }
-    catch(IOException e){
-      
-    }
-    notifyObservers(EvolutionGraphFactoryObserver.Action.process);
-  }
-
-  @Override
   public void buildEvolutionFile() {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
-  
-  public void addGraph(CommunityGraphViewer cg){
-    //graphs.add(cg);
-    notifyObservers(EvolutionGraphFactoryObserver.Action.addgraph);
-  }
-  
-  public void loadAdditionalGraphs() throws FileNotFoundException, IOException{
-    graphs = new ArrayList<>();
-    Thread t = new Thread(gbe);
+    Runnable r = new Runnable() {
+
+      @Override
+      public void run() {
+        try {
+
+          NamedFifo fifo = new NamedFifo(pipeFileName);
+          
+          if (fifo.getFile().exists()){
+            fifo.getFile().delete();
+          }
+    	  fifo.create();
+          Thread.sleep(1000);
+          Runtime.getRuntime().exec(String.format(getMinisat().concat(" %s"), input.getAbsolutePath()));
+          Thread.sleep(1000);
+          BufferedReader reader = openPipedFile();
+          String line;
+          int i = 0;
+          while ((line = reader.readLine()) != null) {
+            outputLine(line);
+            i++;
+          }
+
+          closeWriter();
+          reader.close();
+          fifo.getFile().delete();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+    };
+    Thread t = new Thread(r);
     t.start();
-    String line;
-    CommunityGraph g = new ConcreteCommunityGraph();
-    //DimacsThread thread = new DimacsThread(g, this, n);
-    //Thread t = new Thread(thread);
-    //t.start();
-    boolean clean = false;
-    int lineCount = 0;
+  }
+  
+  private BufferedReader openPipedFile() {
+    Timer timer = new Timer();
+    TimerTask watchdog = new TimerTask(){
+      @Override
+      public void run() {
+        System.err.println("Unable to open pipe file: " + pipeFileName);
+      }
+    };
+    timer.schedule(watchdog, 30000);
     
-    Runtime run = Runtime.getRuntime();
-    NamedFifo fifo = new NamedFifo(dumpFile);
-    fifo.create();
-    Process minipure = run.exec(String.format(System.getProperty("user.dir") + "/Minipure/binary/minipure -dump-freq=%d -dump-file=%s %s", dumpFreq, dumpFile.getAbsolutePath(), input.getAbsolutePath()));
-    BufferedReader reader = new BufferedReader(new FileReader(dumpFile));
-    GraphBuilderRunnable gbr = new GraphBuilderRunnable(
-            getGraph(), 
-            patterns, 
-            getMetric().getClass(), 
-            new FruchPlacer(getGraph()).getClass());
-    Thread t1 = new Thread(gbr);
-    t1.start();
-    while((line = reader.readLine()) != null){
-      if(line.length() != 0 && (line.charAt(0) == 'p' || line.charAt(0) == 'c')){
-        continue;
-      }
-      if(line.equals("$")){
-        gbr.finished();
-        gbe.addThread(gbr);
-        gbr = new GraphBuilderRunnable(getGraph(), patterns, getMetric().getClass(), new FruchPlacer(getGraph()).getClass());
-        t1 = new Thread(gbr);
-        t1.start();
-      }
-      else{
-        gbr.addLine(line);
-      }
+	try {
+      return new BufferedReader(new FileReader(pipeFileName));
+	} 
+    catch (Exception e) {
+      Logger.getLogger(DimacsEvolutionGraphFactory.class.getName()).log(Level.SEVERE, null, e);
+      return openPipedFile();
+	}
+    finally{
+      watchdog.cancel();
     }
   }
-  
 }

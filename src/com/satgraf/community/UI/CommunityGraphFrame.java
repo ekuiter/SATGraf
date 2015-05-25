@@ -7,31 +7,35 @@
 package com.satgraf.community.UI;
 
 import static com.satgraf.ForceInit.forceInit;
-import com.satgraf.community.placer.FruchGPUPlacer;
-import com.satgraf.community.placer.FruchPlacer;
+import com.satgraf.community.placer.CircularCommunityPlacer;
+import com.satgraf.community.placer.CommunityPlacerFactory;
+import com.satgraf.community.placer.GridKKPlacer;
 import com.satgraf.community.placer.GridPlacer;
-import com.satgraf.community.placer.KKPlacer;
-import com.satgraf.evolution.UI.EvolutionGraphFrame;
+import com.satgraf.community.placer.JSONCommunityPlacer;
 import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphFrame;
+import com.satgraf.graph.placer.FruchGPUPlacer;
+import com.satgraf.graph.placer.FruchPlacer;
+import com.satgraf.graph.placer.KKPlacer;
+import com.satgraf.graph.placer.Placer;
+import com.satgraf.graph.placer.PlacerFactory;
 import com.satlib.community.CNMCommunityMetric;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityGraphFactory;
 import com.satlib.community.CommunityGraphFactoryFactory;
-import com.satlib.community.CommunityGraphViewer;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
 import com.satlib.community.JSONCommunityGraph;
+import com.satlib.community.LouvianCommunityMetric;
 import com.satlib.community.OLCommunityMetric;
-import com.satlib.community.placer.CommunityPlacer;
-import com.satlib.community.placer.CommunityPlacerFactory;
-import com.validatedcl.validation.RequiredOption;
+import com.validatedcl.validation.Help;
 import com.validatedcl.validation.ValidatedCommandLine;
 import com.validatedcl.validation.ValidatedOption;
 import com.validatedcl.validation.rules.FileValidationRule;
 import com.validatedcl.validation.rules.ListValidationRule;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 import javax.swing.JFrame;
@@ -47,10 +51,13 @@ import org.json.simple.JSONObject;
  */
 public class CommunityGraphFrame extends GraphFrame{
   static{
-    forceInit(FruchGPUPlacer.class);
+    //forceInit(FruchGPUPlacer.class);
     forceInit(FruchPlacer.class);
     forceInit(KKPlacer.class);
+    forceInit(GridKKPlacer.class);
     forceInit(GridPlacer.class);
+    forceInit(CircularCommunityPlacer.class);
+    forceInit(LouvianCommunityMetric.class);
     forceInit(OLCommunityMetric.class);
     forceInit(CNMCommunityMetric.class);
   }
@@ -82,20 +89,18 @@ public class CommunityGraphFrame extends GraphFrame{
   }
   
   public void init(){
-    super.init();
     metric.getCommunities((CommunityGraph)graphViewer.getGraph());
+    super.init();
   }
   
   public void fromJson(JSONObject json){
-    if(!(this instanceof EvolutionGraphFrame)){
-      JSONCommunityGraph graph = new JSONCommunityGraph((JSONObject)json.get("graphViewer"));
-      graph.init();
-      this.graphViewer = new CommunityGraphViewer(graph, graph.getNodeLists(), graph);
-      this.patterns = new HashMap<>();
-      init();
-      show();
-      this.graphViewer.fromJson((JSONObject)json.get("graphViewer"));
-    }
+    JSONCommunityGraph graph = new JSONCommunityGraph((JSONObject)json.get("graphViewer"));
+    graph.init();
+    this.graphViewer = new CommunityGraphViewer(graph, graph.getNodeLists(), new JSONCommunityPlacer(graph));
+    this.patterns = new HashMap<>();
+    init();
+    show();
+    this.graphViewer.fromJson((JSONObject)json.get("graphViewer"));
     super.fromJson(json);
   }
   public String toJson(){
@@ -119,18 +124,41 @@ public class CommunityGraphFrame extends GraphFrame{
     Options options = new Options();
     ValidatedOption o;
     
-    o = new RequiredOption("f","file",true, "The file (either .cnf or .sb)");
+    o = new ValidatedOption("f","file",true, "The file (either .cnf or .sb)");
     o.addRule(new FileValidationRule(FileValidationRule.FileExists.yes, new String[]{"read"}));
+    options.addOption(o);
+    
+    o = new ValidatedOption("u","url",true, "A file URL (either .cnf or .sb)");
     options.addOption(o);
     
     o = new ValidatedOption("c", "community", true,"The community detection algorithm");
     o.setDefault("ol");
-    o.addRule(new ListValidationRule(CommunityMetricFactory.getInstance().getNames()));
+    o.addRule(new ListValidationRule(CommunityMetricFactory.getInstance().getNames(), CommunityMetricFactory.getInstance().getDescriptions()));
     options.addOption(o);
     
     o = new ValidatedOption("l","layout",true,"The layout algorithm to use");
     o.setDefault("f");
-    o.addRule(new ListValidationRule(CommunityPlacerFactory.getInstance().getNames()));
+    String[] names = new String[CommunityPlacerFactory.getInstance().getNames().length + PlacerFactory.getInstance().getNames().length];
+    String[] descriptions = new String[CommunityPlacerFactory.getInstance().getDescriptions().length + PlacerFactory.getInstance().getDescriptions().length];
+    int i = 0;
+    for(String name : PlacerFactory.getInstance().getNames()){
+      names[i] = name;
+      i++;
+    }
+    for(String name : CommunityPlacerFactory.getInstance().getNames()){
+      names[i] = name;
+      i++;
+    }
+    i = 0;
+    for(String description : PlacerFactory.getInstance().getDescriptions()){
+      descriptions[i] = description;
+      i++;
+    }
+    for(String description : CommunityPlacerFactory.getInstance().getDescriptions()){
+      descriptions[i] = description;
+      i++;
+    }
+    o.addRule(new ListValidationRule(names, descriptions));
     options.addOption(o);
     
     o = new ValidatedOption("p", "pattern",true,"A list of regex expressions to group variables (not yet implemented)");
@@ -140,16 +168,17 @@ public class CommunityGraphFrame extends GraphFrame{
   }
   
   public static void main(String args[]) throws IOException, ParseException{
-    if(args.length < 3){
+    if(args.length == 0){
       args = new String[]{
         //"formula/satcomp/dimacs/toybox.cnf",
-        "-f","formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
+        //"-f","/home/zacknewsham/aes.sb",
+        "-f","/home/zacknewsham/satgraf/formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
         //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
         //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "-c","ol",
-        "-l","fgpu"
+        "-l","f"
       };
-      //System.out.print(Help.getHelp(options()));
+      System.out.print(Help.getHelp(options()));
       //return;
     }
     CommandLineParser clp = new GnuParser();
@@ -162,33 +191,59 @@ public class CommunityGraphFrame extends GraphFrame{
     }
     
     
-    
+    String comName = cl.getOptionValue("c", o.getOption("c").getValue());
+    CommunityGraphFactoryFactory ff = new CommunityGraphFactoryFactory(comName);
     HashMap<String, String> patterns = new HashMap<>();
-
-    /*for (int i = 5; i < args.length; i += 2) {
-      patterns.put(args[i], args[i + 1]);
-    }*/
-    File input = new File(cl.getOptionValue("f"));
-    CommunityGraphFactory factory = (new CommunityGraphFactoryFactory(cl.getOptionValue("c"))).getFactory(input, patterns);
+    CommunityGraphFactory factory;
+    
+    Object in;
+    if(cl.getOptionValue("f") == null && cl.getOptionValue("u") == null){
+      System.err.println("Must supply either -f or -u");
+      return;
+    }
+    else if(cl.getOptionValue("f") == null){
+      URL input = new URL(cl.getOptionValue("u"));
+      in = input;
+      factory = ff.getFactory(input, patterns);
+    }
+    else{
+      File input = new File(cl.getOptionValue("f"));
+      in = input;
+      factory = ff.getFactory(input, patterns);
+    }
+    if(factory == null){
+      System.err.println("Factory is null");
+      return;
+    }
     
     CommunityGraphViewer graphViewer = new CommunityGraphViewer(null, factory.getNodeLists(), null);
     CommunityGraphFrame frmMain = new CommunityGraphFrame(graphViewer, factory.getPatterns(), factory.getMetric());
+    frmMain.setCommunityName(comName);
     frmMain.setProgressive(factory);
     frmMain.preinit();
+    if(in instanceof File){
+      factory.makeGraph((File)in);
+    }
+    else if(in instanceof URL){
+      factory.makeGraph((URL)in);
+    }
     
     frmMain.setVisible(true);
-    factory.makeGraph(input);
-    CommunityPlacer p = null;
-    if(factory.getGraph() instanceof CommunityPlacer){
-      p = (CommunityPlacer)factory.getGraph();
+    Placer p = null;
+    frmMain.setPlacerName(cl.getOptionValue("l", o.getOption("l").getValue()));
+    if(factory.getGraph() instanceof Placer){
+      p = (Placer)factory.getGraph();
     }
     else{
-      p = CommunityPlacerFactory.getInstance().getByName(cl.getOptionValue("l"), factory.getGraph());
+      p = CommunityPlacerFactory.getInstance().getByName(frmMain.getPlacerName(), factory.getGraph());
+      if( p == null){
+        p = PlacerFactory.getInstance().getByName(frmMain.getPlacerName(), factory.getGraph());
+      }
     }
     frmMain.setProgressive(p);
     graphViewer.graph = factory.getGraph();
-    graphViewer.setPlacer(p);
     frmMain.init();
+    graphViewer.setPlacer(p);
     frmMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frmMain.show();
   }

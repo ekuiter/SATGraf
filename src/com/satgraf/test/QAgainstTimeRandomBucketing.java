@@ -9,14 +9,11 @@ package com.satgraf.test;
 
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.satlib.community.CommunityGraph;
-import com.satgraf.evolution.UI.EvolutionGenerator;
 
 /**
  *
@@ -26,7 +23,7 @@ import com.satgraf.evolution.UI.EvolutionGenerator;
 public class QAgainstTimeRandomBucketing extends com.satgraf.test.QAgainstTime{
   
   public void run(int vars, int clauses, int buckets, double prob) throws Exception{
-    CommunityGraph c = EvolutionGenerator.makeCommunity(vars, clauses, buckets, prob);
+    CommunityGraph c = InstanceGenerator.makeCommunity(vars, clauses, buckets, prob);
     f = new File(String.format("/home/sfischme/work/vijay/comdelete/tmp/%d.%d.%d.dimacs", vars, clauses, buckets));
     c.writeDimacs(f);
     timeout = 60 * 15 * 1000;

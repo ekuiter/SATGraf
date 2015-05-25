@@ -10,17 +10,13 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.json.simple.JSONObject;
-
-import com.satlib.graph.GraphViewer;
 
 /**
  *
@@ -36,9 +32,9 @@ public class OptionsPanel extends JPanel{
   public OptionsPanel(GraphFrame frame, GraphViewer graph, NodePanel nodePanel){
     this.nodePanel = nodePanel;
     this.graph = graph;
-    hideAllEdges.addChangeListener(new ChangeListener() {
+    hideAllEdges.addItemListener(new ItemListener() {
       @Override
-      public void stateChanged(ChangeEvent e) {
+      public void itemStateChanged(ItemEvent e) {
         if(!hideAllEdges.isSelected()){
           OptionsPanel.this.graph.hideEdgeSet("All");
         }
@@ -47,9 +43,9 @@ public class OptionsPanel extends JPanel{
         }
       }
     });
-    hideAllNodes.addChangeListener(new ChangeListener() {
+    hideAllNodes.addItemListener(new ItemListener() {
       @Override
-      public void stateChanged(ChangeEvent e) {
+      public void itemStateChanged(ItemEvent e) {
         if(!hideAllNodes.isSelected()){
           OptionsPanel.this.graph.hideNodeSet("All");
         }

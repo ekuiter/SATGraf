@@ -7,7 +7,7 @@
 package com.satgraf.implication.UI;
 
 import com.satlib.graph.Clause;
-import com.satlib.graph.GraphViewer;
+import com.satgraf.graph.UI.GraphViewer;
 import com.satlib.implication.ImplicationClause;
 import java.util.HashSet;
 import com.satgraf.graph.UI.ClausePanel;

@@ -7,7 +7,6 @@
 package com.satgraf.graph.UI;
 
 import javax.swing.JLabel;
-import com.satlib.graph.GraphViewer;
 import com.satlib.graph.Node;
 
 /**

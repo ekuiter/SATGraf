@@ -7,7 +7,6 @@
 package com.satgraf.graph.UI;
 
 import com.satlib.graph.Graph;
-import com.satlib.graph.GraphViewer;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
@@ -17,11 +16,16 @@ import javax.swing.JPanel;
  *
  * @author zacknewsham
  */
-public abstract class GraphInfoPanel <T extends Graph> extends JPanel{
-  protected T graph;
+public abstract class GraphInfoPanel <T extends GraphViewer> extends JPanel{
+  protected T graphViewer;
+  protected Graph graph;
   protected int rows = 0;
-  public GraphInfoPanel(T graph){
-    this.graph = graph;
+  public GraphInfoPanel(T graphViewer){
+    this.graphViewer = graphViewer;
+    this.graph = graphViewer.graph;
+  }
+  public Graph getGraph(){
+    return graph;
   }
   
   public void init(){
@@ -49,7 +53,12 @@ public abstract class GraphInfoPanel <T extends Graph> extends JPanel{
     c.gridx = 1;
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_END;
+    try{
     this.add(new JLabel(String.valueOf(graph.getClausesCount())), c);
+    }
+    catch(UnsupportedOperationException e){
+      
+    }
     
     c.gridx = 0;
     c.gridy = rows++;
@@ -60,7 +69,12 @@ public abstract class GraphInfoPanel <T extends Graph> extends JPanel{
     c.gridx = 1;
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_END;
+    try{
     this.add(new JLabel(String.valueOf(graph.getLongestClause().size())), c);
+    }
+    catch(UnsupportedOperationException | NullPointerException e){
+      
+    }
     
     c.gridx = 0;
     c.gridy = rows++;
@@ -71,7 +85,12 @@ public abstract class GraphInfoPanel <T extends Graph> extends JPanel{
     c.gridx = 1;
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_END;
+    try{
     this.add(new JLabel(String.valueOf(graph.getNodeCount())), c);
+    }
+    catch(UnsupportedOperationException e){
+      
+    }
     
     c.gridx = 0;
     c.gridy = rows++;
@@ -82,7 +101,12 @@ public abstract class GraphInfoPanel <T extends Graph> extends JPanel{
     c.gridx = 1;
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_END;
-    this.add(new JLabel(String.valueOf(graph.getEdgesList().size())), c);
+    try{
+    this.add(new JLabel(String.valueOf(graph.getEdges().size())), c);
+    }
+    catch(UnsupportedOperationException | NullPointerException e){
+      
+    }
     
     c.gridx = 0;
     c.gridy = rows++;
@@ -93,7 +117,12 @@ public abstract class GraphInfoPanel <T extends Graph> extends JPanel{
     c.gridx = 1;
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_END;
+    try{
     this.add(new JLabel(String.valueOf(graph.getTotalEdges())), c);
+    }
+    catch(UnsupportedOperationException e){
+      
+    }
     
     c.gridx = 0;
     c.gridy = rows++;
@@ -104,7 +133,12 @@ public abstract class GraphInfoPanel <T extends Graph> extends JPanel{
     c.gridx = 1;
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_END;
+    try{
     this.add(new JLabel(String.valueOf(graph.getWeight())), c);
+    }
+    catch(UnsupportedOperationException e){
+      
+    }
   }
   
   public int getRows(){

@@ -4,10 +4,12 @@
  */
 package com.satgraf.graph.UI;
 
+import com.satlib.graph.Node;
 import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,8 +19,6 @@ import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.json.simple.JSONObject;
-import com.satlib.graph.GraphViewer;
-import com.satlib.graph.Node;
 
 /**
  *
@@ -56,16 +56,16 @@ public class NodeCheckboxPanel extends JPanel{
     while(nodes.hasNext()){
       Node next = nodes.next();
       JCheckBox jc = checkBoxes.get(next);
-      if(next.isVisible()){
+      if(next.isVisible() && jc.isSelected() == false){
         jc.setSelected(true);
       }
-      else{
+      else if(!next.isVisible() && jc.isSelected() == true){
         jc.setSelected(false);
       }
     }
   }
   
-  public NodeCheckboxPanel(GraphViewer graph, String set, Iterator<Node> nodes){
+  public NodeCheckboxPanel(GraphViewer graph, String set, Collection<Node> nodes){
     this.graph = graph;
     this.add(hideAll);
     this.set = set;
@@ -86,9 +86,8 @@ public class NodeCheckboxPanel extends JPanel{
     addAll(nodes);
     this.setLayout(new GridLayout(count, 1));
   }
-  final void addAll(Iterator<Node> nodes){
-    while(nodes.hasNext()){
-      Node node = nodes.next();
+  final void addAll(Collection<Node> nodes){
+    for(Node node : nodes){
       add(node);
     }
     List nodes1 = new ArrayList<Node>();
