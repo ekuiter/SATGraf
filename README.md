@@ -127,9 +127,9 @@ At the moment only the variable-incidence graph is supported, however the implem
 1. Ouputs are `\n` delimited.
 2. There are three types of line
     1. clause lines begin with `c` followed by a space, followed by either a `+` to denote a clause added or `-` to denote a clause removed, followed with a space. This is followed by the space delimited list of the variables (not literals) involved in the clause.
-       e.g. `c + 1 2 3` - this states that a clause with the variables 1, 2 and 3 is added.
+       E.g. `c + 1 2 3` - this states that a clause with the variables 1, 2 and 3 is added.
     2. variable lines begin with a `v` followed by a space, followed by either a `p` to denote a propagated variable, or `d` to denote a decision variable. This is followed by a space, then either `0` to denote a false assignment or `1` to denote a true assignment or `2` to denote unassigned. This is followed by a space, then the variable.
-       e.g. `v p 0 1` - this states that a the variable 1 is assigned false due to propagation.
+       E.g. `v p 0 1` - this states that a the variable 1 is assigned false due to propagation.
     3. conflict lines begin with a `!` and is followed by a space, followed by the conflict count.
-       e.g. `! 23` - denotes that 23 conflicts have occured.
+       E.g. `! 23` - denotes that 23 conflicts have occured.
 
