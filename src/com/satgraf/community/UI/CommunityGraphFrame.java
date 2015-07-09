@@ -172,14 +172,14 @@ public class CommunityGraphFrame extends GraphFrame{
       args = new String[]{
         //"formula/satcomp/dimacs/toybox.cnf",
         //"-f","/home/zacknewsham/aes.sb",
-        "-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/aes_16_10_keyfind_3.cnf",
+        "-f","/home/zacknewsham/satgraf/formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
         //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
         //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "-c","ol",
         "-l","f"
       };
       System.out.print(Help.getHelp(options()));
-      return;
+      //return;
     }
     CommandLineParser clp = new GnuParser();
     Options o = options();
