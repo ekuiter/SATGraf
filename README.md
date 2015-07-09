@@ -1,16 +1,18 @@
-Installation:   
-unzip satgraf.zip   
-cd satgraf   
-cd solvers/minisat   
-make   
-cd ../../   
-Notes:   
-The fgpu option is under development and may not work fully. 
-Either -f or -u must be specified.   
+#Installation:     
+    unzip satgraf.zip   
+    cd satgraf   
+    cd solvers/minisat   
+    make   
+    cd ../../   
+
+#Notes:   
+    The fgpu option is under development and may not work fully. 
+    The circle layout algorithm works poorly with disjoint graphs.
+    The Louvian method requires a non disjoint graph
+    Either -f or -u must be specified.   
     
-Usage: java -jar SatGraf.jar [com|imp|evo] <options>
---------------------------------   
-    com - View the static community representation of the formula.   
+#Usage: java -jar SatGraf.jar [com|imp|evo] <options>
+    ##com - View the static community representation of the formula.   
 	-f --file(default = null) The file (either .cnf or .sb)   
 	Must be an existing file For which you have: read permissions   
 	-u --url(default = null) A file URL (either .cnf or .sb)   
@@ -29,9 +31,7 @@ Usage: java -jar SatGraf.jar [com|imp|evo] <options>
 		grid - A basic layout algorithm, nodes are layed out within a community in a grid pattern. The communities are then layed out on a grid   
 		gkk - A basic layout algorithm, nodes are layed out within a community using the KK algorithm. The communities are then layed out on a grid   
 	   
---------------------------------   
---------------------------------   
-    imp - View the graph and manually set the values of nodes to see how they propagate.   
+    ##imp - View the graph and manually set the values of nodes to see how they propagate.   
 	-f --file(default = null) The file (either .cnf or .sb)   
 	Must be an existing file For which you have: read permissions   
 	-u --url(default = null) A file URL (either .cnf or .sb)   
@@ -42,9 +42,7 @@ Usage: java -jar SatGraf.jar [com|imp|evo] <options>
 		fgpu - A GPU implementation of the Fruchtermon and Reingold force directed layout algorithm   
 		kk - An implementation of the Kamada-Kawai placement algorithm   
 	   
---------------------------------   
---------------------------------   
-    evo - View the evolution of the structure of the graph, with other evolution properties presented.   
+    ##evo - View the evolution of the structure of the graph, with other evolution properties presented.   
 	-f --file(default = null) The file (either .cnf or .sb)   
 	Must be an existing file For which you have: read permissions   
 	-u --url(default = null) A file URL (either .cnf or .sb)   
@@ -69,3 +67,11 @@ Usage: java -jar SatGraf.jar [com|imp|evo] <options>
 		c - A basic layout algorithm, nodes are layed out within a community using the FR layout algorithm. The communities are then layed out in a circle, with those most connected next to each other.   
 		grid - A basic layout algorithm, nodes are layed out within a community in a grid pattern. The communities are then layed out on a grid   
 		gkk - A basic layout algorithm, nodes are layed out within a community using the KK algorithm. The communities are then layed out on a grid
+
+
+#Extending SATGraf:
+--------------------------------   
+    SATGraf may be extendid with trivial ease in three areas, and with slightly more involvement in a fourth.
+    
+    ##
+
