@@ -108,16 +108,28 @@ At the moment only the variable-incidence graph is supported, however the implem
 2. Modify the `getFactory` methods of `com.satlib.evolution.EvolutionGraphFactoryFactory` to return your GraphFactory implementation
 
 #Implementing the SATGraf protocol in a solver
-If implementing your solver in C++ 
-To use SATgraf with a custom solver, the following must be implemented/done in your solver:
-    
-1. In your code, tell the Pipe class where your piped file will be. Ex: Pipe::getInstance()->openPipe("solvers/piping/myPipe.txt");
-2. To inform SATgraf of variables changing state, send the following to the pipe: Pipe::getInstance()->printVar(const int id, int state, bool isDecisionVariable, int activity)
+##If implementing your solver in C++ 
+
+1. Include the Pipe class 
+2. In your code, tell the Pipe class where your piped file will be. Ex: Pipe::getInstance()->openPipe("solvers/piping/myPipe.txt");
+3. To inform SATgraf of variables changing state, send the following to the pipe: Pipe::getInstance()->printVar(const int id, int state, bool isDecisionVariable, int activity)
     1. id = the variable id
     2. state = the possible states are defined in Pipe.h and are VAR_ASSIGNED_TRUE, VAR_ASSIGNED_FALSE, VAR_UNASSIGNED
-    3. isDecisionVariable(optional) = will highlight this variable in SATgraf. Does not neccessarily have to be a decision variable but can be used to highlight any desired variable if that is desired.
+    3. isDecisionVariable(optional) = will highlight this variable in SATgraf. Does not neccessarily have to be a decision variable but can be used to highlight any variable if that is desired.
     4. activity(optional) = the associated activity of a variable. Refers to conflict activity and will highlight decision variables with an activity greater than 0 a different color than those that are 0
-3. To inform SATgraf of the clauses being added or removed, do the following: Pipe::getInstance()->printClause(const string vars, int state)
+4. To inform SATgraf of the clauses being added or removed, do the following: Pipe::getInstance()->printClause(const string vars, int state)
     1. vars = a spaced string with all of the variables ids. Ex: 1 2 3 4 5
     2. state = the state of the clause. All of the states are defined in Pipe.h and are CLAUSE_ADDED, CLAUSE_REMOVED
-4. (Optional) To inform SATgraf of the conflicts in the solving of the instance, do the following when a conflict arises Pipe::getInstance()->printConflict(). This can be done before and after a clause arises in order to see the state of the SAT instance at both of those times. Could be used to see any specific event within the solver.
+5. (Optional) To inform SATgraf of the conflicts in the solving of the instance, do the following when a conflict arises Pipe::getInstance()->printConflict(). This can be done before and after a clause arises in order to see the state of the SAT instance at both of those times. Could be used to see any specific event within the solver.
+
+##If implementing your solver in any other language
+
+1. Ouputs are `\n` delimited.
+2. There are three types of line
+    1. clause lines begin with `c` followed by a space, followed by either a `+` to denote a clause added or `-` to denote a clause removed, followed with a space. This is followed by the space delimited list of the variables (not literals) involved in the clause.
+       e.g. `c + 1 2 3` - this states that a clause with the variables 1, 2 and 3 is added.
+    2. variable lines begin with a `v` followed by a space, followed by either a `p` to denote a propagated variable, or `d` to denote a decision variable. This is followed by a space, then either `0` to denote a false assignment or `1` to denote a true assignment or `2` to denote unassigned. This is followed by a space, then the variable.
+       e.g. `v p 0 1` - this states that a the variable 1 is assigned false due to propagation.
+    3. conflict lines begin with a `!` and is followed by a space, followed by the conflict count.
+       e.g. `! 23` - denotes that 23 conflicts have occured.
+
