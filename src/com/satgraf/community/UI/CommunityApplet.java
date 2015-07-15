@@ -7,9 +7,10 @@
 package com.satgraf.community.UI;
 
 import com.satlib.community.CommunityGraphFactory;
-import com.satlib.community.CommunityGraphFactoryFactory;
 import com.satgraf.community.placer.CommunityPlacer;
 import com.satgraf.community.placer.CommunityPlacerFactory;
+import com.satlib.graph.GraphFactory;
+import com.satlib.graph.GraphFactoryFactory;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -37,15 +38,25 @@ public class CommunityApplet extends JApplet{
             }
             final URL file;
             URL temp  = new URL(String.format("http://satbench.uwaterloo.ca/json/%d.sb", formula_id));
+            String extension = "sb";
             HttpURLConnection huc =  (HttpURLConnection)  temp.openConnection(); 
             if(huc.getResponseCode() == 200){
               file = temp;
             }
             else{
               file = new URL(String.format("http://satbench.uwaterloo.ca/formula/%d.cnf", formula_id));
+              extension = "cnf";
             }
             
-            final CommunityGraphFactory factory = (new CommunityGraphFactoryFactory("ol")).getFactory(file, patterns);
+            GraphFactory tmp = GraphFactoryFactory.getInstance().getByNameAndExtension("auto", extension, "ol", null);
+            if(tmp == null){
+              throw new InstantiationException("auto is not available for format " + extension);
+            }
+            else if(!(tmp instanceof CommunityGraphFactory)){
+              InstantiationException e = new InstantiationException(tmp.getClass().getName() + " is not an instance of CommunityGraph");
+              throw e;
+            }
+            final CommunityGraphFactory factory = (CommunityGraphFactory)tmp;
 
             final CommunityGraphViewer graphViewer = new CommunityGraphViewer(null, factory.getNodeLists(), null);
             final CommunityGraphFrame frmMain = new CommunityGraphFrame(graphViewer, factory.getPatterns(), factory.getMetric());

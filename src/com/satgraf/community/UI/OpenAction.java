@@ -7,9 +7,10 @@
 package com.satgraf.community.UI;
 
 import com.satlib.community.CommunityGraphFactory;
-import com.satlib.community.CommunityGraphFactoryFactory;
 import com.satgraf.community.placer.CommunityPlacer;
 import com.satgraf.community.placer.CommunityPlacerFactory;
+import com.satlib.graph.GraphFactory;
+import com.satlib.graph.GraphFactoryFactory;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -40,7 +41,17 @@ public class OpenAction extends com.satgraf.actions.OpenAction<CommunityGraphFra
     try {
       String[] parts = file.getAbsolutePath().split("\\.");
       if(parts[parts.length - 1].equals("cnf")){
-        final CommunityGraphFactory factory = (new CommunityGraphFactoryFactory(frame.getCommunityName())).getFactory(file,new HashMap<String, String>());
+        GraphFactory tmp = GraphFactoryFactory.getInstance().getByNameAndExtension("auto", "cnf", frame.getCommunityName(), null);
+        if(tmp == null){
+          InstantiationException e = new InstantiationException("auto is not available for format cnf");
+          Logger.getLogger(OpenAction.class.getName()).log(Level.SEVERE,null,e);
+        }
+        else if(!(tmp instanceof CommunityGraphFactory)){
+          InstantiationException e = new InstantiationException(tmp.getClass().getName() + " is not an instance of CommunityGraph");
+          Logger.getLogger(OpenAction.class.getName()).log(Level.SEVERE,null,e);
+          return;
+        }
+        final CommunityGraphFactory factory = (CommunityGraphFactory)tmp;
         OpenAction.this.frame.setProgressive(factory);
         final SwingWorker worker1 = new SwingWorker<Void, Void>() {
           @Override

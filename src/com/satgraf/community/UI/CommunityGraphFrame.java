@@ -7,6 +7,7 @@
 package com.satgraf.community.UI;
 
 import static com.satgraf.ForceInit.forceInit;
+import com.satgraf.FormatValidationRule;
 import com.satgraf.community.placer.CircularCommunityPlacer;
 import com.satgraf.community.placer.CommunityPlacerFactory;
 import com.satgraf.community.placer.GridKKPlacer;
@@ -14,7 +15,6 @@ import com.satgraf.community.placer.GridPlacer;
 import com.satgraf.community.placer.JSONCommunityPlacer;
 import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphFrame;
-import com.satgraf.graph.placer.FruchGPUPlacer;
 import com.satgraf.graph.placer.FruchPlacer;
 import com.satgraf.graph.placer.KKPlacer;
 import com.satgraf.graph.placer.Placer;
@@ -22,12 +22,16 @@ import com.satgraf.graph.placer.PlacerFactory;
 import com.satlib.community.CNMCommunityMetric;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityGraphFactory;
-import com.satlib.community.CommunityGraphFactoryFactory;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
+import com.satlib.community.DimacsCommunityGraphFactory;
 import com.satlib.community.JSONCommunityGraph;
+import com.satlib.community.JSONCommunityGraphFactory;
 import com.satlib.community.LouvianCommunityMetric;
 import com.satlib.community.OLCommunityMetric;
+import com.satlib.graph.GraphFactory;
+import com.satlib.graph.GraphFactoryFactory;
+import com.validatedcl.validation.CommandLine;
 import com.validatedcl.validation.Help;
 import com.validatedcl.validation.ValidatedCommandLine;
 import com.validatedcl.validation.ValidatedOption;
@@ -39,7 +43,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 import javax.swing.JFrame;
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
@@ -60,6 +63,8 @@ public class CommunityGraphFrame extends GraphFrame{
     forceInit(LouvianCommunityMetric.class);
     forceInit(OLCommunityMetric.class);
     forceInit(CNMCommunityMetric.class);
+    forceInit(JSONCommunityGraphFactory.class);
+    forceInit(DimacsCommunityGraphFactory.class);
   }
 
   protected HashMap<String, Pattern> patterns;
@@ -136,8 +141,15 @@ public class CommunityGraphFrame extends GraphFrame{
     o.addRule(new ListValidationRule(CommunityMetricFactory.getInstance().getNames(), CommunityMetricFactory.getInstance().getDescriptions()));
     options.addOption(o);
     
+    o = new ValidatedOption("m","format",true, "The format of the file, and desired graph representation");
+    o.addRule(new FormatValidationRule());
+    o.setDefault("auto");
+    options.addOption(o);
+    
     o = new ValidatedOption("l","layout",true,"The layout algorithm to use");
     o.setDefault("f");
+    
+    
     String[] names = new String[CommunityPlacerFactory.getInstance().getNames().length + PlacerFactory.getInstance().getNames().length];
     String[] descriptions = new String[CommunityPlacerFactory.getInstance().getDescriptions().length + PlacerFactory.getInstance().getDescriptions().length];
     int i = 0;
@@ -167,12 +179,12 @@ public class CommunityGraphFrame extends GraphFrame{
     return options;
   }
   
-  public static void main(String args[]) throws IOException, ParseException{
+  public static void main(String args[]) throws IOException, ParseException, InstantiationException{
     if(args.length == 0){
       args = new String[]{
-        //"formula/satcomp/dimacs/toybox.cnf",
+        "-f","formula/satcomp/dimacs/toybox.cnf",
         //"-f","/home/zacknewsham/aes.sb",
-        "-f","/home/zacknewsham/satgraf/formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
+        //"-f","/home/zacknewsham/satgraf/formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
         //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
         //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "-c","ol",
@@ -183,19 +195,17 @@ public class CommunityGraphFrame extends GraphFrame{
     }
     CommandLineParser clp = new GnuParser();
     Options o = options();
-    CommandLine cl = clp.parse(o, args);
+    CommandLine cl = new CommandLine(clp.parse(o, args), o);
     
-    if(!ValidatedCommandLine.validateCommandLine(o, cl)){
+    if(!ValidatedCommandLine.validateCommandLine(o, cl.getCommandLine())){
       System.err.println(ValidatedCommandLine.getError());
       return;
     }
     
     
-    String comName = cl.getOptionValue("c", o.getOption("c").getValue());
-    CommunityGraphFactoryFactory ff = new CommunityGraphFactoryFactory(comName);
+    String comName = cl.getOptionValue("c");
     HashMap<String, String> patterns = new HashMap<>();
     CommunityGraphFactory factory;
-    
     Object in;
     if(cl.getOptionValue("f") == null && cl.getOptionValue("u") == null){
       System.err.println("Must supply either -f or -u");
@@ -204,12 +214,30 @@ public class CommunityGraphFrame extends GraphFrame{
     else if(cl.getOptionValue("f") == null){
       URL input = new URL(cl.getOptionValue("u"));
       in = input;
-      factory = ff.getFactory(input, patterns);
+      String extension = cl.getOptionValue("u").substring(cl.getOptionValue("u").lastIndexOf(".")+1);
+      GraphFactory tmp = GraphFactoryFactory.getInstance().getByNameAndExtension(cl.getOptionValue("m"), extension, cl.getOptionValue("c"), new HashMap<String,String>());
+      if(tmp == null){
+        throw new InstantiationException(cl.getOptionValue("m") + " is not available for format " + extension);
+      }
+      else if(!(tmp instanceof CommunityGraphFactory)){
+        InstantiationException e = new InstantiationException(tmp.getClass().getName() + " is not an instance of CommunityGraph");
+        throw e;
+      }
+      factory = (CommunityGraphFactory)tmp;
     }
     else{
       File input = new File(cl.getOptionValue("f"));
       in = input;
-      factory = ff.getFactory(input, patterns);
+      String extension = cl.getOptionValue("f").substring(cl.getOptionValue("f").lastIndexOf(".")+1);
+      GraphFactory tmp = GraphFactoryFactory.getInstance().getByNameAndExtension(cl.getOptionValue("m"), extension, cl.getOptionValue("c"), new HashMap<String,String>());
+      if(tmp == null){
+        throw new InstantiationException(cl.getOptionValue("m") + " is not available for format " + extension);
+      }
+      else if(tmp == null || !(tmp instanceof CommunityGraphFactory)){
+        InstantiationException e = new InstantiationException(tmp.getClass().getName() + " is not an instance of CommunityGraph");
+        throw e;
+      }
+      factory = (CommunityGraphFactory)tmp;
     }
     if(factory == null){
       System.err.println("Factory is null");
@@ -230,7 +258,7 @@ public class CommunityGraphFrame extends GraphFrame{
     
     frmMain.setVisible(true);
     Placer p = null;
-    frmMain.setPlacerName(cl.getOptionValue("l", o.getOption("l").getValue()));
+    frmMain.setPlacerName(cl.getOptionValue("l"));
     if(factory.getGraph() instanceof Placer){
       p = (Placer)factory.getGraph();
     }

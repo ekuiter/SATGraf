@@ -22,7 +22,7 @@ import org.apache.commons.cli.ParseException;
  * @author zacknewsham
  */
 public class Main {
-  public static void main(String[] args) throws URISyntaxException, IOException, ParseException{
+  public static void main(String[] args) throws URISyntaxException, IOException, ParseException, InstantiationException{
     String[] newargs;
     if(args.length == 0){
       System.out.println("Too few options. Please use:");
