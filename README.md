@@ -98,14 +98,20 @@ At the moment only single level layout algorithms are supported.
 These views are observers of the evolution, and are notified whenever a variable or clause changes. They can show details about how different metrics change during the evolution.
 
 1. Create a class that either implements either `com.satgraf.evolution.observers.VisualEvolutionObserver` or `com.satlib.evolution.observers.EvolutionObserver`. The only difference between these two interfaces is that one will be added as a view (to display graphical elements) and the other may only log to the console (or file).
-2. Choose a name for the observer and register it with `com.satgraf.evolution.observers.EvolutionObserverFactory using the `register(String name, String description, Class implementation)` method.
+2. Choose a name for the observer and register it with `com.satgraf.evolution.observers.EvolutionObserverFactory` using the `register(String name, String description, Class implementation)` method.
 3. Your chosen named observer is now available as one of the options of the `-o` command line option.
 
 ##Different graph representations
-At the moment only the variable-incidence graph is supported, however the implementation of SATGraf doesnt care how the graph was built. It is possible to implement either new adapters for CNF that create literal-incidence graphs or clause-incidence graphs, or implement an adapter that allows non-CNF input. This requires modifying the source in some places, and will be "cleaned up" at a later date.
+At the moment only the variable-incidence graph is supported, however the implementation of SATGraf doesnt care how the graph was built. It is possible to implement either new adapters for CNF that create literal-incidence graphs or clause-incidence graphs, or implement an adapter that allows non-CNF input.
 
-1. Create a class that implements `com.satlib.graph.GraphFactory` (e.g. `DimacsGraphFactory` which takes CNF and outputs a VIG). Implement `makeGraph(File)` and `makeGraph(URL)` in such a way that the provided input is converted to the desired graph representation
-2. Modify the `getFactory` methods of `com.satlib.evolution.EvolutionGraphFactoryFactory` to return your GraphFactory implementation
+1. Create a class that implements `com.satlib.graph.GraphFactory`.
+    1. The `GraphFactory` class has five methods, which are mostly self explanatory `makeGraph(URL)`,`makeGraph(File)` and `getGraph()`. 
+    2. `getNodeLists()` returns a `HashMap` of `String`=>`IntStringHashMap`, which are the variable id's and names. The string is the name of an arbitrary grouping.
+    3. `getPatterns()` returns a `HashMap` of `String`=>`Pattern`, which is used to assign variables to groups based on their names.
+
+2. Choose a name for your `GraphFactory` implementation, e.g. "CIG" (Clause-incidence graph). Also choose the file extensions that will be supported. For each file extension register the class with the `com.satlib.graph.GraphFactoryFactory` class using the `register(String name, String extension, Class implementation)` method. 
+3. Your adapter is now available as one of the options of the `-o` command line option.
+4. Your implementation must return either a `CommunityGraphFactory`, `EvolutioGraphFactory` or `ImplicationGraphFactory` depending on where it will be used.
 
 #Implementing the SATGraf protocol in a solver
 ##If implementing your solver in C++ 
