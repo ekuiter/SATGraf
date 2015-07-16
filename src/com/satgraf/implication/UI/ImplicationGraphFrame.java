@@ -24,6 +24,7 @@ import com.satgraf.graph.placer.PlacerFactory;
 import com.satlib.graph.GraphFactory;
 import com.satlib.graph.GraphFactoryFactory;
 import com.satlib.implication.ImplicationGraphFactory;
+import com.satlib.implication.DimacsImplicationGraphFactory;
 import com.validatedcl.validation.CommandLine;
 import com.validatedcl.validation.Help;
 import com.validatedcl.validation.ValidatedCommandLine;
@@ -51,6 +52,7 @@ public class ImplicationGraphFrame extends GraphFrame{
     forceInit(FruchPlacer.class);
     forceInit(KKPlacer.class);
     forceInit(GridPlacer.class);
+    forceInit(DimacsImplicationGraphFactory.class);
   }
 
   HashMap<String,Pattern> patterns;
