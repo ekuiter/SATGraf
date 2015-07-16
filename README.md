@@ -1,6 +1,9 @@
-#SATLib
+#Dependencies:
 SATGraf is the graphical UI for visualising the evolution of a SAT solver. It uses [SATLib](https://bitbucket.org/znewsham/satlib) as the backend for strucural information and evolution data.
+Validation is provided by the [ValidatedCL](https://bitbucket.org/znewsham/validatedcl) package.
 
+If compiling from source, these packages are required.
+ 
 #Installation:     
     unzip satgraf.zip   
     cd satgraf   
@@ -34,7 +37,11 @@ SATGraf is the graphical UI for visualising the evolution of a SAT solver. It us
 		c - A basic layout algorithm, nodes are layed out within a community using the FR layout algorithm. The communities are then layed out in a circle, with those most connected next to each other.   
 		grid - A basic layout algorithm, nodes are layed out within a community in a grid pattern. The communities are then layed out on a grid   
 		gkk - A basic layout algorithm, nodes are layed out within a community using the KK algorithm. The communities are then layed out on a grid   
-
+	-m --format(default = auto) The format of the file, and desired graph representation
+	Must be one of:
+		auto - accepts: 
+			.cnf - Load a DIMACS format file into a VIG and compute communities
+			.sb - Load a graph representation from SB (JSON) file
 
 ##imp - View the graph and manually set the values of nodes to see how they propagate.   
 	-f --file(default = null) The file (either .cnf or .sb)   
@@ -45,7 +52,10 @@ SATGraf is the graphical UI for visualising the evolution of a SAT solver. It us
 	Must be one of:    
 		f - An implementation of the Fruchtermon and Reingold force directed layout algorithm   
 		fgpu - A GPU implementation of the Fruchtermon and Reingold force directed layout algorithm   
-		kk - An implementation of the Kamada-Kawai placement algorithm   
+		kk - An implementation of the Kamada-Kawai placement algorithm  
+	Must be one of:
+		auto - accepts: 
+			.cnf - Load a DIMACS format file into a VIG allow manual variable setting 
 	   
 ##evo - View the evolution of the structure of the graph, with other evolution properties presented.   
 	-f --file(default = null) The file (either .cnf or .sb)   
@@ -72,7 +82,10 @@ SATGraf is the graphical UI for visualising the evolution of a SAT solver. It us
 		c - A basic layout algorithm, nodes are layed out within a community using the FR layout algorithm. The communities are then layed out in a circle, with those most connected next to each other.   
 		grid - A basic layout algorithm, nodes are layed out within a community in a grid pattern. The communities are then layed out on a grid   
 		gkk - A basic layout algorithm, nodes are layed out within a community using the KK algorithm. The communities are then layed out on a grid
-
+	-m --format(default = auto) The format of the file, and desired graph representation
+	Must be one of:
+		auto - accepts: 
+			.cnf - Load a DIMACS format file into a VIG and compute communities, then solve and display evolution
 
 #Extending SATGraf:
 SATGraf may be extendid with trivial ease in three areas, and with slightly more involvement in a fourth.
