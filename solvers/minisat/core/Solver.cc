@@ -44,7 +44,7 @@ static BoolOption    opt_luby_restart      (_cat, "luby",        "Use the Luby r
 static IntOption     opt_restart_first     (_cat, "rfirst",      "The base restart interval", 100, IntRange(1, INT32_MAX));
 static DoubleOption  opt_restart_inc       (_cat, "rinc",        "Restart interval increase factor", 2, DoubleRange(1, false, HUGE_VAL, false));
 static DoubleOption  opt_garbage_frac      (_cat, "gc-frac",     "The fraction of wasted memory allowed before a garbage collection is triggered",  0.20, DoubleRange(0, false, HUGE_VAL, false));
-
+static StringOption  opt_pipe_location     (_cat, "pipe", 	 "The location of the Pipe file for SATGraf", "solvers/piping/myPipe.txt");
 
 //=================================================================================================
 // Constructor/Destructor:
@@ -67,6 +67,7 @@ Solver::Solver() :
   , garbage_frac     (opt_garbage_frac)
   , restart_first    (opt_restart_first)
   , restart_inc      (opt_restart_inc)
+  , pipe_location    (opt_pipe_location)
 
     // Parameters (the rest):
     //
@@ -99,7 +100,7 @@ Solver::Solver() :
   , propagation_budget (-1)
   , asynch_interrupt   (false)
 {
-    Pipe::getInstance()->openPipe("solvers/piping/myPipe.txt");
+    Pipe::getInstance()->openPipe(pipe_location);
 }
 
 
