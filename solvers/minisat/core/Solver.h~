@@ -119,7 +119,7 @@ public:
     double    clause_decay;
     double    random_var_freq;
     double    random_seed;
-    string pipe_location;
+    char* pipe_location;
     bool      luby_restart;
     int       ccmin_mode;         // Controls conflict clause minimization (0=none, 1=basic, 2=deep).
     int       phase_saving;       // Controls the level of phase saving (0=none, 1=limited, 2=full).
