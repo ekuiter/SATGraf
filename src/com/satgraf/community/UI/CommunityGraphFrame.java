@@ -26,6 +26,7 @@ import com.satlib.community.CommunityGraphFactory;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
 import com.satlib.community.DimacsCommunityGraphFactory;
+import com.satlib.community.DimacsLiteralCommunityGraphFactory;
 import com.satlib.community.JSONCommunityGraph;
 import com.satlib.community.JSONCommunityGraphFactory;
 import com.satlib.community.LouvianCommunityMetric;
@@ -67,6 +68,7 @@ public class CommunityGraphFrame extends GraphFrame{
     forceInit(CNMCommunityMetric.class);
     forceInit(JSONCommunityGraphFactory.class);
     forceInit(DimacsCommunityGraphFactory.class);
+    forceInit(DimacsLiteralCommunityGraphFactory.class);
   }
 
   protected HashMap<String, Pattern> patterns;
@@ -186,11 +188,12 @@ public class CommunityGraphFrame extends GraphFrame{
       args = new String[]{
         //"-f","formula/satcomp/dimacs/toybox.cnf",
         //"-f","/home/zacknewsham/aes.sb",
-        "-f","/home/zacknewsham/Sites/satgraf/formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
+        "-f","/home/zacknewsham/satgraf/formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
         //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
         //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "-c","ol",
-        "-l","fr"
+        "-l","f",
+        "-m","literal"
       };
       System.out.print(Help.getHelp(options()));
       //return;

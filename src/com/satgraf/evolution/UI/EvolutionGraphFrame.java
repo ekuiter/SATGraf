@@ -18,6 +18,7 @@ import com.satlib.community.CommunityGraphFactory;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
 import com.satlib.evolution.DimacsEvolutionGraphFactory;
+import com.satlib.evolution.DimacsLiteralEvolutionGraphFactory;
 import com.satlib.evolution.EvolutionGraphFactory;
 import com.satlib.evolution.observers.EvolutionObserver;
 import com.satlib.graph.GraphFactory;
@@ -49,6 +50,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     forceInit(QEvolutionObserver.class);
     forceInit(VSIDSSpacialLocalityEvolutionObserver.class);
     forceInit(DimacsEvolutionGraphFactory.class);
+    forceInit(DimacsLiteralEvolutionGraphFactory.class);
   }
   private EvolutionGraphFactory factory;
   public static String minisat;
@@ -176,12 +178,14 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
   public static void main(String[] args) throws IOException, ParseException, InstantiationException {
     if (args.length == 0) {
       args = new String[]{
-       //"-f","/home/zacknewsham/Documents/University/visualizationpaper/formula/unif-k3-r4.267-v421-c1796-S4839562527790587617.cnf",
-        "-f","/home/zacknewsham/Sites/satgraf/demo/satgraf/formula/aes_16_10_keyfind_3.cnf",
-        //"-f","./formula/27round.cnf",
-        "-c","l",
-        "-l","c",
-        "-o","Q"
+        //"-f","formula/satcomp/dimacs/toybox.cnf",
+        //"-f","/home/zacknewsham/aes.sb",
+        "-f","/home/zacknewsham/satgraf/formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
+        //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
+        //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
+        "-c","ol",
+        "-l","fr",
+        "-m","literal"
       };
       System.out.print(Help.getHelp(options()));
       //return;
@@ -229,7 +233,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
         throw new InstantiationException(cl.getOptionValue("m") + " is not available for format " + extension);
       }
       else if(tmp == null || !(tmp instanceof EvolutionGraphFactory)){
-        InstantiationException e = new InstantiationException(tmp.getClass().getName() + " is not an instance of CommunityGraph");
+        InstantiationException e = new InstantiationException(tmp.getClass().getName() + " is not an instance of EvolutionGraphFactory");
         throw e;
       }
       factory = (EvolutionGraphFactory)tmp;

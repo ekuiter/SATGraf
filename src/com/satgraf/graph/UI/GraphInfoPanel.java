@@ -7,6 +7,7 @@
 package com.satgraf.graph.UI;
 
 import com.satlib.graph.Graph;
+import com.satlib.graph.LiteralGraph;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
@@ -81,7 +82,12 @@ public abstract class GraphInfoPanel <T extends GraphViewer> extends JPanel{
     c.gridwidth = 1;
     c.gridheight = 1;
     c.anchor = GridBagConstraints.LINE_START;
-    this.add(new JLabel("Vars"), c);
+    if(graph instanceof LiteralGraph){
+      this.add(new JLabel("Literals"), c);
+    }
+    else{
+      this.add(new JLabel("Vars"), c);
+    }
     c.gridx = 1;
     c.gridwidth = 3;
     c.anchor = GridBagConstraints.LINE_END;

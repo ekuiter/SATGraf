@@ -950,9 +950,11 @@ void Solver::garbageCollect()
 void Solver::printClause(const Clause& c, int state) {
     std::ostringstream ss;
     
-    ss << var(c[0])+1;
+    int v = var(c[0]) + 1;
+    ss << ((assigns[var(c[0])] == lbool(true)) ? v : (0 - v));
     for (int i = 1; i < c.size(); i++) {
-        ss << " " << var(c[i])+1;
+	v = var(c[i]) + 1;
+        ss << " " << ((assigns[var(c[i])] == lbool(true)) ? v : (0 - v));
     }
     
     Pipe::getInstance()->printClause(ss.str(), state);
