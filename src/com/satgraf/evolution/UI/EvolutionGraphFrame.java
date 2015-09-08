@@ -1,6 +1,6 @@
 package com.satgraf.evolution.UI;
 
-import static com.satgraf.ForceInit.forceInit;
+import static com.satlib.ForceInit.forceInit;
 import com.satgraf.FormatValidationRule;
 import com.satgraf.community.UI.CommunityGraphFrame;
 import com.satgraf.community.placer.CommunityPlacer;

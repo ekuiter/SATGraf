@@ -9,6 +9,8 @@ package com.satgraf.graph.UI;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -57,7 +59,7 @@ public class OptionsPanel extends JPanel{
     
     scale = new GraphScaler(frame, graph);
     options.setLayout(new BoxLayout(options, BoxLayout.Y_AXIS));
-    options.setPreferredSize(new Dimension(300, 700));
+    //options.setPreferredSize(new Dimension(300, 700));
     
     JPanel neOptions = new JPanel();
     neOptions.setLayout(new GridLayout(1, 2, 10, 0));
@@ -69,8 +71,8 @@ public class OptionsPanel extends JPanel{
     this.options.add(Box.createRigidArea(new Dimension(0,10)));
     
     this.setLayout(new BorderLayout());
-    this.add(options, BorderLayout.CENTER);
-    this.add(nodePanel, BorderLayout.SOUTH);
+    this.add(options, BorderLayout.NORTH);
+    this.add(nodePanel, BorderLayout.CENTER);
   }
   
   public void fromJson(JSONObject json){

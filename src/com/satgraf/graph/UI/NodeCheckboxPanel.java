@@ -51,17 +51,22 @@ public class NodeCheckboxPanel extends JPanel{
     json.append("}");
     return json.toString();
   }
+  boolean updating = false;
   public void update(){
-    Iterator<Node> nodes = checkBoxes.keySet().iterator();
-    while(nodes.hasNext()){
-      Node next = nodes.next();
-      JCheckBox jc = checkBoxes.get(next);
-      if(next.isVisible() && jc.isSelected() == false){
-        jc.setSelected(true);
+    if(!updating){
+      updating = true;
+      Iterator<Node> nodes = checkBoxes.keySet().iterator();
+      while(nodes.hasNext()){
+        Node next = nodes.next();
+        JCheckBox jc = checkBoxes.get(next);
+        if(next.isVisible() && jc.isSelected() == false){
+          jc.setSelected(true);
+        }
+        else if(!next.isVisible() && jc.isSelected() == true){
+          jc.setSelected(false);
+        }
       }
-      else if(!next.isVisible() && jc.isSelected() == true){
-        jc.setSelected(false);
-      }
+      updating = false;
     }
   }
   

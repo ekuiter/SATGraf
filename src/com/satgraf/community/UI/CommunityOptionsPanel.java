@@ -48,6 +48,7 @@ public class CommunityOptionsPanel extends GraphOptionsPanel{
     }
     this.setTopComponent(optionsPanel);
   }
+  
   public CommunityOptionsPanel(GraphFrame frame, CommunityGraphViewer graph, Collection<String> groups) {
     this(frame, graph, groups, true);
   }

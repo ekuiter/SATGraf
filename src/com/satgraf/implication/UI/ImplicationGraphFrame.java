@@ -6,7 +6,7 @@
 
 package com.satgraf.implication.UI;
 
-import static com.satgraf.ForceInit.forceInit;
+import static com.satlib.ForceInit.forceInit;
 import com.satgraf.FormatValidationRule;
 import com.satgraf.actions.ExportAction;
 import com.satgraf.actions.OpenAction;
