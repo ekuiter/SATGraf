@@ -12,6 +12,7 @@ import com.satlib.community.JSONCommunityGraphFactory;
 import com.satlib.community.LouvianCommunityMetric;
 import com.satlib.community.OLCommunityMetric;
 import com.satlib.evolution.DimacsEvolutionGraphFactory;
+import com.satlib.evolution.DimacsLiteralEvolutionGraphFactory;
 import com.satlib.evolution.Evolution;
 import com.satlib.evolution.EvolutionGraph;
 import com.satlib.evolution.EvolutionGraphFactory;
@@ -51,6 +52,7 @@ public class CalculateEvolution {
     forceInit(QEvolutionObserver.class);
     forceInit(VSIDSSpacialLocalityEvolutionObserver.class);
     forceInit(DimacsEvolutionGraphFactory.class);
+    forceInit(DimacsLiteralEvolutionGraphFactory.class);
     forceInit(LouvianCommunityMetric.class);
     forceInit(OLCommunityMetric.class);
     forceInit(CNMCommunityMetric.class);

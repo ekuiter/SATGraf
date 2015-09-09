@@ -12,6 +12,7 @@ import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
 import com.satlib.community.CommunityNode;
 import com.satlib.community.DimacsCommunityGraphFactory;
+import com.satlib.community.DimacsLiteralCommunityGraphFactory;
 import com.satlib.community.JSONCommunityGraphFactory;
 import com.satlib.community.LouvianCommunityMetric;
 import com.satlib.community.OLCommunityMetric;
@@ -83,6 +84,7 @@ public class GenerateOne {
     static{
       forceInit(DimacsCommunityGraphFactory.class);
       forceInit(LouvianCommunityMetric.class);
+    forceInit(DimacsLiteralCommunityGraphFactory.class);
       forceInit(OLCommunityMetric.class);
       forceInit(CNMCommunityMetric.class);
       forceInit(JSONCommunityGraphFactory.class);

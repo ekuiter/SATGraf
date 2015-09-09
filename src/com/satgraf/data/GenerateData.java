@@ -6,6 +6,7 @@ import static com.satlib.ForceInit.forceInit;
 import com.satlib.community.CNMCommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
 import com.satlib.community.DimacsCommunityGraphFactory;
+import com.satlib.community.DimacsLiteralCommunityGraphFactory;
 import com.satlib.community.JSONCommunityGraphFactory;
 import com.satlib.community.LouvianCommunityMetric;
 import com.satlib.community.OLCommunityMetric;
@@ -49,6 +50,7 @@ public class GenerateData {
     forceInit(QEvolutionObserver.class);
     forceInit(VSIDSSpacialLocalityEvolutionObserver.class);
     forceInit(DimacsCommunityGraphFactory.class);
+    forceInit(DimacsLiteralCommunityGraphFactory.class);
     forceInit(LouvianCommunityMetric.class);
     forceInit(OLCommunityMetric.class);
     forceInit(CNMCommunityMetric.class);
@@ -77,7 +79,7 @@ public class GenerateData {
     options.addOption(o);
     
     o = new ValidatedOption("o", "output", true, "The output CSV");
-    o.addRule(new FileValidationRule(FileValidationRule.FileExists.yes, new String[]{"write"}));
+    o.addRule(new FileValidationRule(FileValidationRule.FileExists.neither, new String[]{"write"}));
     options.addOption(o);
     
     return options;
