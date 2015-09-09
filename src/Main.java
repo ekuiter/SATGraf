@@ -1,5 +1,8 @@
 
 import com.satgraf.community.UI.CommunityGraphFrame;
+import com.satgraf.data.CalculateEvolution;
+import com.satgraf.data.GenerateData;
+import com.satgraf.data.GenerateOne;
 import com.satgraf.evolution.UI.EvolutionGraphFrame;
 import com.satgraf.implication.UI.ImplicationGraphFrame;
 import com.satgraf.test.QAgainstTimeRandomBucketing;
@@ -22,7 +25,7 @@ import org.apache.commons.cli.ParseException;
  * @author zacknewsham
  */
 public class Main {
-  public static void main(String[] args) throws URISyntaxException, IOException, ParseException, InstantiationException{
+  public static void main(String[] args) throws URISyntaxException, IOException, ParseException, InstantiationException, InterruptedException{
     String[] newargs;
     if(args.length == 0){
       System.out.println("Too few options. Please use:");
@@ -43,6 +46,15 @@ public class Main {
     }
     else if(args[0].equals("evo")){
       EvolutionGraphFrame.main(newargs);
+    }
+    else if(args[0].equals("generate")){
+      GenerateData.main(newargs);
+    }
+    else if(args[0].equals("generateOne")){
+      GenerateOne.main(newargs);
+    }
+    else if(args[0].equals("evo_data")){
+      CalculateEvolution.main(newargs);
     }
     else if(args[0].equals("q")){
       QAgainstTimeRandomBucketing.main(newargs);
@@ -65,6 +77,9 @@ public class Main {
     builder.append(dashes).append("\ncom - View the static community representation of the formula.\n").append("\t".concat(Help.getHelp(CommunityGraphFrame.options()).replace("\n","\n\t"))).append("\n").append(dashes).append("\n");
     builder.append(dashes).append("\nimp - View the graph and manually set the values of nodes to see how they propagate.\n").append("\t".concat(Help.getHelp(ImplicationGraphFrame.options()).replace("\n","\n\t"))).append("\n").append(dashes).append("\n");
     builder.append(dashes).append("\nevo - View the evolution of the structure of the graph, with other evolution properties presented.\n").append("\t".concat(Help.getHelp(EvolutionGraphFrame.options()).replace("\n","\n\t"))).append("\n").append(dashes).append("\n");
+    builder.append(dashes).append("\nevo_data - Generate evolution data for a given SAT instance.\n").append("\t".concat(Help.getHelp(CalculateEvolution.options()).replace("\n","\n\t"))).append("\n").append(dashes).append("\n");
+    builder.append(dashes).append("\ngenerate - Generate static data for all files within the provided list, output to a csv.\n").append("\t".concat(Help.getHelp(GenerateData.options()).replace("\n","\n\t"))).append("\n").append(dashes).append("\n");
+    builder.append(dashes).append("\ngenerateOne - Generate static data for the provided instance, output data in csv to a file in the provided directory (for parallel).\n").append("\t".concat(Help.getHelp(GenerateOne.options()).replace("\n","\n\t"))).append("\n").append(dashes).append("\n");
     /*builder.append("com ").append(CommunityGraphFrame.usage()).append("\n").append(CommunityGraphFrame.help()).append("\n\n");
     builder.append("imp ").append(ImplicationGraphFrame.usage()).append("\n").append(ImplicationGraphFrame.help()).append("\n\n");
     builder.append("evo ").append(EvolutionGraphFrame.usage()).append("\n").append(EvolutionGraphFrame.help()).append("\n\n");
