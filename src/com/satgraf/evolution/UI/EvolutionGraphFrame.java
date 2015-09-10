@@ -3,9 +3,8 @@ package com.satgraf.evolution.UI;
 import static com.satlib.ForceInit.forceInit;
 import com.satgraf.FormatValidationRule;
 import com.satgraf.community.UI.CommunityGraphFrame;
-import com.satgraf.community.placer.CommunityPlacer;
 import com.satgraf.community.placer.CommunityPlacerFactory;
-import com.satgraf.evolution.observers.EvolutionObserverFactory;
+import com.satgraf.evolution.observers.VisualEvolutionObserverFactory;
 import com.satgraf.evolution.observers.QEvolutionObserver;
 import com.satgraf.evolution.observers.VSIDSSpacialLocalityEvolutionObserver;
 import com.satgraf.evolution.observers.VSIDSTemporalLocalityEvolutionObserver;
@@ -14,13 +13,11 @@ import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphOptionsPanel;
 import com.satgraf.graph.placer.Placer;
 import com.satgraf.graph.placer.PlacerFactory;
-import com.satlib.community.CommunityGraphFactory;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
 import com.satlib.evolution.DimacsEvolutionGraphFactory;
 import com.satlib.evolution.DimacsLiteralEvolutionGraphFactory;
 import com.satlib.evolution.EvolutionGraphFactory;
-import com.satlib.evolution.observers.EvolutionObserver;
 import com.satlib.graph.GraphFactory;
 import com.satlib.graph.GraphFactoryFactory;
 import com.validatedcl.validation.CommandLine;
@@ -45,7 +42,7 @@ import org.apache.commons.cli.ParseException;
 
 public class EvolutionGraphFrame extends CommunityGraphFrame {
   static{
-    forceInit(com.satgraf.evolution.observers.EvolutionObserverFactory.class);
+    forceInit(com.satgraf.evolution.observers.VisualEvolutionObserverFactory.class);
     forceInit(VSIDSTemporalLocalityEvolutionObserver.class);
     forceInit(QEvolutionObserver.class);
     forceInit(VSIDSSpacialLocalityEvolutionObserver.class);
@@ -164,7 +161,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     options.addOption(o);
     
     o = new ValidatedOption("o", "observers", true, "A named evolution observer");
-    o.addRule(new ListValidationRule(EvolutionObserverFactory.getInstance().getNames(),EvolutionObserverFactory.getInstance().getDescriptions()));
+    o.addRule(new ListValidationRule(VisualEvolutionObserverFactory.getInstance().getNames(),VisualEvolutionObserverFactory.getInstance().getDescriptions()));
     options.addOption(o);
     
     o = new ValidatedOption("m","format",true, "The format of the file, and desired graph representation");
@@ -185,7 +182,10 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
         //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "-c","ol",
         "-l","fr",
-        "-m","literal"
+        "-m","literal",
+        "-o","Q",
+        "-o","VSIDST",
+        "-o","VSIDSS"
       };
       System.out.print(Help.getHelp(options()));
       //return;
@@ -268,22 +268,16 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     factory.buildEvolutionFile();
     frmMain.show();
     GraphOptionsPanel panel = frmMain.panel;
-    if(cl.getOptionValue("o") != null){
+    for(String obs : cl.getCommandLine().getOptionValues("o")){
       
-      EvolutionObserver observer = null;
-      if(VisualEvolutionObserver.class.isAssignableFrom(EvolutionObserverFactory.getInstance().getObserverType(cl.getOptionValue("o")))){
-        observer = EvolutionObserverFactory.getInstance().getByName(cl.getOptionValue("o"), graphViewer);
-      }
-      else{
-        observer = EvolutionObserverFactory.getInstance().getByName(cl.getOptionValue("o"), factory.getGraph());
-      }
+      VisualEvolutionObserver observer = null;
+      observer = VisualEvolutionObserverFactory.getInstance().getByName(obs, graphViewer);
       CommunityMetric metric = CommunityMetricFactory.getInstance().getByName(comName);
       observer.setCommunityMetric(metric);
       
       if(observer instanceof JPanel){
         panel.addPanel((JPanel)observer, observer.getName());
       }
-      
     }
   }
 

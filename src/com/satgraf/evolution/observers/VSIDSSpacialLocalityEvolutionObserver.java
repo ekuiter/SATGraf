@@ -7,12 +7,13 @@
 package com.satgraf.evolution.observers;
 
 import com.satgraf.evolution.UI.EvolutionGraphViewer;
+import com.satlib.CSVModel;
 import com.satlib.community.Community;
 import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityNode;
 import com.satlib.evolution.EvolutionGraph;
-import com.satlib.evolution.observers.EvolutionObserverFactory;
+import com.satlib.evolution.observers.CSVEvolutionObserverFactory;
 import com.satlib.graph.Node;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -68,9 +69,8 @@ public class VSIDSSpacialLocalityEvolutionObserver extends JPanel implements Vis
   private Comparator currentComparator = COMMUNITY_COMPARATOR;
   private CommunityMetric metric;
   static{
-    EvolutionObserverFactory.getInstance().register("VSIDSS", "A graphical representation of the spacial locailty of the VSIDS decision heuristic", VSIDSSpacialLocalityEvolutionObserver.class);
+    VisualEvolutionObserverFactory.getInstance().register("VSIDSS", "A graphical representation of the spacial locailty of the VSIDS decision heuristic", VSIDSSpacialLocalityEvolutionObserver.class);
   }
-  
   public VSIDSSpacialLocalityEvolutionObserver(EvolutionGraphViewer graph){
     this.graph = graph.getGraph();
     this.graphViewer = graph;

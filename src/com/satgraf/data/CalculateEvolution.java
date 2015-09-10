@@ -5,6 +5,7 @@ import com.satgraf.FormatValidationRule;
 import com.satgraf.community.placer.CommunityPlacerFactory;
 import static com.satgraf.evolution.UI.EvolutionGraphFrame.options;
 import com.satgraf.graph.placer.PlacerFactory;
+import com.satlib.CSVModel;
 import static com.satlib.ForceInit.forceInit;
 import com.satlib.community.CNMCommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
@@ -16,7 +17,8 @@ import com.satlib.evolution.DimacsLiteralEvolutionGraphFactory;
 import com.satlib.evolution.Evolution;
 import com.satlib.evolution.EvolutionGraph;
 import com.satlib.evolution.EvolutionGraphFactory;
-import com.satlib.evolution.observers.EvolutionObserverFactory;
+import com.satlib.evolution.observers.CSVEvolutionObserver;
+import com.satlib.evolution.observers.CSVEvolutionObserverFactory;
 import com.satlib.evolution.observers.QEvolutionObserver;
 import com.satlib.evolution.observers.VSIDSSpacialLocalityEvolutionObserver;
 import com.satlib.evolution.observers.VSIDSTemporalLocalityEvolutionObserver;
@@ -30,7 +32,10 @@ import com.validatedcl.validation.rules.NumericValidationRule;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
@@ -110,6 +115,14 @@ public class CalculateEvolution {
     o.setDefault("10");
     options.addOption(o);
     
+    o = new ValidatedOption("o", "observer", true, "The name of the observer to use for the evolution");
+    o.addRule(new ListValidationRule(CSVEvolutionObserverFactory.getInstance().getNames(), CSVEvolutionObserverFactory.getInstance().getDescriptions()));
+    options.addOption(o);
+    
+    o = new ValidatedOption("e","decisions",true, "The number of decisions to execute for");
+    o.addRule(new NumericValidationRule(true));
+    o.setDefault("10240");
+    options.addOption(o);
     return options;
   }
    
@@ -117,7 +130,11 @@ public class CalculateEvolution {
     if(args.length < 1){
       args = new String[]{
         "-f","/home/zacknewsham/obfuscated-instances/pass-hash-jenkins-OAAT_test000004.cnf",
-        "-d","/home/zacknewsham/evolution/",
+        "-d","/home/zacknewsham/var_evolution/",
+        "-o","Q",
+        "-o","VSIDST",
+        "-o","VSIDSS",
+        "-e","10240"
       };
     }
     
@@ -144,25 +161,31 @@ public class CalculateEvolution {
     Evolution.pipeFileName = Evolution.dumpFileDirectory + "myPipe.txt";
     Evolution.outputDirectory = Evolution.dumpFileDirectory + "output/";
     Evolution e = factory.getEvolution();
+    e.getDecisions();
     factory.process(graph);
     
-    VSIDSSpacialLocalityEvolutionObserver spacial = (VSIDSSpacialLocalityEvolutionObserver)EvolutionObserverFactory.getInstance().getByName("VSIDSS", graph);
-    VSIDSTemporalLocalityEvolutionObserver temporal = (VSIDSTemporalLocalityEvolutionObserver)EvolutionObserverFactory.getInstance().getByName("VSIDST", graph);
-    QEvolutionObserver q = (QEvolutionObserver)EvolutionObserverFactory.getInstance().getByName("Q", graph);
-    q.windowSize = Integer.parseInt(cl.getOptionValue("w"));
-    spacial.setCommunityMetric(factory.getMetric());
-    temporal.setCommunityMetric(factory.getMetric());
-    q.setCommunityMetric(factory.getMetric());
-    
+    List<CSVEvolutionObserver> observers = new ArrayList<>();
+    boolean shouldSkip = true;
+    for(String observer : cl.getCommandLine().getOptionValues("o")){
+      CSVEvolutionObserver obs = CSVEvolutionObserverFactory.getInstance().getByName(observer, graph);
+      observers.add(obs);
+      obs.setCommunityMetric(factory.getMetric());
+      if(obs instanceof QEvolutionObserver){
+        ((QEvolutionObserver)obs).windowSize = Integer.parseInt(cl.getOptionValue("w"));
+      }
+      File f = new File(cl.getOptionValue("d") + input.getName() + obs.getName());
+      if(!f.exists()){
+        shouldSkip = false;
+      }
+    }
+    if(shouldSkip){
+      return;
+    }
     int i = 0;
     int exceptionCount = 0;
     int lastSize = 0;
-    File f_q = new File(cl.getOptionValue("d") + input.getName() + ".q");
-    f_q.createNewFile();
-    File f_s = new File(cl.getOptionValue("d") + input.getName() + ".spacial");
-    f_s.createNewFile();
-    File f_t = new File(cl.getOptionValue("d") + input.getName() + ".temporal");
-    f_t.createNewFile();
+    int decisions = Integer.parseInt(cl.getOptionValue("e"));
+    cl.getOptionValue("o");
     while((factory.solverRunning()) || i < e.getTotalLines() && !e.hasError()){
       while(e.getTotalLines() <= i && factory.solverRunning()){
         Thread.sleep(1000);
@@ -178,47 +201,24 @@ public class CalculateEvolution {
         Thread.sleep(1000);
         if(exceptionCount == 10){break;}
       }
-      if(q.decisions.size() == 10240){
+      if(e.getDecisions() == decisions){
         break;
       }
-      else if(q.decisions.size() % 5 == 0 && lastSize != q.decisions.size()){
-        System.err.printf("%d\n", q.decisions.size());
+      else if(e.getDecisions() % 5 == 0 && lastSize != e.getDecisions()){
+        System.err.printf("%d\n", e.getDecisions());
       }
-      lastSize = q.decisions.size();
+      lastSize = e.getDecisions();
       i = i + 1;
     }
     factory.stopSolver();
     if(e.hasError()){
       return;
     }
-    i = 0;
-    FileWriter f = new FileWriter(_f);
-    f.write("decision,q\n");
-    f.flush();
-    for(Integer n: q.qs.keySet()){
-      i = (n/10) - 1;
-      f.write(String.format("%d,%f\n",n, q.qs.get(n)));
+    for(CSVEvolutionObserver obs : observers){
+      FileWriter f = new FileWriter(new File(cl.getOptionValue("d") + input.getName() + obs.getName()));
+      CSVModel model = obs.getModel();
+      model.toFile(new File(cl.getOptionValue("d") + input.getName() + obs.getName()));
     }
-    f.close();
-    f = new FileWriter(f_s);
-    f.write("community,decisions,ratio\n");
-    f.flush();
-    for(Integer n : spacial.total.keySet()){
-      f.write(String.format("%d,%d,%f\n", n, spacial.total.get(n), spacial.ratio.get(n)));
-    }
-    f.close();
-    f = new FileWriter(f_t);
-    f.write("decision,communtycount_d,communitycount_p\n");
-    for(Integer n : temporal.decisionComs.keySet()){
-      int pcount = 0;
-      if(temporal.propogationComs.containsKey(n)){
-        pcount = temporal.propogationComs.get(n);
-      }
-     
-      
-      f.write(String.format("%d,%d,%d\n",n,temporal.decisionComs.get(n), pcount));
-    }
-    f.close();
     System.exit(0);
     //System.out.printf("%f,%f,%f\n", q.bestCase, q.worstCase, q.qs.get(10), q.qs.get(25), q.qs.get(50), q.qs.get(100), q.qs.get(250), q.qs.get(500), q.qs.get(750), q.qs.get(1000));
   }

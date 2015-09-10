@@ -6,12 +6,13 @@
 
 package com.satgraf.evolution.observers;
 
+import com.satgraf.evolution.UI.EvolutionGraphViewer;
 import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityNode;
 import com.satlib.evolution.EvolutionGraph;
 import com.satlib.evolution.observers.EvolutionObserver;
-import com.satlib.evolution.observers.EvolutionObserverFactory;
+import com.satlib.evolution.observers.CSVEvolutionObserverFactory;
 import com.satlib.graph.Clause;
 import com.satlib.graph.Node;
 import java.awt.Dimension;
@@ -38,8 +39,8 @@ import org.jfree.data.xy.XYSeriesCollection;
  *
  * @author zacknewsham
  */
-public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements EvolutionObserver{
-  private final EvolutionGraph graph;
+public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements VisualEvolutionObserver{
+  private final EvolutionGraphViewer graphViewer;
   private final JTextField txtWindowSize = new JTextField("10");
   private final JLabel lblWorstCase = new JLabel("0");
   private static final int VARS_PER_REDRAW = 10;
@@ -53,11 +54,11 @@ public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements Ev
   private final JScrollPane chartScroll = new JScrollPane(chartPanel);
   private CommunityMetric metric;
   static{
-    EvolutionObserverFactory.getInstance().register("VSIDST", "A graphical representation of the temporal locailty of the VSIDS decision heuristic", VSIDSTemporalLocalityEvolutionObserver.class);
+    VisualEvolutionObserverFactory.getInstance().register("VSIDST", "A graphical representation of the temporal locailty of the VSIDS decision heuristic", VSIDSTemporalLocalityEvolutionObserver.class);
   }
   
-  public VSIDSTemporalLocalityEvolutionObserver(EvolutionGraph graph){
-    this.graph = graph;
+  public VSIDSTemporalLocalityEvolutionObserver(EvolutionGraphViewer graphViewer){
+    this.graphViewer = graphViewer;
     init();
     decisionSeries.add(0, 0);
     propogationSeries.add(0, 0);

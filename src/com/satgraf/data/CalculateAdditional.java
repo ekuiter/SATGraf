@@ -1,6 +1,7 @@
 package com.satgraf.data;
 
 
+import com.satlib.CSVModel;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityGraphFactory;
 import com.satlib.community.CommunityMetric;

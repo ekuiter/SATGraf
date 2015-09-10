@@ -54,7 +54,7 @@ public class QEvolutionObserver extends JPanel implements VisualEvolutionObserve
   private final JScrollPane chartScroll = new JScrollPane(chartPanel);
   private CommunityMetric metric;
   static{
-    com.satlib.evolution.observers.EvolutionObserverFactory.getInstance().register("Q", "A graphical representation of the evolution of Q over the solution of the solver (based on the selected community metric)", QEvolutionObserver.class);
+    VisualEvolutionObserverFactory.getInstance().register("Q", "A graphical representation of the evolution of Q over the solution of the solver (based on the selected community metric)", QEvolutionObserver.class);
   }
 
   public QEvolutionObserver(EvolutionGraphViewer graphViewer){

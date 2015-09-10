@@ -1,10 +1,11 @@
 package com.satgraf.evolution.UI;
 
+import com.satlib.evolution.observers.EvolutionObserverFactory;
 import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityMetric;
 import com.satlib.evolution.Evolution;
 import com.satlib.evolution.observers.EvolutionObserver;
-import com.satlib.evolution.observers.EvolutionObserverFactory;
+import com.satlib.evolution.observers.CSVEvolutionObserverFactory;
 import com.satlib.community.CommunityNode;
 import com.satlib.graph.Edge;
 import com.satgraf.graph.UI.GraphViewerObserver;
