@@ -50,6 +50,8 @@ public class PlacerFactory {
         Constructor<? extends Placer> con = classes.get(name).getConstructor(Graph.class);
         return con.newInstance(graph);
       } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException | SecurityException ex) {
+        ex.printStackTrace();
+        ex.getCause().printStackTrace();
         return null;
       }
     }

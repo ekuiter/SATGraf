@@ -89,7 +89,7 @@ public class CommunityOptionsPanel extends GraphOptionsPanel{
       HashSet<CommunityEdge> interConnections = new HashSet<>();
       HashSet<CommunityEdge> intraConnections = new HashSet<>();
       
-      Iterator<CommunityEdge> eit = graph.getEdges().iterator();
+      /*Iterator<CommunityEdge> eit = graph.getEdges().iterator();
       while (eit.hasNext()) {
     	  CommunityEdge e = (CommunityEdge) eit.next();
     	  
@@ -98,7 +98,7 @@ public class CommunityOptionsPanel extends GraphOptionsPanel{
     	  } else {
     		  intraConnections.add(e);
     	  }
-      }
+      }*/
       
       interConnectionPanel = new EdgeCheckBoxPanel(graph, interConnections);
       interConncetionScroll = new JScrollPane(interConnectionPanel);

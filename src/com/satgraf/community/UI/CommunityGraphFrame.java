@@ -16,6 +16,7 @@ import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphFrame;
 import com.satgraf.graph.placer.FruchPlacer;
 import com.satgraf.graph.placer.FruchRandomPlacer;
+import com.satgraf.graph.placer.JungWrapper;
 import com.satgraf.graph.placer.KKPlacer;
 import com.satgraf.graph.placer.Placer;
 import com.satgraf.graph.placer.PlacerFactory;
@@ -69,6 +70,7 @@ public class CommunityGraphFrame extends GraphFrame{
     forceInit(JSONCommunityGraphFactory.class);
     forceInit(DimacsCommunityGraphFactory.class);
     forceInit(DimacsLiteralCommunityGraphFactory.class);
+    forceInit(JungWrapper.class);
   }
 
   protected HashMap<String, Pattern> patterns;
@@ -188,12 +190,11 @@ public class CommunityGraphFrame extends GraphFrame{
       args = new String[]{
         //"-f","formula/satcomp/dimacs/toybox.cnf",
         //"-f","/home/zacknewsham/aes.sb",
-        "-f","/home/zacknewsham/satgraf/formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
+        "-f","/home/zacknewsham/satgraf/formula/16round.cnf",
         //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
         //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "-c","ol",
-        "-l","f",
-        "-m","literal"
+        "-l","jung",
       };
       System.out.print(Help.getHelp(options()));
       //return;

@@ -110,13 +110,13 @@ public abstract class GraphOptionsPanel extends JSplitPane implements GraphViewe
       checkBoxPanel.addBar("Graph Info", infoScroll);
       
       Iterator<String> groupsI = groups.iterator();
-      while(groupsI.hasNext()){
+      /*while(groupsI.hasNext()){
         String group = groupsI.next();
         NodeCheckboxPanel temp = new NodeCheckboxPanel(graph, group, graph.getNodes(group));
         checkboxPanels.put(group, temp);
         JScrollPane tempScroll = new JScrollPane(temp);
         checkBoxPanel.addBar("Variables - " + group, tempScroll);
-      }
+      }*/
       checkBoxPanel.setVisibleBar(0);
     }
   }
