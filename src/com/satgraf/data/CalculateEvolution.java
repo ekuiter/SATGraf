@@ -82,9 +82,6 @@ public class CalculateEvolution {
     o.addRule(new FileValidationRule(FileValidationRule.FileExists.yes, new String[]{"read"}));
     options.addOption(o);
     
-    o = new ValidatedOption("u","url",true, "A file URL (.cnf)");
-    options.addOption(o);
-    
     o = new ValidatedOption("c", "community", true,"The community detection algorithm");
     o.setDefault("ol");
     o.addRule(new ListValidationRule(CommunityMetricFactory.getInstance().getNames(), CommunityMetricFactory.getInstance().getDescriptions()));
@@ -119,7 +116,7 @@ public class CalculateEvolution {
     o.addRule(new ListValidationRule(CSVEvolutionObserverFactory.getInstance().getNames(), CSVEvolutionObserverFactory.getInstance().getDescriptions()));
     options.addOption(o);
     
-    o = new ValidatedOption("e","decisions",true, "The number of decisions to execute for");
+    o = new ValidatedOption("e","decisions",true, "The number of decisions to solve until");
     o.addRule(new NumericValidationRule(true));
     o.setDefault("10240");
     options.addOption(o);
