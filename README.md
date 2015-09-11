@@ -17,7 +17,7 @@ If compiling from source, these packages are required.
     The Louvian method requires a non disjoint graph
     Either -f or -u must be specified.   
     
-#Usage: java -jar SatGraf.jar [com|imp|evo] <options>
+#Usage: java -jar SatGraf.jar [com|imp|evo|evo_data|generate|generateOne] <options>
 
 ##com - View the static community representation of the formula.   
 	-f --file(default = null) The file (either .cnf or .sb)   
@@ -108,8 +108,8 @@ If compiling from source, these packages are required.
 		auto - Nodes are blue
 		decisionTemp - Color the nodes between green and red based on number of decisions
 		assignmentTemp - Color the nodes between green and red based on number of assignments
-	
-##evo_data - Generate evolution data for a given SAT instance. Outputs data for each given `-o` to a new CSV file in the directory given by `-d`. Skips instances where the files already exist
+
+##evoData - Generate evolution data for a given SAT instance. Outputs data for each given `-o` to a new CSV file in the directory given by `-d`. Skips instances where the files already exist
 	-w --window(default = 10) The number of decisions before re-computing Q
 	Must be an integer
 	-f --file(default = null) The file (.cnf)
@@ -140,11 +140,8 @@ If compiling from source, these packages are required.
 			.sb - Load a graph representation from SB (JSON) file
 		literal - accepts: 
 			.cnf - Load a DIMACS format file into a LIG and compute communities, then solve and display evolution
-			
-	
---------------------------------
---------------------------------
-generate - Generate static data for all files within the provided list, output to a csv.
+
+##generate - Generate static data for all files within the provided list, output to a csv.
 	-f --file(default = null) The file containing a list of .cnf files
 	Must be an existing file For which you have: read permissions
 	-c --community(default = ol) The community detection algorithm
@@ -161,11 +158,8 @@ generate - Generate static data for all files within the provided list, output t
 			.sb - Load a graph representation from SB (JSON) file
 		literal - accepts: 
 			.cnf - Load a DIMACS format file into a LIG and compute communities, then solve and display evolution
-			
-	
---------------------------------
---------------------------------
-generateOne - Generate static data for the provided instance, output data as a csv line to a file in the provided directory (for parallel processing).
+
+##generateOne - Generate static data for the provided instance, output data as a csv line to a file in the provided directory (for parallel processing).
 	-f --file(default = null) The file (.cnf)
 	Must be an existing file For which you have: read permissions
 	-d --directory(default = null) The output directory
