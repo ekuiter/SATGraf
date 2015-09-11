@@ -37,7 +37,7 @@ public class JungWrapper extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
   @Override
   public void init() {
     int steps = 0;
-    layout.setSize(new Dimension(2500,2500));
+    layout.setSize(new Dimension(5000,5000));
     layout.initialize();
     while(!layout.done()){
       layout.step();

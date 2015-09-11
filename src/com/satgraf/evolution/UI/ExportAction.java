@@ -6,21 +6,14 @@
 
 package com.satgraf.evolution.UI;
 
-import com.satgraf.community.UI.CommunityEdgeLayer;
 import com.satgraf.community.placer.CommunityPlacer;
 import com.satgraf.graph.UI.EdgeLayer;
-import com.satgraf.graph.UI.GraphCanvasPanel;
-import com.satgraf.graph.UI.GraphViewer;
 import com.satgraf.graph.UI.NodeLayer;
 import com.satlib.GifSequenceWriter;
 import com.satlib.Progressive;
 import com.satlib.evolution.Evolution;
 import com.satlib.evolution.EvolutionGraph;
-import com.satlib.graph.Edge;
-import com.satlib.graph.Graph;
-import com.satlib.graph.Node;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -69,7 +62,7 @@ public class ExportAction extends com.satgraf.actions.ExportAction<EvolutionGrap
         
         EvolutionOptionsPanel panel = (EvolutionOptionsPanel)frame.getOptionsPanel();
         Rectangle bounds = graphViewer.getBounds();
-        edgeLayer = new CommunityEdgeLayer(new Dimension((int)bounds.getWidth(), (int)bounds.getHeight()), exportableGraphViewer);
+        edgeLayer = new EdgeLayer(new Dimension((int)bounds.getWidth(), (int)bounds.getHeight()), exportableGraphViewer);
         nodeLayer = new NodeLayer(new Dimension((int)bounds.getWidth(), (int)bounds.getHeight()), exportableGraphViewer);
         
         File dir = new File("/tmp/satgraf");

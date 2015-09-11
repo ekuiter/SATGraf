@@ -14,6 +14,8 @@ import com.satgraf.community.placer.GridPlacer;
 import com.satgraf.community.placer.JSONCommunityPlacer;
 import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphFrame;
+import com.satgraf.graph.color.EdgeColoringFactory;
+import com.satgraf.graph.color.NodeColoringFactory;
 import com.satgraf.graph.placer.FruchPlacer;
 import com.satgraf.graph.placer.FruchRandomPlacer;
 import com.satgraf.graph.placer.JungWrapper;
@@ -70,6 +72,7 @@ public class CommunityGraphFrame extends GraphFrame{
     forceInit(JSONCommunityGraphFactory.class);
     forceInit(DimacsCommunityGraphFactory.class);
     forceInit(DimacsLiteralCommunityGraphFactory.class);
+    forceInit(CommunityColoring.class);
     forceInit(JungWrapper.class);
   }
 
@@ -182,6 +185,16 @@ public class CommunityGraphFrame extends GraphFrame{
     o = new ValidatedOption("p", "pattern",true,"A list of regex expressions to group variables (not yet implemented)");
     options.addOption(o);
     
+    o = new ValidatedOption("e", "edge-color", true, "The edge colouring implementation to use");
+    o.setDefault("auto");
+    o.addRule(new ListValidationRule(EdgeColoringFactory.getInstance().getNames(), EdgeColoringFactory.getInstance().getDescriptions()));
+    options.addOption(o);
+    
+    o = new ValidatedOption("n", "node-color", true, "node edge colouring implementation to use");
+    o.setDefault("auto");
+    o.addRule(new ListValidationRule(NodeColoringFactory.getInstance().getNames(), NodeColoringFactory.getInstance().getDescriptions()));
+    options.addOption(o);
+    
     return options;
   }
   
@@ -190,7 +203,7 @@ public class CommunityGraphFrame extends GraphFrame{
       args = new String[]{
         //"-f","formula/satcomp/dimacs/toybox.cnf",
         //"-f","/home/zacknewsham/aes.sb",
-        "-f","/home/zacknewsham/satgraf/formula/16round.cnf",
+        "-f","/home/zacknewsham/23/1.cnf",
         //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
         //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "-c","ol",
@@ -278,6 +291,8 @@ public class CommunityGraphFrame extends GraphFrame{
     graphViewer.graph = factory.getGraph();
     frmMain.init();
     graphViewer.setPlacer(p);
+    graphViewer.setNodeColoring(NodeColoringFactory.getInstance().getByName(cl.getOptionValue("n"), graphViewer.graph));
+    graphViewer.setEdgeColoring(EdgeColoringFactory.getInstance().getByName(cl.getOptionValue("e"), graphViewer.graph));
     frmMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frmMain.show();
   }

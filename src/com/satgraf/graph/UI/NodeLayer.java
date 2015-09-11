@@ -80,16 +80,12 @@ public class NodeLayer extends Layer implements Progressive{
     }
   }
 
-  protected Color getColor(Node n) {
-    return graph.getColor(n);
-  }
-
   private void drawNode(Node n) {
     if (!graph.getShowAssignedVars() && n.isAssigned()) {
       return;
     }
 
-    drawNodeWithColor(n, getColor(n), getColor(n));
+    drawNodeWithColor(n, graph.getColor(n), graph.getFillColor(n));
   }
 
   private void drawNodeWithColor(Node n, Color color, Color fillColor) {
@@ -102,10 +98,10 @@ public class NodeLayer extends Layer implements Progressive{
       }
 
     synchronized (graph) {
-      g.setColor(color);
-      g.drawArc(x, y, diameter, diameter, 0, 360);
       g.setColor(fillColor);
       g.fillArc(x, y, diameter, diameter, 0, 360);
+      g.setColor(color);
+      g.drawArc(x, y, diameter, diameter, 0, 360);
     }
   }
 

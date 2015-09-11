@@ -85,8 +85,8 @@ public class GenerateData {
     public static void main(String args[]) throws FileNotFoundException, IOException, InterruptedException, ParseException{
         if(args.length == 0){
             args = new String[]{
-                "-f","/media/zacknewsham/SAT/bmc.files",
-                "-o","/media/zacknewsham/SAT/bmc.csv"
+                "-f","/home/zacknewsham/obfuscated.files",
+                "-o","bmc.csv"
             };
         }
         

@@ -118,33 +118,7 @@ public class CommunityGraphViewer extends GraphViewer<CommunityNode, CommunityEd
 	Community com = getGraph().getCommunity(community);
     return (com == null ? null : (Collection<CommunityNode>)com.getCommunityNodes());
   }
-  
-  @Override
-  public Color getFillColor(CommunityNode node){
-    return getColor(node);
-  }
-  
-  @Override
-  public Color getColor(CommunityNode n){
-    if(n.getAssignmentState() == NodeAssignmentState.ASSIGNED_FALSE) {
-      return Color.RED;
-    } else if (n.getAssignmentState() == NodeAssignmentState.ASSIGNED_TRUE) {
-    	return Color.GREEN;
-    } else {
-      return Color.BLUE;
-    }
-  }
-  
-  @Override
-  public Color getColor(CommunityEdge e){
-    if(e.getStart().getCommunity() == e.getEnd().getCommunity()){
-      return COMMUNITY_COLORS[e.getStart().getCommunity() % COMMUNITY_COLORS.length];
-    }
-    else {
-      return Color.BLACK;
-    }
-  }
-  
+    
   public Collection<CommunityEdge> getInterCommunityConnections(int community) {
     if(getGraph().getCommunity(community) == null){
       return new ArrayList<>();

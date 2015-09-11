@@ -4,6 +4,8 @@
  */
 package com.satgraf.graph.UI;
 
+import com.satgraf.graph.color.EdgeColoring;
+import com.satgraf.graph.color.NodeColoring;
 import com.satgraf.graph.placer.Placer;
 import com.satlib.graph.Edge;
 import com.satlib.graph.Edge.EdgeState;
@@ -35,6 +37,8 @@ import org.json.simple.JSONObject;
 public abstract class GraphViewer<T extends Node, T1 extends Edge> implements ActionListener {
 
   protected Placer placer;
+  protected NodeColoring nodeColoring;
+  protected EdgeColoring edgeColoring;
   public Graph graph;
   private T selectedNode;
   //protected GraphCanvas canvas;
@@ -162,6 +166,9 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
 
   public void showEdgeSet(String set) {
     Iterator<T> ns = graph.getNodes(set).iterator();
+    if(set.equals("All")){
+      hideAllEdges = false;
+    }
     while (ns.hasNext()) {
       T n = ns.next();
       Iterator<T1> edges = n.getEdges().iterator();
@@ -173,8 +180,12 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
     edgeEvent();
   }
 
+  boolean hideAllEdges = false;
   public void hideEdgeSet(String set) {
     Iterator<T> ns = graph.getNodes(set).iterator();
+    if(set.equals("All")){
+      hideAllEdges = true;
+    }
     while (ns.hasNext()) {
       T n = ns.next();
       Iterator<T1> edges = n.getEdges().iterator();
@@ -216,17 +227,26 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
     addUpdatedNode(n, NodeState.HIDE, true);
   }
 
+  public boolean hideAllEdges(){
+    return hideAllEdges;
+  }
   public abstract T getNodeAtXY(int x, int y);
 
   public abstract int getX(T node);
 
   public abstract int getY(T node);
 
-  public abstract Color getFillColor(T node);
+  public Color getFillColor(T node){
+    return nodeColoring.getFillColor(node);
+  }
 
-  public abstract Color getColor(T node);
+  public Color getColor(T node){
+    return nodeColoring.getOutlineColor(node);
+  }
 
-  public abstract Color getColor(T1 e);
+  public Color getColor(T1 e){
+    return edgeColoring.getColor(e);
+  }
 
   public void selectNode(T node) {
     this.selectedNode = node;
@@ -362,6 +382,9 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   }
 
   public boolean shouldShowEdge(T1 e) {
+    if(hideAllEdges){
+      return false;
+    }
     if (e.getAssignmentState() == EdgeState.HIDE || e.getState() == EdgeState.HIDE) {
       return false;
     } else if (!getShowAssignedVars() && (e.getStart().isAssigned() || e.getEnd().isAssigned())) {
@@ -387,6 +410,14 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
   public void setPlacer(Placer placer){
     this.placer = placer;
     init();
+  }
+  
+  public void setNodeColoring(NodeColoring coloring){
+    this.nodeColoring = coloring;
+  }
+  
+  public void setEdgeColoring(EdgeColoring coloring){
+    this.edgeColoring = coloring;
   }
   
   public static class NodeXComparator implements Comparator <Node>{

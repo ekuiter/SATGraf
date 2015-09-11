@@ -11,6 +11,8 @@ import com.satgraf.evolution.observers.VSIDSTemporalLocalityEvolutionObserver;
 import com.satgraf.evolution.observers.VisualEvolutionObserver;
 import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphOptionsPanel;
+import com.satgraf.graph.color.EdgeColoringFactory;
+import com.satgraf.graph.color.NodeColoringFactory;
 import com.satgraf.graph.placer.Placer;
 import com.satgraf.graph.placer.PlacerFactory;
 import com.satlib.community.CommunityMetric;
@@ -48,6 +50,8 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     forceInit(VSIDSSpacialLocalityEvolutionObserver.class);
     forceInit(DimacsEvolutionGraphFactory.class);
     forceInit(DimacsLiteralEvolutionGraphFactory.class);
+    forceInit(EvolutionColoring.class);
+    forceInit(EvolutionDecisionTemperatureColoring.class);
   }
   private EvolutionGraphFactory factory;
   public static String minisat;
@@ -169,6 +173,16 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     o.setDefault("auto");
     options.addOption(o);
     
+    o = new ValidatedOption("e", "edge-color", true, "The edge colouring implementation to use");
+    o.setDefault("auto");
+    o.addRule(new ListValidationRule(EdgeColoringFactory.getInstance().getNames(), EdgeColoringFactory.getInstance().getDescriptions()));
+    options.addOption(o);
+    
+    o = new ValidatedOption("n", "node-color", true, "node edge colouring implementation to use");
+    o.setDefault("auto");
+    o.addRule(new ListValidationRule(NodeColoringFactory.getInstance().getNames(), NodeColoringFactory.getInstance().getDescriptions()));
+    options.addOption(o);
+    
     return options;
   }
   
@@ -177,15 +191,19 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
       args = new String[]{
         //"-f","formula/satcomp/dimacs/toybox.cnf",
         //"-f","/home/zacknewsham/aes.sb",
+        //"-f","/home/zacknewsham/satgraf/formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
+        //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
+        //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "-f","/home/zacknewsham/satgraf/formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
         //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
         //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "-c","ol",
-        "-l","fr",
+        "-l","f",
         "-m","literal",
         "-o","Q",
         "-o","VSIDST",
-        "-o","VSIDSS"
+        "-o","VSIDSS",
+        "-n","decisionTemp"
       };
       System.out.print(Help.getHelp(options()));
       //return;
@@ -264,6 +282,8 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     graphViewer.graph = factory.getGraph();
     frmMain.init();
     graphViewer.setPlacer(p);
+    graphViewer.setNodeColoring(NodeColoringFactory.getInstance().getByName(cl.getOptionValue("n"), graphViewer.graph));
+    graphViewer.setEdgeColoring(EdgeColoringFactory.getInstance().getByName(cl.getOptionValue("e"), graphViewer.graph));
     frmMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     factory.buildEvolutionFile();
     frmMain.show();

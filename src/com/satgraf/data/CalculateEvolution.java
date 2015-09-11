@@ -129,8 +129,8 @@ public class CalculateEvolution {
   public static void main(String[] args) throws IOException, InterruptedException, ParseException{
     if(args.length < 1){
       args = new String[]{
-        "-f","/home/zacknewsham/obfuscated-instances/pass-hash-jenkins-OAAT_test000004.cnf",
-        "-d","/home/zacknewsham/var_evolution/",
+        "-f","/home/zacknewsham/obfuscated/lc_test000001.cnf",
+        "-d","/home/zacknewsham/",
         "-o","Q",
         "-o","VSIDST",
         "-o","VSIDSS",
@@ -150,20 +150,8 @@ public class CalculateEvolution {
     EvolutionGraphFactory factory = (EvolutionGraphFactory)GraphFactoryFactory.getInstance().getByNameAndExtension(cl.getOptionValue("m"), "cnf", cl.getOptionValue("c"), new HashMap<String, String>());
     
     File input = new File(cl.getOptionValue("f"));
-    File _f = new File(cl.getOptionValue("d") + input.getName() + ".q");
-    if(_f.exists()){
-      return;
-    }
-    EvolutionGraph graph = factory.makeGraph(input);
-    factory.getMetric().getCommunities(graph);
-    factory.setSolver(cl.getOptionValue("s"));
-    Evolution.dumpFileDirectory = cl.getOptionValue("p");
-    Evolution.pipeFileName = Evolution.dumpFileDirectory + "myPipe.txt";
-    Evolution.outputDirectory = Evolution.dumpFileDirectory + "output/";
-    Evolution e = factory.getEvolution();
-    e.getDecisions();
-    factory.process(graph);
     
+    EvolutionGraph graph = factory.makeGraph(input);
     List<CSVEvolutionObserver> observers = new ArrayList<>();
     boolean shouldSkip = true;
     for(String observer : cl.getCommandLine().getOptionValues("o")){
@@ -173,7 +161,7 @@ public class CalculateEvolution {
       if(obs instanceof QEvolutionObserver){
         ((QEvolutionObserver)obs).windowSize = Integer.parseInt(cl.getOptionValue("w"));
       }
-      File f = new File(cl.getOptionValue("d") + input.getName() + obs.getName());
+      File f = new File(cl.getOptionValue("d") + input.getName() + "." + obs.getName());
       if(!f.exists()){
         shouldSkip = false;
       }
@@ -181,6 +169,14 @@ public class CalculateEvolution {
     if(shouldSkip){
       return;
     }
+    factory.getMetric().getCommunities(graph);
+    factory.setSolver(cl.getOptionValue("s"));
+    Evolution.dumpFileDirectory = cl.getOptionValue("p");
+    Evolution.pipeFileName = Evolution.dumpFileDirectory + "myPipe.txt";
+    Evolution.outputDirectory = Evolution.dumpFileDirectory + "output/";
+    Evolution e = factory.getEvolution();
+    e.getDecisions();
+    factory.process(graph);
     int i = 0;
     int exceptionCount = 0;
     int lastSize = 0;
@@ -215,9 +211,8 @@ public class CalculateEvolution {
       return;
     }
     for(CSVEvolutionObserver obs : observers){
-      FileWriter f = new FileWriter(new File(cl.getOptionValue("d") + input.getName() + obs.getName()));
       CSVModel model = obs.getModel();
-      model.toFile(new File(cl.getOptionValue("d") + input.getName() + obs.getName()));
+      model.toFile(new File(cl.getOptionValue("d") + input.getName() + "." + obs.getName()));
     }
     System.exit(0);
     //System.out.printf("%f,%f,%f\n", q.bestCase, q.worstCase, q.qs.get(10), q.qs.get(25), q.qs.get(50), q.qs.get(100), q.qs.get(250), q.qs.get(500), q.qs.get(750), q.qs.get(1000));

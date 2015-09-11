@@ -33,7 +33,7 @@ public class EdgeLayer extends Layer implements Progressive{
   }
 
   protected Color getColor(Edge e) {
-    return Color.WHITE;
+    return graph.getColor(e);
   }
 
   public synchronized void paintComponent(final Graphics g) {
@@ -73,7 +73,7 @@ public class EdgeLayer extends Layer implements Progressive{
     for (int i = from; i < to; i++) {
       Edge e = edges.get(i);
 
-      if (!e.getStart().isVisible() || !e.getEnd().isVisible()){
+      if (graph.hideAllEdges() || !e.getStart().isVisible() || !e.getEnd().isVisible()){
         continue;
       }
 
@@ -103,7 +103,7 @@ public class EdgeLayer extends Layer implements Progressive{
       }
       
       synchronized (graph) {
-        g.setColor(getColor(c));
+        g.setColor(graph.getColor(c));
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.setRenderingHints(hints);
         g2d.setStroke(stroke);

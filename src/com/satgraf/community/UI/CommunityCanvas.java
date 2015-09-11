@@ -28,6 +28,6 @@ public class CommunityCanvas extends GraphCanvas {
   
   @Override
   protected EdgeLayer createNewEdgeLayer() {
-	  return new CommunityEdgeLayer(this.getSize(), graph);
+	  return new EdgeLayer(this.getSize(), graph);
   }
 }

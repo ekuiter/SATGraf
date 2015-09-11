@@ -55,7 +55,7 @@ class CommunityCheckBoxPanel extends JPanel{
   private void init(){
     int community = 0;
     Collection<CommunityNode> communities = graph.getCommunityNodes(community);
-    /*while(communities != null){
+    while(communities != null){
       int intercomm = graph.getInterCommunityConnections(community).size();
       CommunityCheckBox jc = new CommunityCheckBox(community, communities.size(), intercomm);
       checkBoxes.put(community, jc);
@@ -76,6 +76,6 @@ class CommunityCheckBoxPanel extends JPanel{
       communities = graph.getCommunityNodes(community);
       this.add(jc);
       count ++;
-    }*/
+    }
   }
 }
