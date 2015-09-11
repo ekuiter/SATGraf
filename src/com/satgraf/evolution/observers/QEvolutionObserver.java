@@ -6,15 +6,18 @@
 
 package com.satgraf.evolution.observers;
 
-import com.satlib.community.Community;
 import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityNode;
 import com.satlib.community.ConcreteCommunityGraph;
 import com.satgraf.evolution.UI.EvolutionGraphViewer;
+import com.satgraf.supplemental.SupplementalView;
+import com.satgraf.supplemental.SupplementalViewFactory;
 import com.satlib.evolution.EvolutionGraph;
-import com.satlib.graph.Clause;
+import com.satlib.evolution.observers.EvolutionObserver;
+import com.satlib.evolution.observers.EvolutionObserverFactory;
+import com.satlib.graph.Graph;
 import com.satlib.graph.Node;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -23,8 +26,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -40,7 +41,7 @@ import org.jfree.data.xy.XYSeriesCollection;
  *
  * @author zacknewsham
  */
-public class QEvolutionObserver extends JPanel implements VisualEvolutionObserver{
+public class QEvolutionObserver extends JPanel implements EvolutionObserver, SupplementalView<CommunityNode, CommunityEdge, EvolutionGraph,EvolutionGraphViewer>{
   private final EvolutionGraph graph;
   private final CommunityGraph tmpGraph;
   private final JTextField txtWindowSize = new JTextField("10");
@@ -54,11 +55,12 @@ public class QEvolutionObserver extends JPanel implements VisualEvolutionObserve
   private final JScrollPane chartScroll = new JScrollPane(chartPanel);
   private CommunityMetric metric;
   static{
-    VisualEvolutionObserverFactory.getInstance().register("Q", "A graphical representation of the evolution of Q over the solution of the solver (based on the selected community metric)", QEvolutionObserver.class);
+    SupplementalViewFactory.getInstance().register("Q", "A graphical representation of the evolution of Q over the solution of the solver (based on the selected community metric)", QEvolutionObserver.class);
   }
 
-  public QEvolutionObserver(EvolutionGraphViewer graphViewer){
-    this.graph = graphViewer.getGraph();
+  public QEvolutionObserver(Graph _graph){
+    this.graph = (EvolutionGraph)_graph;
+    EvolutionObserverFactory.getInstance().addObserver(this);
     tmpGraph = new ConcreteCommunityGraph(){
       @Override
       public Collection<CommunityEdge> getEdges(){
@@ -99,7 +101,6 @@ public class QEvolutionObserver extends JPanel implements VisualEvolutionObserve
       }
       
     });
-    init();
   }
 
   public final void init(){
@@ -220,6 +221,10 @@ public class QEvolutionObserver extends JPanel implements VisualEvolutionObserve
   @Override
   public void updateGraph() {
     
+  }
+
+  @Override
+  public void setGraphViewer(EvolutionGraphViewer v) {
   }
   
 }

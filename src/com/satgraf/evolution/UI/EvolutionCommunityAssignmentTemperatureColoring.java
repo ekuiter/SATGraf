@@ -6,7 +6,9 @@ package com.satgraf.evolution.UI;
 
 import com.satgraf.graph.color.NodeColoring;
 import com.satgraf.graph.color.NodeColoringFactory;
+import com.satlib.community.Community;
 import com.satlib.community.CommunityEdge;
+import com.satlib.community.CommunityGraph;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityNode;
 import com.satlib.evolution.observers.EvolutionObserver;
@@ -21,14 +23,14 @@ import java.util.Map;
  *
  * @author zacknewsham
  */
-public class EvolutionAssignmentTemperatureColoring implements NodeColoring<CommunityNode>, EvolutionObserver{
+public class EvolutionCommunityAssignmentTemperatureColoring implements NodeColoring<CommunityNode>, EvolutionObserver{
   static{
-    NodeColoringFactory.getInstance().register("assignmentTemp", "Color the nodes between green and red based on number of times they have been assigned", EvolutionAssignmentTemperatureColoring.class);
+    NodeColoringFactory.getInstance().register("comAssignmentTemp", "Color the nodes between green and red based on number of times variables in the same community have been assigned", EvolutionCommunityAssignmentTemperatureColoring.class);
   }
   private Graph graph;
-  private Map<Node, Integer> assignments = new HashMap<>();
+  private Map<Integer, Integer> assignments = new HashMap<>();
   
-  public EvolutionAssignmentTemperatureColoring(Graph g){
+  public EvolutionCommunityAssignmentTemperatureColoring(Graph g){
     graph = g;
     EvolutionObserverFactory.getInstance().addObserver(this);
   }
@@ -36,9 +38,9 @@ public class EvolutionAssignmentTemperatureColoring implements NodeColoring<Comm
   @Override
   public Color getOutlineColor(CommunityNode node) {
     int n = 0;
-    if(assignments.containsKey(node)){
-      n = assignments.get(node);
-      n = Math.min(n, 255);
+    if(assignments.containsKey(node.getCommunity())){
+      n = assignments.get(node.getCommunity());
+      n = Math.min(n, 255)/((CommunityGraph)graph).getCommunitySize(node.getCommunity());
     }
             
     int R = n;
@@ -64,11 +66,11 @@ public class EvolutionAssignmentTemperatureColoring implements NodeColoring<Comm
   @Override
   public void nodeAssigned(CommunityNode n, Node.NodeAssignmentState state, boolean isDecision) {
     if(state != Node.NodeAssignmentState.UNASSIGNED){
-      if(!assignments.containsKey(n)){
-        assignments.put(n, 1);
+      if(!assignments.containsKey(n.getCommunity())){
+        assignments.put(n.getCommunity(), 1);
       }
       else{
-        assignments.put(n, assignments.get(n) + 1);
+        assignments.put(n.getCommunity(), assignments.get(n.getCommunity()) + 1);
       }
     }
   }

@@ -6,13 +6,16 @@
 
 package com.satgraf.graph.UI;
 
+import com.satlib.graph.Edge;
+import com.satlib.graph.Graph;
+import com.satlib.graph.Node;
 import org.json.simple.JSONObject;
 
 /**
  *
  * @author zacknewsham
  */
-public interface GraphViewerObserver {
+public interface GraphViewerObserver <N extends Node, E extends Edge, G extends Graph, V extends GraphViewer>{
   public enum Action{
     selectnode,
     setscale,
@@ -23,8 +26,9 @@ public interface GraphViewerObserver {
     decisionVariable;
     
   }
-  public void notify(GraphViewer graph, Action action);
-  public void initFromJson(JSONObject json);
-  public String toJson();
-  public String JsonName();
+  void notify(GraphViewer graph, Action action);
+  void initFromJson(JSONObject json);
+  
+  String toJson();
+  String JsonName();
 }

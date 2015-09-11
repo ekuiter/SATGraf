@@ -37,34 +37,36 @@ public class EdgeLayer extends Layer implements Progressive{
   }
 
   public synchronized void paintComponent(final Graphics g) {
-    this.g = g;
-    int taskCount = threadCount;
-    int edgeCount = graph.getGraph().getEdges().size();
-    Graphics2D g2d = (Graphics2D) g.create();
-    drawn = 0;
-    total = edgeCount;
-    ArrayList<Future> threads = new ArrayList();
-    for (int t = taskCount; t > 0; t--) {
-        final int from = (int) Math.floor(edgeCount * (t - 1) / taskCount);
-        final int to = (int) Math.floor(edgeCount * t / taskCount);
+    synchronized(g){
+      this.g = g;
+      int taskCount = threadCount;
+      int edgeCount = graph.getGraph().getEdges().size();
+      Graphics2D g2d = (Graphics2D) g.create();
+      drawn = 0;
+      total = edgeCount;
+      ArrayList<Future> threads = new ArrayList();
+      for (int t = taskCount; t > 0; t--) {
+          final int from = (int) Math.floor(edgeCount * (t - 1) / taskCount);
+          final int to = (int) Math.floor(edgeCount * t / taskCount);
 
-        Future future = pool.submit(new Runnable() {
-            @Override
-            public void run() {
-                drawEdges(from, to);
-            }
-        });
-        threads.add(future);
-    }
-
-    for (Future future : threads) {
-      try {
-        future.get();
-      } catch (InterruptedException | ExecutionException ex) {
-        ex.printStackTrace();
+          Future future = pool.submit(new Runnable() {
+              @Override
+              public void run() {
+                  drawEdges(from, to);
+              }
+          });
+          threads.add(future);
       }
+
+      for (Future future : threads) {
+        try {
+          future.get();
+        } catch (InterruptedException | ExecutionException ex) {
+          ex.printStackTrace();
+        }
+      }
+      graph.clearUpdatedEdges();
     }
-    graph.clearUpdatedEdges();
   }
 
   private void drawEdges(int from, int to) {

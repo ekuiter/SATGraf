@@ -7,13 +7,16 @@
 package com.satgraf.evolution.observers;
 
 import com.satgraf.evolution.UI.EvolutionGraphViewer;
-import com.satlib.CSVModel;
+import com.satgraf.supplemental.SupplementalView;
+import com.satgraf.supplemental.SupplementalViewFactory;
 import com.satlib.community.Community;
 import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityNode;
 import com.satlib.evolution.EvolutionGraph;
-import com.satlib.evolution.observers.CSVEvolutionObserverFactory;
+import com.satlib.evolution.observers.EvolutionObserver;
+import com.satlib.evolution.observers.EvolutionObserverFactory;
+import com.satlib.graph.Graph;
 import com.satlib.graph.Node;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -54,9 +57,9 @@ import org.jfree.data.general.DatasetChangeEvent;
  *
  * @author zacknewsham
  */
-public class VSIDSSpacialLocalityEvolutionObserver extends JPanel implements VisualEvolutionObserver, ChartMouseListener{
+public class VSIDSSpacialLocalityEvolutionObserver extends JPanel implements EvolutionObserver, ChartMouseListener, SupplementalView<CommunityNode, CommunityEdge, EvolutionGraph,EvolutionGraphViewer>{
   private final EvolutionGraph graph;
-  private final EvolutionGraphViewer graphViewer;
+  private EvolutionGraphViewer graphViewer;
   private final SortableCategoryDataset dataset = new SortableCategoryDataset();
   private final JFreeChart objChart = ChartFactory.createStackedAreaChart("Communities used", "Community ID", "# Decision", dataset);
   private final ChartPanel chartPanel = new ChartPanel(objChart);
@@ -69,12 +72,11 @@ public class VSIDSSpacialLocalityEvolutionObserver extends JPanel implements Vis
   private Comparator currentComparator = COMMUNITY_COMPARATOR;
   private CommunityMetric metric;
   static{
-    VisualEvolutionObserverFactory.getInstance().register("VSIDSS", "A graphical representation of the spacial locailty of the VSIDS decision heuristic", VSIDSSpacialLocalityEvolutionObserver.class);
+    SupplementalViewFactory.getInstance().register("VSIDSS", "A graphical representation of the spacial locailty of the VSIDS decision heuristic", VSIDSSpacialLocalityEvolutionObserver.class);
   }
-  public VSIDSSpacialLocalityEvolutionObserver(EvolutionGraphViewer graph){
-    this.graph = graph.getGraph();
-    this.graphViewer = graph;
-    init();
+  public VSIDSSpacialLocalityEvolutionObserver(Graph _graph){
+    this.graph = (EvolutionGraph)_graph;
+    EvolutionObserverFactory.getInstance().addObserver(this);
     
     rdoDistributionTotal.addActionListener(new ActionListener() {
 
@@ -299,6 +301,11 @@ public class VSIDSSpacialLocalityEvolutionObserver extends JPanel implements Vis
   @Override
   public void updateGraph() {
     
+  }
+
+  @Override
+  public void setGraphViewer(EvolutionGraphViewer v) {
+    this.graphViewer = v;
   }
   
   private static final class SortableDatasetEntry{

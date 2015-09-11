@@ -4,17 +4,17 @@ import static com.satlib.ForceInit.forceInit;
 import com.satgraf.FormatValidationRule;
 import com.satgraf.community.UI.CommunityGraphFrame;
 import com.satgraf.community.placer.CommunityPlacerFactory;
-import com.satgraf.evolution.observers.VisualEvolutionObserverFactory;
 import com.satgraf.evolution.observers.QEvolutionObserver;
 import com.satgraf.evolution.observers.VSIDSSpacialLocalityEvolutionObserver;
 import com.satgraf.evolution.observers.VSIDSTemporalLocalityEvolutionObserver;
-import com.satgraf.evolution.observers.VisualEvolutionObserver;
 import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphOptionsPanel;
 import com.satgraf.graph.color.EdgeColoringFactory;
 import com.satgraf.graph.color.NodeColoringFactory;
 import com.satgraf.graph.placer.Placer;
 import com.satgraf.graph.placer.PlacerFactory;
+import com.satgraf.supplemental.SupplementalView;
+import com.satgraf.supplemental.SupplementalViewFactory;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
 import com.satlib.evolution.DimacsEvolutionGraphFactory;
@@ -44,7 +44,6 @@ import org.apache.commons.cli.ParseException;
 
 public class EvolutionGraphFrame extends CommunityGraphFrame {
   static{
-    forceInit(com.satgraf.evolution.observers.VisualEvolutionObserverFactory.class);
     forceInit(VSIDSTemporalLocalityEvolutionObserver.class);
     forceInit(QEvolutionObserver.class);
     forceInit(VSIDSSpacialLocalityEvolutionObserver.class);
@@ -53,6 +52,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     forceInit(EvolutionColoring.class);
     forceInit(EvolutionDecisionTemperatureColoring.class);
     forceInit(EvolutionAssignmentTemperatureColoring.class);
+    forceInit(EvolutionCommunityAssignmentTemperatureColoring.class);
   }
   private EvolutionGraphFactory factory;
   public static String minisat;
@@ -165,8 +165,8 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     o.setDefault("solvers/minisat/minisat");
     options.addOption(o);
     
-    o = new ValidatedOption("o", "observers", true, "A named evolution observer");
-    o.addRule(new ListValidationRule(VisualEvolutionObserverFactory.getInstance().getNames(),VisualEvolutionObserverFactory.getInstance().getDescriptions()));
+    o = new ValidatedOption("o", "supplemental", true, "A named supplemental view");
+    o.addRule(new ListValidationRule(SupplementalViewFactory.getInstance().getNames(),SupplementalViewFactory.getInstance().getDescriptions()));
     options.addOption(o);
     
     o = new ValidatedOption("m","format",true, "The format of the file, and desired graph representation");
@@ -204,7 +204,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
         "-o","Q",
         "-o","VSIDST",
         "-o","VSIDSS",
-        "-n","decisionTemp"
+        "-n","assignmentTemp"
       };
       System.out.print(Help.getHelp(options()));
       //return;
@@ -291,10 +291,11 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     GraphOptionsPanel panel = frmMain.panel;
     for(String obs : cl.getCommandLine().getOptionValues("o")){
       
-      VisualEvolutionObserver observer = null;
-      observer = VisualEvolutionObserverFactory.getInstance().getByName(obs, graphViewer);
+      SupplementalView observer = SupplementalViewFactory.getInstance().getByName(obs, graphViewer.getGraph());
       CommunityMetric metric = CommunityMetricFactory.getInstance().getByName(comName);
       observer.setCommunityMetric(metric);
+      observer.setGraphViewer(graphViewer);
+      observer.init();
       
       if(observer instanceof JPanel){
         panel.addPanel((JPanel)observer, observer.getName());

@@ -7,13 +7,16 @@
 package com.satgraf.evolution.observers;
 
 import com.satgraf.evolution.UI.EvolutionGraphViewer;
+import com.satgraf.graph.UI.GraphViewer;
+import com.satgraf.supplemental.SupplementalView;
+import com.satgraf.supplemental.SupplementalViewFactory;
 import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityNode;
 import com.satlib.evolution.EvolutionGraph;
 import com.satlib.evolution.observers.EvolutionObserver;
-import com.satlib.evolution.observers.CSVEvolutionObserverFactory;
-import com.satlib.graph.Clause;
+import com.satlib.evolution.observers.EvolutionObserverFactory;
+import com.satlib.graph.Graph;
 import com.satlib.graph.Node;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -39,8 +42,8 @@ import org.jfree.data.xy.XYSeriesCollection;
  *
  * @author zacknewsham
  */
-public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements VisualEvolutionObserver{
-  private final EvolutionGraphViewer graphViewer;
+public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements EvolutionObserver, SupplementalView<CommunityNode, CommunityEdge, EvolutionGraph, EvolutionGraphViewer>{
+  private EvolutionGraphViewer graphViewer;
   private final JTextField txtWindowSize = new JTextField("10");
   private final JLabel lblWorstCase = new JLabel("0");
   private static final int VARS_PER_REDRAW = 10;
@@ -54,12 +57,11 @@ public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements Vi
   private final JScrollPane chartScroll = new JScrollPane(chartPanel);
   private CommunityMetric metric;
   static{
-    VisualEvolutionObserverFactory.getInstance().register("VSIDST", "A graphical representation of the temporal locailty of the VSIDS decision heuristic", VSIDSTemporalLocalityEvolutionObserver.class);
+    SupplementalViewFactory.getInstance().register("VSIDST", "A graphical representation of the temporal locailty of the VSIDS decision heuristic", VSIDSTemporalLocalityEvolutionObserver.class);
   }
   
-  public VSIDSTemporalLocalityEvolutionObserver(EvolutionGraphViewer graphViewer){
-    this.graphViewer = graphViewer;
-    init();
+  public VSIDSTemporalLocalityEvolutionObserver(Graph graph){
+    EvolutionObserverFactory.getInstance().addObserver(this);
     decisionSeries.add(0, 0);
     propogationSeries.add(0, 0);
     propogations.put(null, new ArrayList<CommunityNode>());
@@ -235,6 +237,12 @@ public class VSIDSTemporalLocalityEvolutionObserver extends JPanel implements Vi
 
   @Override
   public void updateGraph() {
+  }
+
+
+  @Override
+  public void setGraphViewer(EvolutionGraphViewer v) {
+    this.graphViewer = v;
   }
 
   

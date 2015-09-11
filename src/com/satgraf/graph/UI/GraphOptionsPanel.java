@@ -5,6 +5,9 @@
 package com.satgraf.graph.UI;
 
 import com.satgraf.UI.JAccordianPanel;
+import com.satlib.graph.Edge;
+import com.satlib.graph.Graph;
+import com.satlib.graph.Node;
 import java.awt.Dimension;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,7 +22,7 @@ import org.json.simple.JSONObject;
  *
  * @author zacknewsham
  */
-public abstract class GraphOptionsPanel extends JSplitPane implements GraphViewerObserver{
+public abstract class GraphOptionsPanel<N extends Node, E extends Edge, G extends Graph, V extends GraphViewer> extends JSplitPane implements GraphViewerObserver<N, E, G, V>{
   private GraphViewer graph;
   protected OptionsPanel optionsPanel;
   protected GraphInfoPanel infoPanel;

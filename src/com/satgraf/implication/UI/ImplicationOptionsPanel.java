@@ -15,13 +15,17 @@ import com.satgraf.graph.UI.GraphInfoPanel;
 import com.satgraf.graph.UI.GraphOptionsPanel;
 import com.satgraf.graph.UI.NodePanel;
 import com.satgraf.graph.UI.OptionsPanel;
+import com.satlib.graph.Edge;
 import com.satlib.graph.Graph;
+import com.satlib.graph.Node;
+import com.satlib.implication.ImplicationGraph;
+import com.satlib.implication.ImplicationNode;
 
 /**
  *
  * @author zacknewsham
  */
-public class ImplicationOptionsPanel extends GraphOptionsPanel{
+public class ImplicationOptionsPanel extends GraphOptionsPanel<ImplicationNode,Edge, ImplicationGraph, ImplicationGraphViewer>{
   public ImplicationOptionsPanel(GraphFrame frame, ImplicationGraphViewer graph, Collection<String> groups) {
     super(graph, groups);
     NodePanel nodePanel = new ImplicationNodePanel(graph);
