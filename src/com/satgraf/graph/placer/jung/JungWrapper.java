@@ -2,17 +2,22 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.satgraf.graph.placer;
+package com.satgraf.graph.placer.jung;
 
-import com.satgraf.graph.placer.jung.GraphWrapper;
+import com.satgraf.graph.placer.AbstractPlacer;
+import com.satgraf.graph.placer.PlacerFactory;
 import com.satlib.graph.Clause;
+import com.satlib.graph.DrawableNode;
 import com.satlib.graph.Edge;
 import com.satlib.graph.Graph;
 import com.satlib.graph.Node;
-import edu.uci.ics.jung.algorithms.layout.BalloonLayout;
 import edu.uci.ics.jung.algorithms.layout.FRLayout;
+import edu.uci.ics.jung.algorithms.layout.FRLayout2;
 import edu.uci.ics.jung.algorithms.layout.ISOMLayout;
+import edu.uci.ics.jung.algorithms.layout.KKLayout;
 import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.util.Iterator;
 
 /**
  *
@@ -30,6 +35,18 @@ public class JungWrapper extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
   }
   @Override
   public Node getNodeAtXY(int x, int y, double scale) {
+    x /= scale;
+    y /= scale;
+    Iterator<Node> nodes = graph.getNodes("All").iterator();
+    Rectangle r = new Rectangle(0, 0, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER);
+    while(nodes.hasNext()){
+        Node node = (Node)nodes.next();
+        r.x = getX(node) - DrawableNode.NODE_DIAMETER / 2;
+        r.y = getY(node) - DrawableNode.NODE_DIAMETER / 2;
+        if(r.contains(x, y)){
+            return node;
+        }
+    }
     return null;
   }
 
@@ -37,7 +54,7 @@ public class JungWrapper extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
   @Override
   public void init() {
     int steps = 0;
-    layout.setSize(new Dimension(5000,5000));
+    layout.setSize(new Dimension(10000,10000));
     layout.initialize();
     while(!layout.done()){
       layout.step();

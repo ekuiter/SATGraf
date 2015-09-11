@@ -8,9 +8,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -69,9 +73,16 @@ public class EdgeLayer extends Layer implements Progressive{
     }
   }
 
+  double oldScale;
   private void drawEdges(int from, int to) {
     ArrayList<Edge> edges = new ArrayList<Edge>(graph.getGraph().getEdges());
     scale = graph.getScale();
+    
+    if(scale != oldScale){
+      startPoints.clear();
+      endPoints.clear();
+    }
+    oldScale = scale;
     for (int i = from; i < to; i++) {
       Edge e = edges.get(i);
 
@@ -89,16 +100,32 @@ public class EdgeLayer extends Layer implements Progressive{
   private static final BasicStroke stroke = new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
   private static final RenderingHints hints = GraphCanvas.getRenderingHints();
   private double scale = 1.0;
+  final Map<Edge, Point2D> startPoints = new HashMap<>();
+  final Map<Edge, Point2D> endPoints = new HashMap<>();
   protected void drawConnection(Edge c) {
     if (!graph.shouldShowEdge(c)){
       return;
     }
-
     if(c.getStart().isVisible() && c.getEnd().isVisible()){
-      int startX = (int) (graph.getX(c.getStart()) * scale);
-      int startY = (int) (graph.getY(c.getStart()) * scale);
-      int endX = (int) (graph.getX(c.getEnd()) * scale);
-      int endY = (int) (graph.getY(c.getEnd()) * scale);
+      int startX, startY, endX, endY;
+      if(startPoints.containsKey(c)){
+        startX = (int)startPoints.get(c).getX();
+        startY = (int)startPoints.get(c).getY();
+        endX = (int)endPoints.get(c).getX();
+        endY = (int)endPoints.get(c).getY();
+      }
+      else{
+        startX = (int) (graph.getX(c.getStart()) * scale);
+        startY = (int) (graph.getY(c.getStart()) * scale);
+        endX = (int) (graph.getX(c.getEnd()) * scale);
+        endY = (int) (graph.getY(c.getEnd()) * scale);
+        synchronized(startPoints){
+          startPoints.put(c, new Point(startX, startY));
+        }
+        synchronized(endPoints){
+          endPoints.put(c, new Point(endX, endY));
+        }
+      }
       Rectangle r = new Rectangle(Math.min(startX, endX), Math.min(startY, endY), Math.abs(startX-endX), Math.abs(startY-endY));
       if(!r.intersects(g.getClipBounds()) && !g.getClipBounds().intersects(r)){
         return;

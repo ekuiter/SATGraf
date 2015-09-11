@@ -18,7 +18,7 @@ import com.satgraf.graph.color.EdgeColoringFactory;
 import com.satgraf.graph.color.NodeColoringFactory;
 import com.satgraf.graph.placer.FruchPlacer;
 import com.satgraf.graph.placer.FruchRandomPlacer;
-import com.satgraf.graph.placer.JungWrapper;
+import com.satgraf.graph.placer.jung.JungWrapper;
 import com.satgraf.graph.placer.KKPlacer;
 import com.satgraf.graph.placer.Placer;
 import com.satgraf.graph.placer.PlacerFactory;
