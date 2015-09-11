@@ -41,8 +41,8 @@ public class EvolutionAssignmentTemperatureColoring implements NodeColoring<Comm
       n = Math.min(n, 255);
     }
             
-    int R = (255 * n) / 100;
-    int G = (255 * (100 - n)) / 100;
+    int R = n;
+    int G = (255 -n);
     int B = 0;
     
     return new Color(R, G, B);

@@ -52,6 +52,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     forceInit(DimacsLiteralEvolutionGraphFactory.class);
     forceInit(EvolutionColoring.class);
     forceInit(EvolutionDecisionTemperatureColoring.class);
+    forceInit(EvolutionAssignmentTemperatureColoring.class);
   }
   private EvolutionGraphFactory factory;
   public static String minisat;
@@ -178,7 +179,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     o.addRule(new ListValidationRule(EdgeColoringFactory.getInstance().getNames(), EdgeColoringFactory.getInstance().getDescriptions()));
     options.addOption(o);
     
-    o = new ValidatedOption("n", "node-color", true, "node edge colouring implementation to use");
+    o = new ValidatedOption("n", "node-color", true, "The node colouring implementation to use");
     o.setDefault("auto");
     o.addRule(new ListValidationRule(NodeColoringFactory.getInstance().getNames(), NodeColoringFactory.getInstance().getDescriptions()));
     options.addOption(o);
