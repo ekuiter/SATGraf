@@ -7,6 +7,7 @@
 package com.satgraf.evolution.observers;
 
 import com.satgraf.evolution.UI.EvolutionGraphViewer;
+import com.satgraf.graph.UI.GraphViewerObserver;
 import com.satgraf.supplemental.SupplementalView;
 import com.satgraf.supplemental.SupplementalViewFactory;
 import com.satlib.community.Community;
@@ -103,10 +104,10 @@ public class VSIDSSpacialLocalityEvolutionObserver extends JPanel implements Evo
       group.add(rdoCommunity);
       group.add(rdoDistributionTotal);
       group.add(rdoDistributionRatio);
-      for(Community c : graph.getCommunities()){
+      /*for(Community c : graph.getCommunities()){
         dataset.addValue(0, SERIES_1.concat(" (Total)"), String.valueOf(c.getId()));
         dataset.addValue(0, SERIES_1.concat(" (Ratio)"), String.valueOf(c.getId()));
-      }
+      }*/
       KeyToGroupMap map = new KeyToGroupMap("G1");
 
       Paint p1 = new ChartColor(0x00, 0xff, 0x00);
@@ -152,8 +153,6 @@ public class VSIDSSpacialLocalityEvolutionObserver extends JPanel implements Evo
     c.fill = GridBagConstraints.BOTH;
     c.gridheight = 1;
     c.gridwidth = 4;
-    chartPanel.setPreferredSize(new Dimension(graph.getCommunities().size() * 10,300));
-    chartPanel.setMinimumSize(new Dimension(graph.getCommunities().size() * 10,300));
     chartScroll.setPreferredSize(chartPanel.getPreferredSize());
     this.add(chartScroll, c);
     
@@ -233,7 +232,12 @@ public class VSIDSSpacialLocalityEvolutionObserver extends JPanel implements Evo
       return;
     }
     if(isDecision){
-      while(dataset.getColumnCount() == 0){}
+      if(!dataset.getColumnKeys().contains(String.valueOf(n.getCommunity()))){
+        dataset.addValue(0, SERIES_1.concat(" (Total)"), String.valueOf(n.getCommunity()));
+        dataset.addValue(0, SERIES_1.concat(" (Ratio)"), String.valueOf(n.getCommunity()));
+        chartPanel.setPreferredSize(new Dimension(dataset.getColumnCount() * 10,300));
+        chartPanel.setMinimumSize(new Dimension(dataset.getColumnCount() * 10,300));
+      }
       synchronized(dataset){
         int decisions = dataset.getValue(SERIES_1.concat(" (Total)"), String.valueOf(n.getCommunity())).intValue();
         dataset.setValue(decisions + 1, SERIES_1.concat(" (Total)"), String.valueOf(n.getCommunity()));
@@ -263,6 +267,7 @@ public class VSIDSSpacialLocalityEvolutionObserver extends JPanel implements Evo
       }
       objChart.getCategoryPlot().datasetChanged(new DatasetChangeEvent(cme, dataset));
       chartPanel.repaint();
+      graphViewer.notifyObservers(GraphViewerObserver.Action.selectnode);
   }
 
   @Override
@@ -341,6 +346,9 @@ public class VSIDSSpacialLocalityEvolutionObserver extends JPanel implements Evo
       Map<Comparable, List<SortableDatasetEntry>> rows = new HashMap<>();
       List<Comparable> keys = new ArrayList<>();
       int _i = 0;
+      if(getRowCount() == 0){
+        return;
+      }
       for(int i = 0; i < getRowCount(); i++){
         Comparable key = getRowKey(i);
         keys.add(key);
@@ -362,7 +370,7 @@ public class VSIDSSpacialLocalityEvolutionObserver extends JPanel implements Evo
         _i++;
       }
       clear();
-        List<SortableDatasetEntry> sortedBy = rows.get(keys.get(rowIndex));
+      List<SortableDatasetEntry> sortedBy = rows.get(keys.get(rowIndex));
       for(Comparable key : keys){
         List<SortableDatasetEntry> entries = rows.get(key);
         for(int a = 0; a < entries.size(); a++){

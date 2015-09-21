@@ -131,7 +131,7 @@ public class CalculateEvolution {
         "-o","Q",
         "-o","VSIDST",
         "-o","VSIDSS",
-        "-e","10240"
+        "-e","10240",
       };
     }
     
@@ -144,6 +144,9 @@ public class CalculateEvolution {
       return;
     }
     
+    Evolution.dumpFileDirectory = cl.getOptionValue("p");
+    Evolution.pipeFileName = Evolution.dumpFileDirectory + "myPipe.txt";
+    Evolution.outputDirectory = Evolution.dumpFileDirectory + "output/";
     EvolutionGraphFactory factory = (EvolutionGraphFactory)GraphFactoryFactory.getInstance().getByNameAndExtension(cl.getOptionValue("m"), "cnf", cl.getOptionValue("c"), new HashMap<String, String>());
     
     File input = new File(cl.getOptionValue("f"));
@@ -168,9 +171,6 @@ public class CalculateEvolution {
     }
     factory.getMetric().getCommunities(graph);
     factory.setSolver(cl.getOptionValue("s"));
-    Evolution.dumpFileDirectory = cl.getOptionValue("p");
-    Evolution.pipeFileName = Evolution.dumpFileDirectory + "myPipe.txt";
-    Evolution.outputDirectory = Evolution.dumpFileDirectory + "output/";
     Evolution e = factory.getEvolution();
     e.getDecisions();
     factory.process(graph);

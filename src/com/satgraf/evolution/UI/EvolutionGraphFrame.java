@@ -19,6 +19,7 @@ import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
 import com.satlib.evolution.DimacsEvolutionGraphFactory;
 import com.satlib.evolution.DimacsLiteralEvolutionGraphFactory;
+import com.satlib.evolution.Evolution;
 import com.satlib.evolution.EvolutionGraphFactory;
 import com.satlib.graph.GraphFactory;
 import com.satlib.graph.GraphFactoryFactory;
@@ -157,7 +158,12 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     o.addRule(new ListValidationRule(names, descriptions));
     options.addOption(o);
     
-    o = new ValidatedOption("p", "pattern",true,"A list of regex expressions to group variables (not yet implemented)");
+    //o = new ValidatedOption("p", "pattern",true,"A list of regex expressions to group variables (not yet implemented)");
+    //options.addOption(o);
+    
+    o = new ValidatedOption("p", "pipe", true, "The piping file location");
+    o.addRule(new FileValidationRule(FileValidationRule.FileExists.yes));
+    o.setDefault("solvers/piping/");
     options.addOption(o);
     
     o = new ValidatedOption("s","solver",true,"The location of the modified solver");
@@ -195,7 +201,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
         //"-f","/home/zacknewsham/satgraf/formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
         //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
         //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
-        "-f","/home/zacknewsham/jenkins.cnf",
+        "-f","formula/satcomp/dimacs/fiasco.cnf",
         //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
         //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "-c","ol",
@@ -203,7 +209,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
         "-o","Q",
         "-o","VSIDST",
         "-o","VSIDSS",
-        "-n","assignmentTemp"
+        "-n","assignmentTemp",
       };
       System.out.print(Help.getHelp(options()));
       //return;
@@ -217,6 +223,10 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
       return;
     }
     
+    
+    Evolution.dumpFileDirectory = cl.getOptionValue("p");
+    Evolution.pipeFileName = Evolution.dumpFileDirectory + "myPipe.txt";
+    Evolution.outputDirectory = Evolution.dumpFileDirectory + "output/";
     String comName = cl.getOptionValue("c");
     HashMap<String, String> patterns = new HashMap<String, String>();
     minisat = cl.getOptionValue("s");
@@ -288,16 +298,18 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     factory.buildEvolutionFile();
     frmMain.show();
     GraphOptionsPanel panel = frmMain.panel;
-    for(String obs : cl.getCommandLine().getOptionValues("o")){
-      
-      SupplementalView observer = SupplementalViewFactory.getInstance().getByName(obs, graphViewer.getGraph());
-      CommunityMetric metric = CommunityMetricFactory.getInstance().getByName(comName);
-      observer.setCommunityMetric(metric);
-      observer.setGraphViewer(graphViewer);
-      observer.init();
-      
-      if(observer instanceof JPanel){
-        panel.addPanel((JPanel)observer, observer.getName());
+    if(cl.getCommandLine().getOptionValues("o") != null){
+      for(String obs : cl.getCommandLine().getOptionValues("o")){
+
+        SupplementalView observer = SupplementalViewFactory.getInstance().getByName(obs, graphViewer.getGraph());
+        CommunityMetric metric = CommunityMetricFactory.getInstance().getByName(comName);
+        observer.setCommunityMetric(metric);
+        observer.setGraphViewer(graphViewer);
+        observer.init();
+
+        if(observer instanceof JPanel){
+          panel.addPanel((JPanel)observer, observer.getName());
+        }
       }
     }
   }

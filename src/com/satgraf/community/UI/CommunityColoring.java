@@ -87,7 +87,6 @@ public class CommunityColoring implements NodeColoring<CommunityNode>, EdgeColor
 	    new Color(0xFF9933),
 	    new Color(0x0099FF),
 	    new Color(0xFF6600),
-	    new Color(0xFF0000),
 	    new Color(0x00FFCC),
 	    new Color(0xFF3333),
 	    new Color(0x33FFCC),
