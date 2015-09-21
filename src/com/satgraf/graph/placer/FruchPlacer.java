@@ -112,8 +112,8 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
     private boolean isSeedSet = false;
 
     private Collection<Node> nodeList;
-    public int width = 2500;
-    public int height = 2500;
+    public int width = 5000;
+    public int height = 5000;
     private boolean update = true;
     private Random rand = new Random(this.seed);
     private HashMap locations = new HashMap();

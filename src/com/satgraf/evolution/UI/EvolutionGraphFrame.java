@@ -201,15 +201,16 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
         //"-f","/home/zacknewsham/satgraf/formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
         //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
         //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
-        "-f","formula/satcomp/dimacs/fiasco.cnf",
+        "-f","formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
         //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
         //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "-c","ol",
-        "-l","fr",
+        "-l","f",
+        "-m","literal",
         "-o","Q",
         "-o","VSIDST",
         "-o","VSIDSS",
-        "-n","assignmentTemp",
+        //"-n","assignmentTemp",
       };
       System.out.print(Help.getHelp(options()));
       //return;
