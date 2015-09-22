@@ -173,7 +173,7 @@ public class GraphCanvas extends JLayeredPane implements MouseListener, MouseMot
   }
   
   @Override
-  public void paint(Graphics g) {
+  public void paintComponent(Graphics g) {
     if (graph.isUpdateRequired() || isLocalUpdateRequired()) {
       if(currentClip == null){
         currentClip = new Area();
@@ -184,7 +184,7 @@ public class GraphCanvas extends JLayeredPane implements MouseListener, MouseMot
       }
       Graphics g2 = buffer.createGraphics();
       g2.setClip(g.getClip());
-      super.paint(g2);
+      super.paintComponent(g2);
     }
     g.drawImage(buffer, 0, 0, Color.BLACK, null);
     highlightLayer.paintComponent(g);

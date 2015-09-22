@@ -133,7 +133,8 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
       nodeList = g.getNodes();
       this.width = width;
       this.height = height;
-      optDist = 0.46 * Math.sqrt(((width * height) / (this.graph.getNodeCount() + 1)));
+      optDist = 100;   
+      //optDist = 0.46 * Math.sqrt(((width * height) / (this.graph.getNodeCount() + 1)));
     }
 
     /**
@@ -326,6 +327,7 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
 		    noBreak = true;
 	
 		    Object[] nl = nodeList.toArray();
+		    optDist = 0.46 * Math.sqrt(((width * height) / (nl.length + 1)));
 	
 		    // calc constants
 		    double temp = width / 10;
@@ -355,7 +357,7 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
 		    double[] xPos = new double[nNodes];
 		    double[] yPos = new double[nNodes];
 		    boolean[] fixed = new boolean[nNodes];
-            edges.addAll(graph.getEdges());
+	
 		    for (int i = 0; i < nNodes; i++) {
 				Node workNode = (Node)nl[i];
 				xPos[i] = getX(workNode);
@@ -364,6 +366,7 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
 				maxHeight = Math.max(maxHeight,DrawableNode.NODE_DIAMETER + DrawableNode.NODE_X_SPACING);
 				//fixed[i] = workNode.__getattr_Fixed();
 				fixed[i] = false;
+				edges.addAll(workNode.getEdgesList());
 				nodeIndexer.put(workNode, new Integer(i));
 		    }
 	
@@ -437,7 +440,7 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
 				    if (deltaLength == 0) 
 				    	deltaLength = 0.001;
 				    
-				    force = calcAttraction(deltaLength) * edge.getWeight();
+				    force = calcAttraction(deltaLength);// * edge.getWeight();
 				    if(vIndex == 1167){
                       int test = 1;
                     }

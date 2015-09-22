@@ -1,6 +1,5 @@
 package com.satgraf.evolution.UI;
 
-import static com.satlib.ForceInit.forceInit;
 import com.satgraf.FormatValidationRule;
 import com.satgraf.community.UI.CommunityGraphFrame;
 import com.satgraf.community.placer.CommunityPlacerFactory;
@@ -11,10 +10,12 @@ import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphOptionsPanel;
 import com.satgraf.graph.color.EdgeColoringFactory;
 import com.satgraf.graph.color.NodeColoringFactory;
+import com.satgraf.graph.placer.FruchGPUPlacer;
 import com.satgraf.graph.placer.Placer;
 import com.satgraf.graph.placer.PlacerFactory;
 import com.satgraf.supplemental.SupplementalView;
 import com.satgraf.supplemental.SupplementalViewFactory;
+import static com.satlib.ForceInit.forceInit;
 import com.satlib.community.CommunityMetric;
 import com.satlib.community.CommunityMetricFactory;
 import com.satlib.evolution.DimacsEvolutionGraphFactory;
@@ -54,6 +55,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     forceInit(EvolutionDecisionTemperatureColoring.class);
     forceInit(EvolutionAssignmentTemperatureColoring.class);
     forceInit(EvolutionCommunityAssignmentTemperatureColoring.class);
+    //forceInit(FruchGPUPlacer.class);
   }
   private EvolutionGraphFactory factory;
   public static String minisat;
@@ -201,12 +203,12 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
         //"-f","/home/zacknewsham/satgraf/formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
         //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
         //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
-        "-f","formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
+        "-f","formula/satcomp/dimacs/toybox.cnf",
         //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
         //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "-c","ol",
         "-l","f",
-        "-m","literal",
+        
         "-o","Q",
         "-o","VSIDST",
         "-o","VSIDSS",

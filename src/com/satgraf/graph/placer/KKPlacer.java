@@ -100,7 +100,7 @@ public class KKPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>> {
     }
     
     public double getProgress(){
-      return 0.0;
+      return  (double)subPasses / (double)maxPasses;
     }
     /**
      * Will place each component as close together as possible on the graph
@@ -238,6 +238,7 @@ public class KKPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>> {
         
 	}
     
+    int subPasses;
 	private void runKamadaOn(Collection<Node> componentNodes) {
 		int nNodes = componentNodes.size();
 		
@@ -288,7 +289,7 @@ public class KKPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>> {
 		    }
 		}
 	    
-		int subPasses = 0;
+		subPasses = 0;
 		
 		//epsilon minimizing loop
 		while ((epsilon > minEpsilon) && !stop) {

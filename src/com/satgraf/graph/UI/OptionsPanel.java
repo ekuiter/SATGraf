@@ -18,6 +18,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import org.json.simple.JSONObject;
 
 /**
@@ -26,6 +27,8 @@ import org.json.simple.JSONObject;
  */
 public class OptionsPanel extends JPanel{
   private final NodePanel nodePanel;
+  private final JPanel content = new JPanel();
+  private final JScrollPane scroll = new JScrollPane(content);
   private final JPanel options = new JPanel();
   private final GraphScaler scale;
   private final GraphViewer graph;
@@ -56,7 +59,8 @@ public class OptionsPanel extends JPanel{
         }
       }
     });
-    
+    this.setLayout(new BorderLayout());
+    this.add(scroll, BorderLayout.CENTER);
     scale = new GraphScaler(frame, graph);
     options.setLayout(new BoxLayout(options, BoxLayout.Y_AXIS));
     //options.setPreferredSize(new Dimension(300, 700));
@@ -69,10 +73,11 @@ public class OptionsPanel extends JPanel{
     this.options.add(scale);
     this.options.add(neOptions);
     this.options.add(Box.createRigidArea(new Dimension(0,10)));
+    //this.options.setPreferredSize(new Dimension(100,100));
     
-    this.setLayout(new BorderLayout());
-    this.add(options, BorderLayout.NORTH);
-    this.add(nodePanel, BorderLayout.CENTER);
+    content.setLayout(new BorderLayout());
+    content.add(options, BorderLayout.NORTH);
+    content.add(nodePanel, BorderLayout.SOUTH);
   }
   
   public void fromJson(JSONObject json){

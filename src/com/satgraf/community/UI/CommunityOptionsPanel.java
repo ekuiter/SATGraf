@@ -61,9 +61,9 @@ public class CommunityOptionsPanel extends GraphOptionsPanel{
   
   public void initFromJson(JSONObject json){
     super.fromJson((JSONObject)json.get(JsonName()));
-    //communityPanel.fromJson((JSONObject)json.get("communities"));
-    //interConnectionPanel.fromJson((JSONObject)json.get("interEdges"));
-    //intraConnectionPanel.fromJson((JSONObject)json.get("intraEdges"));
+    communityPanel.fromJson((JSONObject)json.get("communities"));
+    interConnectionPanel.fromJson((JSONObject)json.get("interEdges"));
+    intraConnectionPanel.fromJson((JSONObject)json.get("intraEdges"));
   }
   public String toJson(){
     StringBuilder json = new StringBuilder(super.toJson());
@@ -89,7 +89,7 @@ public class CommunityOptionsPanel extends GraphOptionsPanel{
       HashSet<CommunityEdge> interConnections = new HashSet<>();
       HashSet<CommunityEdge> intraConnections = new HashSet<>();
       
-      /*Iterator<CommunityEdge> eit = graph.getEdges().iterator();
+      Iterator<CommunityEdge> eit = graph.getEdges().iterator();
       while (eit.hasNext()) {
     	  CommunityEdge e = (CommunityEdge) eit.next();
     	  
@@ -98,7 +98,7 @@ public class CommunityOptionsPanel extends GraphOptionsPanel{
     	  } else {
     		  intraConnections.add(e);
     	  }
-      }*/
+      }
       
       interConnectionPanel = new EdgeCheckBoxPanel(graph, interConnections);
       interConncetionScroll = new JScrollPane(interConnectionPanel);
