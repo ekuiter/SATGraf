@@ -42,9 +42,11 @@ public class ProgressionViewer extends JPanel{
             SwingUtilities.invokeLater ( new Runnable (){
               public void run (){
                 Container parent = ProgressionViewer.this.getParent();
-                parent.remove(ProgressionViewer.this);
-                parent.revalidate();
-                parent.repaint();
+                if(parent != null){
+                    parent.remove(ProgressionViewer.this);
+                    parent.revalidate();
+                    parent.repaint();
+                }
               }
             });
           }

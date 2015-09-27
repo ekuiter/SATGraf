@@ -16,6 +16,7 @@ import com.satgraf.graph.UI.GraphCanvasPanel;
 import com.satgraf.graph.UI.GraphFrame;
 import com.satgraf.graph.color.EdgeColoringFactory;
 import com.satgraf.graph.color.NodeColoringFactory;
+import com.satgraf.graph.placer.ForceAtlas2;
 import com.satgraf.graph.placer.FruchPlacer;
 import com.satgraf.graph.placer.FruchRandomPlacer;
 import com.satgraf.graph.placer.jung.JungWrapper;
@@ -74,6 +75,7 @@ public class CommunityGraphFrame extends GraphFrame{
     forceInit(DimacsLiteralCommunityGraphFactory.class);
     forceInit(CommunityColoring.class);
     forceInit(JungWrapper.class);
+    forceInit(ForceAtlas2.class);
   }
 
   protected HashMap<String, Pattern> patterns;
@@ -203,11 +205,11 @@ public class CommunityGraphFrame extends GraphFrame{
       args = new String[]{
         //"-f","formula/satcomp/dimacs/toybox.cnf",
         //"-f","/home/zacknewsham/aes.sb",
-        "-f","/home/zacknewsham/23/1.cnf",
+        "-f","formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
         //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
         //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
         "-c","ol",
-        "-l","jung",
+        "-l","forceAtlas2",
       };
       System.out.print(Help.getHelp(options()));
       //return;

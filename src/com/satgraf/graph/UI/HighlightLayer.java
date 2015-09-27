@@ -70,6 +70,8 @@ public class HighlightLayer<T extends GraphViewer> extends Layer {
       return;
     }
     int scaled_diameter = (int) Math.ceil(DrawableNode.NODE_DIAMETER * graph.getScale());
+    
+    g2.setStroke(new BasicStroke(1));
     Stroke s = g2.getStroke();
     Iterator<Edge> es = n.getEdges().iterator();
     if(edges){
@@ -95,7 +97,7 @@ public class HighlightLayer<T extends GraphViewer> extends Layer {
     }
     g2.setStroke(s);
     g.setColor(HIGHLIGHT_COLOR);
-    scaled_diameter += 1;
+    scaled_diameter += 3;
     int x = (int) (graph.getX(n) * graph.getScale()) - scaled_diameter / 2;
     int y = (int) (graph.getY(n) * graph.getScale()) - scaled_diameter / 2;
     g.fillArc(x, y, scaled_diameter, scaled_diameter, 0, 360);

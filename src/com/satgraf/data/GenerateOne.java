@@ -456,8 +456,8 @@ public class GenerateOne {
     public static void main(String[] args) throws IOException, InterruptedException, ParseException{
       if(args.length == 0){
         args = new String[]{
-          "-f","/media/zacknewsham/SAT/sat2013/SATBench/satchal12-selected/Hard_Combinatorial_SAT+UNSAT/SATCompetition2011/crafted/SAT11/crafted/spence/sgen/sgen3-n240-s78945233-sat.cnf",
-          "-d","/media/zacknewsham/SAT/test/"
+          "-f","/home/zacknewsham/simp.cnf",
+          "-d","/home/zacknewsham/SAT2015/"
         };
       }
       if(args.length < 2){

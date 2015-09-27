@@ -643,19 +643,19 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
 
   @Override
   public Node getNodeAtXY(int x, int y, double scale) {
-	    x /= scale;
-		y /= scale;
-		Iterator<Node> nodes = graph.getNodes("All").iterator();
-		Rectangle r = new Rectangle(0, 0, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER);
-		while(nodes.hasNext()){
-			Node node = (Node)nodes.next();
-			r.x = getX(node) - DrawableNode.NODE_DIAMETER / 2;
-			r.y = getY(node) - DrawableNode.NODE_DIAMETER / 2;
-			if(r.contains(x, y)){
-				return node;
-			}
-		}
-		return null;
+        x /= scale;
+        y /= scale;
+        Iterator<Node> nodes = graph.getNodes("All").iterator();
+        Rectangle r = new Rectangle(0, 0, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER);
+        while(nodes.hasNext()){
+                Node node = (Node)nodes.next();
+                r.x = getX(node) - DrawableNode.NODE_DIAMETER / 2;
+                r.y = getY(node) - DrawableNode.NODE_DIAMETER / 2;
+                if(r.contains(x, y)){
+                        return node;
+                }
+        }
+        return null;
   }
 
   @Override

@@ -17,6 +17,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.util.PriorityQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JLayeredPane;
 import org.json.simple.JSONObject;
 
@@ -173,18 +175,18 @@ public class GraphCanvas extends JLayeredPane implements MouseListener, MouseMot
   }
   
   @Override
-  public void paintComponent(Graphics g) {
+  public void paint(Graphics g) {
     if (graph.isUpdateRequired() || isLocalUpdateRequired()) {
       if(currentClip == null){
         currentClip = new Area();
       }
       currentClip.add(new Area(g.getClipBounds()));
-      if(buffer == null){
+      //if(buffer == null){
         buffer = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
-      }
+      //}
       Graphics g2 = buffer.createGraphics();
-      g2.setClip(g.getClip());
-      super.paintComponent(g2);
+          g2.setClip(g.getClip());
+      super.paint(g2);
     }
     g.drawImage(buffer, 0, 0, Color.BLACK, null);
     highlightLayer.paintComponent(g);
