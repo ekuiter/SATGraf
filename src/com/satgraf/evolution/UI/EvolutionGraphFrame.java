@@ -160,8 +160,8 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     o.addRule(new ListValidationRule(names, descriptions));
     options.addOption(o);
     
-    //o = new ValidatedOption("p", "pattern",true,"A list of regex expressions to group variables (not yet implemented)");
-    //options.addOption(o);
+    o = new ValidatedOption("r", "pattern",true,"A list of name:regex expressions to group variables");
+    options.addOption(o);
     
     o = new ValidatedOption("p", "pipe", true, "The piping file location");
     o.addRule(new FileValidationRule(FileValidationRule.FileExists.yes));
@@ -197,25 +197,8 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
   
   public static void main(String[] args) throws IOException, ParseException, InstantiationException {
     if (args.length == 0) {
-      args = new String[]{
-        //"-f","formula/satcomp/dimacs/toybox.cnf",
-        //"-f","/home/zacknewsham/aes.sb",
-        //"-f","/home/zacknewsham/satgraf/formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
-        //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
-        //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
-        "-f","formula/satcomp/dimacs/toybox.cnf",
-        //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
-        //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
-        "-c","ol",
-        "-l","f",
-        
-        "-o","Q",
-        "-o","VSIDST",
-        "-o","VSIDSS",
-        //"-n","assignmentTemp",
-      };
       System.out.print(Help.getHelp(options()));
-      //return;
+      return;
     }
     CommandLineParser clp = new GnuParser();
     Options o = options();
@@ -231,7 +214,13 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     Evolution.pipeFileName = Evolution.dumpFileDirectory + "myPipe.txt";
     Evolution.outputDirectory = Evolution.dumpFileDirectory + "output/";
     String comName = cl.getOptionValue("c");
-    HashMap<String, String> patterns = new HashMap<String, String>();
+    HashMap<String, String> patterns = new HashMap<>();
+    if(cl.getCommandLine().getOptionValues("r") != null){
+      for(String pattern : cl.getCommandLine().getOptionValues("r")){
+        String[] parts = pattern.split(":",2);
+        patterns.put(parts[0], parts[1]);
+      }
+    }
     minisat = cl.getOptionValue("s");
     EvolutionGraphFactory factory;
     Object in;
@@ -243,7 +232,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
       URL input = new URL(cl.getOptionValue("u"));
       in = input;
       String extension = cl.getOptionValue("f").substring(cl.getOptionValue("f").lastIndexOf(".")+1);
-      GraphFactory tmp = GraphFactoryFactory.getInstance().getByNameAndExtension(cl.getOptionValue("m"), extension, cl.getOptionValue("c"), new HashMap<String,String>());
+      GraphFactory tmp = GraphFactoryFactory.getInstance().getByNameAndExtension(cl.getOptionValue("m"), extension, cl.getOptionValue("c"), patterns);
       if(tmp == null){
         throw new InstantiationException(cl.getOptionValue("m") + " is not available for format " + extension);
       }
@@ -259,7 +248,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
       File input = new File(cl.getOptionValue("f"));
       in = input;
       String extension = cl.getOptionValue("f").substring(cl.getOptionValue("f").lastIndexOf(".")+1);
-      GraphFactory tmp = GraphFactoryFactory.getInstance().getByNameAndExtension(cl.getOptionValue("m"), extension, cl.getOptionValue("c"), new HashMap<String,String>());
+      GraphFactory tmp = GraphFactoryFactory.getInstance().getByNameAndExtension(cl.getOptionValue("m"), extension, cl.getOptionValue("c"), patterns);
       if(tmp == null){
         throw new InstantiationException(cl.getOptionValue("m") + " is not available for format " + extension);
       }
@@ -271,6 +260,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
       factory.setSolver(cl.getOptionValue("s"));
     }
     EvolutionGraphViewer graphViewer = new EvolutionGraphViewer(null, factory.getNodeLists(), null);
+    
     
     EvolutionGraphFrame frmMain = new EvolutionGraphFrame(factory, graphViewer, factory.getPatterns(), factory.getMetric());
     frmMain.setPlacerName(cl.getOptionValue("l"));

@@ -14,6 +14,7 @@ import com.satlib.graph.GraphFactoryFactory;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 import javax.swing.JApplet;
 import javax.swing.SwingUtilities;
 
@@ -26,7 +27,6 @@ public class CommunityApplet extends JApplet{
       
         //Execute a job on the event-dispatching thread; creating this applet's GUI.
         try {
-            final HashMap<String, String> patterns = new HashMap<String, String>();
             
             
             final int formula_id;
@@ -58,8 +58,10 @@ public class CommunityApplet extends JApplet{
             }
             final CommunityGraphFactory factory = (CommunityGraphFactory)tmp;
 
+              HashMap<String, Pattern> patterns = new HashMap<>();
+              patterns.put("All", Pattern.compile(".*"));
             final CommunityGraphViewer graphViewer = new CommunityGraphViewer(null, factory.getNodeLists(), null);
-            final CommunityGraphFrame frmMain = new CommunityGraphFrame(graphViewer, factory.getPatterns(), factory.getMetric());
+            final CommunityGraphFrame frmMain = new CommunityGraphFrame(graphViewer, patterns, factory.getMetric());
             frmMain.setProgressive(factory);
             frmMain.preinit();
             SwingUtilities.invokeAndWait(new Runnable() {

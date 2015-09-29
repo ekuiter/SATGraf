@@ -14,7 +14,7 @@ import javax.swing.JCheckBox;
 public class NodeCheckBox extends JCheckBox{
   private Node node;
   public NodeCheckBox(Node node){
-    super(node.getName());
+    super(node.getName() + String.format("(ID: %d, Edges: %d)", node.getId(),node.getEdges().size()));
     this.node = node;
   }
   public Node getNode(){

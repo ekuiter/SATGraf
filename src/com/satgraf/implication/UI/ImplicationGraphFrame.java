@@ -99,7 +99,7 @@ public class ImplicationGraphFrame extends GraphFrame{
     o.addRule(new ListValidationRule(PlacerFactory.getInstance().getNames(),PlacerFactory.getInstance().getDescriptions()));
     options.addOption(o);
     
-    o = new ValidatedOption("p", "pattern",true,"A list of regex expressions to group variables (not yet implemented)");
+    o = new ValidatedOption("r", "pattern",true,"A list of name:regex expressions to group variables");
     options.addOption(o);
     
     o = new ValidatedOption("m","format",true, "The format of the file, and desired graph representation");
@@ -132,7 +132,14 @@ public class ImplicationGraphFrame extends GraphFrame{
       return;
     }
     ImplicationGraphFactory factory = null;
-    HashMap<String, String> patterns = new HashMap<>();
+    HashMap<String, Pattern> patterns = new HashMap<>();
+    patterns.put("All", Pattern.compile(".*"));
+    if(cl.getCommandLine().getOptionValues("r") != null){
+      for(String pattern : cl.getCommandLine().getOptionValues("r")){
+        String[] parts = pattern.split(":",2);
+        patterns.put(parts[0], Pattern.compile(parts[1]));
+      }
+    }
     Object in;
     if(cl.getOptionValue("f") == null && cl.getOptionValue("u") == null){
       System.err.println("Must supply either -f or -u");
@@ -172,7 +179,7 @@ public class ImplicationGraphFrame extends GraphFrame{
     }
     
     ImplicationGraphViewer graphViewer = new ImplicationGraphViewer(null, factory.getNodeLists(), null);
-    ImplicationGraphFrame frmMain = new ImplicationGraphFrame(graphViewer, factory.getPatterns());
+    ImplicationGraphFrame frmMain = new ImplicationGraphFrame(graphViewer, patterns);
     frmMain.setProgressive(factory);
     frmMain.preinit();
     

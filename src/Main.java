@@ -25,6 +25,7 @@ import org.apache.commons.cli.ParseException;
  * @author zacknewsham
  */
 public class Main {
+  
   public static void main(String[] args) throws URISyntaxException, IOException, ParseException, InstantiationException, InterruptedException{
     String[] newargs;
     if(args.length == 0){
@@ -67,6 +68,11 @@ public class Main {
     }
     else if(args[0].equals("rlen")){
       QAgainstTimeRandomBucketingVarLength.main(newargs);
+    }
+    else{
+      System.out.println("Too few options. Please use:");
+      System.out.print(usage());
+      return;
     }
   }
   

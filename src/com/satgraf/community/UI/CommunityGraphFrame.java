@@ -184,7 +184,7 @@ public class CommunityGraphFrame extends GraphFrame{
     o.addRule(new ListValidationRule(names, descriptions));
     options.addOption(o);
     
-    o = new ValidatedOption("p", "pattern",true,"A list of regex expressions to group variables (not yet implemented)");
+    o = new ValidatedOption("r", "pattern",true,"A list of name:regex expressions to group variables");
     options.addOption(o);
     
     o = new ValidatedOption("e", "edge-color", true, "The edge colouring implementation to use");
@@ -202,17 +202,8 @@ public class CommunityGraphFrame extends GraphFrame{
   
   public static void main(String args[]) throws IOException, ParseException, InstantiationException{
     if(args.length == 0){
-      args = new String[]{
-        //"-f","formula/satcomp/dimacs/toybox.cnf",
-        //"-f","/home/zacknewsham/aes.sb",
-        "-f","formula/satcomp/dimacs/aes_16_10_keyfind_3.cnf",
-        //"/home/zacknewsham/Sites/multisat/formula/27round.cnf",
-        //"-f","/media/zacknewsham/SAT/sat2014/sc14-app/005-80-12.cnf",
-        "-c","ol",
-        "-l","forceAtlas2",
-      };
       System.out.print(Help.getHelp(options()));
-      //return;
+      return;
     }
     CommandLineParser clp = new GnuParser();
     Options o = options();
@@ -226,6 +217,12 @@ public class CommunityGraphFrame extends GraphFrame{
     
     String comName = cl.getOptionValue("c");
     HashMap<String, String> patterns = new HashMap<>();
+    if(cl.getCommandLine().getOptionValues("r") != null){
+      for(String pattern : cl.getCommandLine().getOptionValues("r")){
+        String[] parts = pattern.split(":",2);
+        patterns.put(parts[0], parts[1]);//Pattern.compile(parts[1]));
+      }
+    }
     CommunityGraphFactory factory;
     Object in;
     if(cl.getOptionValue("f") == null && cl.getOptionValue("u") == null){
@@ -236,7 +233,7 @@ public class CommunityGraphFrame extends GraphFrame{
       URL input = new URL(cl.getOptionValue("u"));
       in = input;
       String extension = cl.getOptionValue("u").substring(cl.getOptionValue("u").lastIndexOf(".")+1);
-      GraphFactory tmp = GraphFactoryFactory.getInstance().getByNameAndExtension(cl.getOptionValue("m"), extension, cl.getOptionValue("c"), new HashMap<String,String>());
+      GraphFactory tmp = GraphFactoryFactory.getInstance().getByNameAndExtension(cl.getOptionValue("m"), extension, cl.getOptionValue("c"), patterns);
       if(tmp == null){
         throw new InstantiationException(cl.getOptionValue("m") + " is not available for format " + extension);
       }
@@ -250,7 +247,7 @@ public class CommunityGraphFrame extends GraphFrame{
       File input = new File(cl.getOptionValue("f"));
       in = input;
       String extension = cl.getOptionValue("f").substring(cl.getOptionValue("f").lastIndexOf(".")+1);
-      GraphFactory tmp = GraphFactoryFactory.getInstance().getByNameAndExtension(cl.getOptionValue("m"), extension, cl.getOptionValue("c"), new HashMap<String,String>());
+      GraphFactory tmp = GraphFactoryFactory.getInstance().getByNameAndExtension(cl.getOptionValue("m"), extension, cl.getOptionValue("c"), patterns);
       if(tmp == null){
         throw new InstantiationException(cl.getOptionValue("m") + " is not available for format " + extension);
       }

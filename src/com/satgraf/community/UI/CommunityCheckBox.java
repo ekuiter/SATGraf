@@ -16,13 +16,24 @@ public class CommunityCheckBox extends JCheckBox{
   private final int community;
   private final int size;
   private final int intercommunity;
-  public CommunityCheckBox(int community, int size, int intercommunity){
-    super(String.format("%d (%d, %d)", community, size, intercommunity));
+  private final int intracommunity;
+  public CommunityCheckBox(int community, int size, int intercommunity, int intracommunity){
+    super(String.format("%d (Nodes: %d, Inter: %d, Intra: %d)", community, size, intercommunity, intracommunity));
     this.community = community;
     this.size = size;
+    this.intracommunity = intracommunity;
     this.intercommunity = intercommunity;
   }
   public int getCommunity(){
     return this.community;
+  }
+  public int getCommunitySize(){
+    return this.size;
+  }
+  public int getInterConnections(){
+    return this.intercommunity;
+  }
+  public int getIntraConnections(){
+    return this.intracommunity;
   }
 }

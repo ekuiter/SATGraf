@@ -366,7 +366,7 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
 				maxHeight = Math.max(maxHeight,DrawableNode.NODE_DIAMETER + DrawableNode.NODE_X_SPACING);
 				//fixed[i] = workNode.__getattr_Fixed();
 				fixed[i] = false;
-				edges.addAll(workNode.getEdgesList());
+				edges.addAll(workNode.getEdges());
 				nodeIndexer.put(workNode, new Integer(i));
 		    }
 	

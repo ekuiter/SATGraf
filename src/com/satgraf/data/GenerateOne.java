@@ -59,14 +59,14 @@ public class GenerateOne {
     public static BufferedWriter bw;
     public static int getCommunityDegrees(CommunityNode t){
       Set<Integer> t_ = new HashSet<>();
-      for(CommunityEdge e : t.getEdgesList()){
+      for(CommunityEdge e : t.getEdges()){
         t_.add((e.getStart() == t ? e.getEnd() : e.getStart()).getCommunity());
       }
       return t_.size();
     }
     public static int getInterDegrees(CommunityNode t){
       Set<Integer> t_ = new HashSet<>();
-      for(CommunityEdge e : t.getEdgesList()){
+      for(CommunityEdge e : t.getEdges()){
         if(e.getStart().getCommunity() != e.getEnd().getCommunity()){
           t_.add((e.getStart() == t ? e.getEnd() : e.getStart()).getId());
         }
@@ -75,7 +75,7 @@ public class GenerateOne {
     }
     public static int getTotalDegrees(CommunityNode t){
       Set<Integer> t_ = new HashSet<>();
-      for(CommunityEdge e : t.getEdgesList()){
+      for(CommunityEdge e : t.getEdges()){
         t_.add((e.getStart() == t ? e.getEnd() : e.getStart()).getId());
       }
       return t_.size();

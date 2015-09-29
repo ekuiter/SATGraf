@@ -108,7 +108,7 @@ public class EvolutionGraphInfoPanel extends CommunityGraphInfoPanel implements 
         int sameCom = 0;
         for(CommunityNode n : decisions){
           int interComEdges = 0;
-          for(CommunityEdge e : n.getEdgesList()){
+          for(CommunityEdge e : n.getEdges()){
             if(e.getOpposite(n).getCommunity() != n.getCommunity()){
               interComEdges++;
             }
@@ -116,7 +116,7 @@ public class EvolutionGraphInfoPanel extends CommunityGraphInfoPanel implements 
           if(interComEdges != 0){
             interCom++;
           }
-          if(interComEdges > (double)n.getEdgesList().size() / 2.0){
+          if(interComEdges > (double)n.getEdges().size() / 2.0){
             mostInterCom++;
           }
           if(lastCommunity == n.getCommunity()){

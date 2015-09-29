@@ -115,10 +115,10 @@ public class InstanceGenerator {
         for(CommunityNode n2 : nodes.keySet()){
           if(n1 != n2){
             CommunityEdge e = cg.createEdge(n1, n2, false);
-            if(!n1.getEdgesList().contains(e)){
+            if(!n1.getEdges().contains(e)){
               n1.addEdge(e);
             }
-            if(!n2.getEdgesList().contains(e)){
+            if(!n2.getEdges().contains(e)){
               n2.addEdge(e);
             }
           }
@@ -168,10 +168,10 @@ public class InstanceGenerator {
         for(CommunityNode n2 : nodes.keySet()){
           if(n1 != n2){
             CommunityEdge e = cg.createEdge(n1, n2, false);
-            if(!n1.getEdgesList().contains(e)){
+            if(!n1.getEdges().contains(e)){
               n1.addEdge(e);
             }
-            if(!n2.getEdgesList().contains(e)){
+            if(!n2.getEdges().contains(e)){
               n2.addEdge(e);
             }
           }

@@ -16,9 +16,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
-import java.util.PriorityQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JLayeredPane;
 import org.json.simple.JSONObject;
 
@@ -53,6 +50,7 @@ public class GraphCanvas extends JLayeredPane implements MouseListener, MouseMot
 
   protected void setupLayers() {
     highlightLayer = createNewHighlightLayer();
+    this.add(highlightLayer);
 
     nodeLayer = createNewNodeLayer();
     this.add(nodeLayer);
@@ -181,11 +179,11 @@ public class GraphCanvas extends JLayeredPane implements MouseListener, MouseMot
         currentClip = new Area();
       }
       currentClip.add(new Area(g.getClipBounds()));
-      //if(buffer == null){
+      if(buffer == null){
         buffer = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
-      //}
+      }
       Graphics g2 = buffer.createGraphics();
-          g2.setClip(g.getClip());
+      g2.setClip(g.getClip());
       super.paint(g2);
     }
     g.drawImage(buffer, 0, 0, Color.BLACK, null);
@@ -195,6 +193,7 @@ public class GraphCanvas extends JLayeredPane implements MouseListener, MouseMot
   @Override
   public void notify(GraphViewer graph, GraphViewerObserver.Action action) {
     if (action == Action.setscale) {
+      buffer = null;
       revalidate();
     } else if (action == Action.updatedEdges || action == Action.updatedNodes) {
       repaint();

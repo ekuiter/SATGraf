@@ -4,6 +4,8 @@
  */
 package com.satgraf.graph.UI;
 
+import com.satgraf.UI.SortCheckboxesDropDown;
+import com.satgraf.UI.SortableCheckboxes;
 import com.satlib.graph.Node;
 import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
@@ -11,9 +13,11 @@ import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
@@ -24,16 +28,25 @@ import org.json.simple.JSONObject;
  *
  * @author zacknewsham
  */
-public class NodeCheckboxPanel extends JPanel{
+public class NodeCheckboxPanel extends JPanel implements SortableCheckboxes<NodeCheckBox>{
   int count = 0;
 
-  private final HashMap<Node, JCheckBox> checkBoxes = new HashMap<Node, JCheckBox>();
+  private final HashMap<Node, NodeCheckBox> checkBoxes = new HashMap<>();
   private final GraphViewer graph;
   private final JCheckBox hideAll = new JCheckBox("All", true);
   private final String set;
+  private final SortCheckboxesDropDown dd;
+  private final Map<String, Comparator> comparators = new HashMap<>();
   public NodeCheckboxPanel(GraphViewer graph) {
     this.graph = graph;
     set = "";
+    comparators.put("+ID", new NumericComparatorInc());
+    comparators.put("-ID", new NumericComparatorDec());
+    comparators.put("+Name", new NameComparatorInc());
+    comparators.put("-Name", new NameComparatorDec());
+    comparators.put("+Degrees", new DegreeComparatorInc());
+    comparators.put("-Degrees", new DegreeComparatorDec());
+    dd = new SortCheckboxesDropDown(this, comparators);
   }
   
   public void fromJson(JSONObject json){
@@ -72,6 +85,14 @@ public class NodeCheckboxPanel extends JPanel{
   
   public NodeCheckboxPanel(GraphViewer graph, String set, Collection<Node> nodes){
     this.graph = graph;
+    comparators.put("+ID", new NumericComparatorInc());
+    comparators.put("-ID", new NumericComparatorDec());
+    comparators.put("+Name", new NameComparatorInc());
+    comparators.put("-Name", new NameComparatorDec());
+    comparators.put("+Degrees", new DegreeComparatorInc());
+    comparators.put("-Degrees", new DegreeComparatorDec());
+    dd = new SortCheckboxesDropDown(this, comparators);
+    this.add(dd);
     this.add(hideAll);
     this.set = set;
     hideAll.addChangeListener(new ChangeListener() {
@@ -89,18 +110,13 @@ public class NodeCheckboxPanel extends JPanel{
     });
     count++;
     addAll(nodes);
-    this.setLayout(new GridLayout(count, 1));
+    this.setLayout(new GridLayout(count+1, 1));
+    sort(new NumericComparatorInc());
   }
+  
   final void addAll(Collection<Node> nodes){
     for(Node node : nodes){
       add(node);
-    }
-    List nodes1 = new ArrayList<Node>();
-    nodes1.addAll(checkBoxes.keySet());
-    Collections.sort(nodes1, Node.NAME_COMPARATOR);
-    Iterator<Node> nodes2 = nodes1.iterator();
-    while(nodes2.hasNext()){
-      this.add(checkBoxes.get(nodes2.next()));
     }
   }
   
@@ -121,5 +137,60 @@ public class NodeCheckboxPanel extends JPanel{
     });
     checkBoxes.put(node, jc);
     count ++;
+  }
+
+  @Override
+  public void sort(Comparator<NodeCheckBox> comp) {
+    List<NodeCheckBox> sorted = new ArrayList<>();
+    sorted.addAll(checkBoxes.values());
+    Collections.sort(sorted, comp);
+    this.removeAll();
+    this.add(dd);
+    this.add(hideAll);
+    for(NodeCheckBox box : sorted){
+      this.add(box);
+    }
+  }
+
+  private static class NumericComparatorInc implements Comparator<NodeCheckBox> {
+    @Override
+    public int compare(NodeCheckBox t, NodeCheckBox t1) {
+      return t.getNode().getId() - t1.getNode().getId();
+    }
+  }
+
+  private static class NumericComparatorDec implements Comparator<NodeCheckBox> {
+    @Override
+    public int compare(NodeCheckBox t, NodeCheckBox t1) {
+      return t1.getNode().getId() - t.getNode().getId();
+    }
+  }
+
+  private static class NameComparatorInc implements Comparator<NodeCheckBox> {
+    @Override
+    public int compare(NodeCheckBox t, NodeCheckBox t1) {
+      return t.getNode().getName().compareTo(t1.getNode().getName());
+    }
+  }
+
+  private static class NameComparatorDec implements Comparator<NodeCheckBox> {
+    @Override
+    public int compare(NodeCheckBox t, NodeCheckBox t1) {
+      return t1.getNode().getName().compareTo(t.getNode().getName());
+    }
+  }
+
+  private static class DegreeComparatorInc implements Comparator<NodeCheckBox> {
+    @Override
+    public int compare(NodeCheckBox t, NodeCheckBox t1) {
+      return t.getNode().getEdges().size()- t1.getNode().getEdges().size();
+    }
+  }
+
+  private static class DegreeComparatorDec implements Comparator<NodeCheckBox> {
+    @Override
+    public int compare(NodeCheckBox t, NodeCheckBox t1) {
+      return t1.getNode().getEdges().size()- t.getNode().getEdges().size();
+    }
   }
 }
