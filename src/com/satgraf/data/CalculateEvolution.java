@@ -2,9 +2,6 @@ package com.satgraf.data;
 
 
 import com.satgraf.FormatValidationRule;
-import com.satgraf.community.placer.CommunityPlacerFactory;
-import static com.satgraf.evolution.UI.EvolutionGraphFrame.options;
-import com.satgraf.graph.placer.PlacerFactory;
 import com.satlib.CSVModel;
 import static com.satlib.ForceInit.forceInit;
 import com.satlib.community.CNMCommunityMetric;
@@ -170,17 +167,16 @@ public class CalculateEvolution {
       return;
     }
     factory.getMetric().getCommunities(graph);
-    factory.setSolver(cl.getOptionValue("s"));
-    Evolution e = factory.getEvolution();
+    Evolution e = new Evolution(graph, input, cl.getOptionValue("s"));
     e.getDecisions();
-    factory.process(graph);
+    e.start();
     int i = 0;
     int exceptionCount = 0;
     int lastSize = 0;
     int decisions = Integer.parseInt(cl.getOptionValue("e"));
     cl.getOptionValue("o");
-    while((factory.solverRunning()) || i < e.getTotalLines() && !e.hasError()){
-      while(e.getTotalLines() <= i && factory.solverRunning()){
+    while((e.solverRunning()) || i < e.getTotalLines() && !e.hasError()){
+      while(e.getTotalLines() <= i && e.solverRunning()){
         Thread.sleep(1000);
         System.err.println("still waiting");
       }
@@ -203,7 +199,7 @@ public class CalculateEvolution {
       lastSize = e.getDecisions();
       i = i + 1;
     }
-    factory.stopSolver();
+    e.stopSolver();
     if(e.hasError()){
       return;
     }

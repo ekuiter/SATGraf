@@ -58,7 +58,8 @@ public class ExportAction extends com.satgraf.actions.ExportAction<EvolutionGrap
         EvolutionGraphViewer graphViewer = frame.getGraphViewer();
         exportableGraphViewer = new ExportableGraphViewer(graphViewer.getGraph(), null, (CommunityPlacer)graphViewer.getPlacer());
         exportableGraphViewer.setScale(0.5);
-        exportableGraphViewer.setEvolution(new Evolution(exportableGraphViewer.getGraph()));
+        
+        exportableGraphViewer.setEvolution(new Evolution(exportableGraphViewer.getGraph(), graphViewer.evolution.getFile(), graphViewer.evolution.getSolver()));
         
         EvolutionOptionsPanel panel = (EvolutionOptionsPanel)frame.getOptionsPanel();
         Rectangle bounds = graphViewer.getBounds();

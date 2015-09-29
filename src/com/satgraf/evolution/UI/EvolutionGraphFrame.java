@@ -59,13 +59,13 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
   }
   private EvolutionGraphFactory factory;
   public static String minisat;
-  public EvolutionGraphFrame(EvolutionGraphFactory factory, EvolutionGraphViewer viewer, HashMap<String, Pattern> patterns, CommunityMetric metric) {
+  public EvolutionGraphFrame(EvolutionGraphFactory factory, final EvolutionGraphViewer viewer, HashMap<String, Pattern> patterns, CommunityMetric metric) {
     super(viewer, patterns, metric);
     this.factory = factory;
     
     this.addWindowListener(new WindowAdapter() {
     	public void windowClosing(WindowEvent e) {
-    		DimacsEvolutionGraphFactory.deleteOutputFolder();
+    		viewer.evolution.deleteOutputFolder();
     	}
 	});
   }
@@ -241,7 +241,6 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
         throw e;
       }
       factory = (EvolutionGraphFactory)tmp;
-      factory.setSolver(cl.getOptionValue("s"));
     
     }
     else{
@@ -257,7 +256,6 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
         throw e;
       }
       factory = (EvolutionGraphFactory)tmp;
-      factory.setSolver(cl.getOptionValue("s"));
     }
     EvolutionGraphViewer graphViewer = new EvolutionGraphViewer(null, factory.getNodeLists(), null);
     
@@ -274,7 +272,7 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     else if(in instanceof URL){
       factory.makeGraph((URL)in);
     }
-    graphViewer.setEvolution(factory.getEvolution());
+    graphViewer.setEvolution(new Evolution(factory.getGraph(), (File)in, cl.getOptionValue("s")));
     
     Placer p = null;
     p = CommunityPlacerFactory.getInstance().getByName(frmMain.getPlacerName(), factory.getGraph());
@@ -288,7 +286,6 @@ public class EvolutionGraphFrame extends CommunityGraphFrame {
     graphViewer.setNodeColoring(NodeColoringFactory.getInstance().getByName(cl.getOptionValue("n"), graphViewer.graph));
     graphViewer.setEdgeColoring(EdgeColoringFactory.getInstance().getByName(cl.getOptionValue("e"), graphViewer.graph));
     frmMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    factory.buildEvolutionFile();
     frmMain.show();
     GraphOptionsPanel panel = frmMain.panel;
     if(cl.getCommandLine().getOptionValues("o") != null){

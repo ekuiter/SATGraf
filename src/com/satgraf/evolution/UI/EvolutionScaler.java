@@ -44,6 +44,7 @@ public class EvolutionScaler extends JPanel implements ChangeListener, ActionLis
     progress.setPreferredSize(new Dimension(100, 20));
     progress.setEnabled(false);
     EvolutionObserverFactory.getInstance().observers().add(this);
+    graphviewer.evolution.start();
     play.setPreferredSize(new Dimension(70, 30));
     play.setEnabled(false);
 
