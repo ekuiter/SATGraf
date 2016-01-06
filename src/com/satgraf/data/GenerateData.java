@@ -85,8 +85,8 @@ public class GenerateData {
     public static void main(String args[]) throws FileNotFoundException, IOException, InterruptedException, ParseException{
         if(args.length == 0){
             args = new String[]{
-                "-f","/home/zacknewsham/obfuscated.files",
-                "-o","bmc.csv"
+                "-f","/home/zacknewsham/Sites/satgraf/test.list",
+                "-o","/home/zacknewsham/test.csv"
             };
         }
         
@@ -192,6 +192,7 @@ public class GenerateData {
         String line;
         while((line = br.readLine()) != null){
           System.out.println(line.split(",")[0].trim());
+          
           try{
             GenerateOne.run(line.split(",")[0].trim(), cl.getOptionValue("m"), cl.getOptionValue("c"));
           }

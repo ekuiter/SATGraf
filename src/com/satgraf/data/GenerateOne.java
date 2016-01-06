@@ -105,11 +105,12 @@ public class GenerateOne {
         
         DisjointGraphs dj = new DisjointGraphs();
         Set<CommunityGraph> graphs = dj.getDisjointGraphs(c);
-        if(graphs.size() == 1){
+        /*if(graphs.size() == 1){
             return;
+        }*/
+        if(bw == null){
+            bw = new BufferedWriter(new FileWriter(out));
         }
-        bw = new BufferedWriter(new FileWriter(out));
-        
         System.out.println("Built Graph");
         if(c == null){
           return;
@@ -469,7 +470,7 @@ public class GenerateOne {
     public static void main(String[] args) throws IOException, InterruptedException, ParseException{
       if(args.length == 0){
         args = new String[]{
-          "-f","/media/zacknewsham/SAT/sat2013/SATBench/satchal12-selected/Hard_Combinatorial_SAT+UNSAT/SC2012_Hard_Combinatorial/satrace-unselected/repeat/prime2209/prime2209-84.cnf",
+          "-f","/media/zacknewsham/SAT/sat2013/random/sc13-benchmarks-random/unsat/unsat-unif-k6/unif-k6-r43.37-v71-c3079-S8370820542459007665.cnf",
           "-d","/home/zacknewsham/test"
         };
       }
