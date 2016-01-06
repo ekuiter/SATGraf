@@ -13,6 +13,7 @@ import com.satlib.community.CommunityMetricFactory;
 import com.satlib.community.CommunityNode;
 import com.satlib.community.DimacsCommunityGraphFactory;
 import com.satlib.community.DimacsLiteralCommunityGraphFactory;
+import com.satlib.community.DisjointGraphs;
 import com.satlib.community.JSONCommunityGraphFactory;
 import com.satlib.community.LouvianCommunityMetric;
 import com.satlib.community.OLCommunityMetric;
@@ -101,6 +102,14 @@ public class GenerateOne {
         long startTime = System.currentTimeMillis();
         factory.makeGraph(f);
         CommunityGraph c = factory.getGraph();
+        
+        DisjointGraphs dj = new DisjointGraphs();
+        Set<CommunityGraph> graphs = dj.getDisjointGraphs(c);
+        if(graphs.size() == 1){
+            return;
+        }
+        bw = new BufferedWriter(new FileWriter(out));
+        
         System.out.println("Built Graph");
         if(c == null){
           return;
@@ -380,6 +389,10 @@ public class GenerateOne {
               num20PerInterCommunity.size(),
               num20PerTotalInterCommunity.size()
               ));
+        
+        
+              
+      CalculateNew.run(graphs, bw);
       
       metric = null;
       factory = null;
@@ -452,12 +465,12 @@ public class GenerateOne {
     
     return options;
   }
-   
+   static File out;
     public static void main(String[] args) throws IOException, InterruptedException, ParseException{
       if(args.length == 0){
         args = new String[]{
-          "-f","/home/zacknewsham/simp.cnf",
-          "-d","/home/zacknewsham/SAT2015/"
+          "-f","/media/zacknewsham/SAT/sat2013/SATBench/satchal12-selected/Hard_Combinatorial_SAT+UNSAT/SC2012_Hard_Combinatorial/satrace-unselected/repeat/prime2209/prime2209-84.cnf",
+          "-d","/home/zacknewsham/test"
         };
       }
       if(args.length < 2){
@@ -475,12 +488,15 @@ public class GenerateOne {
       }
       
       File in = new File(cl.getOptionValue("f"));
-      File out = new File(cl.getOptionValue("d") + "/" + in.getName());
+      out = new File(cl.getOptionValue("d") + "/" + in.getName());
+      
       /*while(out.exists()){
         out = new File(args[1] + "/" + String.valueOf(Math.random())+".cnf");
       }*/
-      bw = new BufferedWriter(new FileWriter(out));
       run(cl.getOptionValue("f"), cl.getOptionValue("m"), cl.getOptionValue("c"));
-      bw.close();
+      System.out.println("closing");
+      if(bw != null){
+        bw.close();
+      }
     }
 }

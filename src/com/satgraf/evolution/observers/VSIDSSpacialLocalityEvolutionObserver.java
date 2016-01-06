@@ -47,6 +47,7 @@ import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.entity.CategoryItemEntity;
+import org.jfree.chart.labels.CategoryToolTipGenerator;
 import org.jfree.chart.labels.StandardCategoryToolTipGenerator;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.renderer.category.GroupedStackedBarRenderer;
@@ -128,7 +129,7 @@ public class VSIDSSpacialLocalityEvolutionObserver extends JPanel implements Evo
     chartPanel.addChartMouseListener(this); 
     objChart.getCategoryPlot().setRenderer(renderer);
     ((NumberAxis)objChart.getCategoryPlot().getRangeAxis()).setTickUnit(new NumberTickUnit(1));
-    renderer.setBaseToolTipGenerator(new StandardCategoryToolTipGenerator("Community {1} = {2}", NumberFormat.getInstance()));
+    renderer.setBaseToolTipGenerator((CategoryToolTipGenerator) new StandardCategoryToolTipGenerator("Community {1} = {2}", NumberFormat.getInstance()));
     
     //SubCategoryAxis domainAxis = new SubCategoryAxis("Decisions");
     CategoryAxis domainAxis = objChart.getCategoryPlot().getDomainAxis();

@@ -8,6 +8,7 @@ package com.satgraf.community.UI;
 
 import com.satgraf.FormatValidationRule;
 import com.satgraf.community.placer.CircularCommunityPlacer;
+import com.satgraf.community.placer.CommunityForceAtlasPlacer;
 import com.satgraf.community.placer.CommunityPlacerFactory;
 import com.satgraf.community.placer.GridKKPlacer;
 import com.satgraf.community.placer.GridPlacer;
@@ -17,9 +18,9 @@ import com.satgraf.graph.UI.GraphFrame;
 import com.satgraf.graph.color.EdgeColoringFactory;
 import com.satgraf.graph.color.NodeColoringFactory;
 import com.satgraf.graph.placer.ForceAtlas2;
+import com.satgraf.graph.placer.FruchNearestPlacer;
 import com.satgraf.graph.placer.FruchPlacer;
 import com.satgraf.graph.placer.FruchRandomPlacer;
-import com.satgraf.graph.placer.jung.JungWrapper;
 import com.satgraf.graph.placer.KKPlacer;
 import com.satgraf.graph.placer.Placer;
 import com.satgraf.graph.placer.PlacerFactory;
@@ -63,10 +64,12 @@ public class CommunityGraphFrame extends GraphFrame{
     //forceInit(FruchGPUPlacer.class);
     forceInit(FruchPlacer.class);
     forceInit(FruchRandomPlacer.class);
+    forceInit(FruchNearestPlacer.class);
     forceInit(KKPlacer.class);
     forceInit(GridKKPlacer.class);
     forceInit(GridPlacer.class);
     forceInit(CircularCommunityPlacer.class);
+    forceInit(CommunityForceAtlasPlacer.class);
     forceInit(LouvianCommunityMetric.class);
     forceInit(OLCommunityMetric.class);
     forceInit(CNMCommunityMetric.class);
@@ -74,7 +77,6 @@ public class CommunityGraphFrame extends GraphFrame{
     forceInit(DimacsCommunityGraphFactory.class);
     forceInit(DimacsLiteralCommunityGraphFactory.class);
     forceInit(CommunityColoring.class);
-    forceInit(JungWrapper.class);
     forceInit(ForceAtlas2.class);
   }
 

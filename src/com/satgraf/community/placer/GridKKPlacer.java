@@ -6,21 +6,17 @@
 
 package com.satgraf.community.placer;
 
+import com.satgraf.community.placer.Fake.FakeCommunityGraph;
 import com.satgraf.graph.placer.KKPlacer;
 import com.satgraf.graph.placer.AbstractPlacer;
 import com.satlib.community.Community;
-import com.satlib.community.CommunityEdge;
 import com.satlib.community.CommunityGraph;
-import com.satlib.community.CommunityGraphAdapter;
 import com.satlib.community.CommunityNode;
 import com.satlib.graph.DrawableNode;
-import com.satlib.graph.UnionFind;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -152,184 +148,4 @@ public class GridKKPlacer extends AbstractPlacer<CommunityNode, CommunityGraph> 
     return gridPlacer.getCommunityHeight(community);
   }
   
-  
-  class FakeCommunityNode extends CommunityNode{
-    private FakeCommunity c;
-    private FakeCommunityGraph g;
-    public FakeCommunityNode(FakeCommunity c, FakeCommunityGraph g) {
-      super(c.getId(), "");
-      this.c = c;
-      this.g = g;
-    }
-    
-    @Override
-    public int getCommunity(){
-      return c.getId();
-    }
-    
-    public int getWidth(){
-      return gridPlacer.getCommunityWidth(c.c.getId());
-    }
-    public int getHeight(){
-      return gridPlacer.getCommunityHeight(c.c.getId());
-    }
-  }
-  private class FakeCommunity extends Community{
-    Community c;
-    private HashMap<Community, CommunityEdge> edges = new HashMap<Community, CommunityEdge>();
-    private FakeCommunityNode n;
-    public FakeCommunity(Community c) {
-      super(c.getId());
-      this.c = c;
-    }
-    public void setFakeCommunityNode(FakeCommunityNode n){
-      this.n = n;
-      this.communityNodes.add(n);
-    }
-    
-    /*void addFakeEdge(FakeCommunityEdge e){
-      if(e.getStart().getCommunity() == this){
-        if(!edges.containsKey(e.getEnd().getCommunity())){
-          edges.put(e.getEnd().getCommunity(), e);
-        }
-      }
-      else{
-        if(!edges.containsKey(e.getStart().getCommunity())){
-          edges.put(e.getStart().getCommunity(), e);
-        }
-      }
-    }
-    
-    @Override
-    public Collection<CommunityEdge> getInterCommunityEdges(){
-      return edges.values();
-    }*/
-  }
-  
-  private class FakeCommunityEdge extends CommunityEdge {
-    private double weight = 0.0;
-    public FakeCommunityEdge(CommunityNode a, CommunityNode b, boolean dummy) {
-      super(a, b, dummy);
-    }
-    
-    @Override
-    public double getWeight(){
-      if(weight == 0.0 && !dummy){
-        if (a.getCommunity() == b.getCommunity())
-        	weight = 0.4;
-        else
-        	weight = 0.1;
-      }
-      if(dummy){
-        weight = 1;
-      }
-      return weight;
-    }
-  }
-  private class FakeCommunityGraph extends CommunityGraphAdapter {
-    private TIntObjectHashMap<CommunityNode> nodes = new TIntObjectHashMap<>();
-    private HashMap<CommunityEdge,CommunityEdge> edges = new HashMap<>();
-    private UnionFind uf = new UnionFind();
-    private FakeCommunityGraph(CommunityGraph g){
-      Iterator<Community> communities = g.getCommunities().iterator();
-      while(communities.hasNext()){
-        Community c = communities.next();
-        FakeCommunityNode fcn = this.createNode(c);
-        uf.add(fcn);
-        Iterator<CommunityEdge> edges = new ArrayList<CommunityEdge>(c.getInterCommunityEdges()).iterator();
-        while(edges.hasNext()){
-          CommunityEdge e = edges.next();
-          Community otherC = graph.getCommunity(c.getId() == e.getEnd().getCommunity() ? e.getStart().getCommunity() : e.getEnd().getCommunity());
-          FakeCommunityNode fcn2 = this.createNode(otherC);
-          uf.add(fcn2);
-          FakeCommunityEdge fce = (FakeCommunityEdge)this.createEdge(fcn, fcn2, false);
-          
-          fcn.addEdge(fce);
-        }
-      }
-    }
-    public Iterator<CommunityEdge> getDummyEdges(){
-      return new ArrayList<CommunityEdge>().iterator();
-    }
-
-    @Override
-    public CommunityEdge createEdge(CommunityNode a, CommunityNode b, boolean dummy) {
-      FakeCommunityEdge fce = new FakeCommunityEdge(a, b, dummy);
-      uf.union(a, b);
-      a.addEdge(fce);
-      b.addEdge(fce);
-      if(a.getCommunity() != b.getCommunity()){
-        graph.getCommunity(a.getCommunity()).addInterCommunityEdge(fce);
-        graph.getCommunity(b.getCommunity()).addInterCommunityEdge(fce);
-      }
-      if(edges.containsKey(fce)){
-        return edges.get(fce);
-      }
-      else{
-        edges.put(fce, fce);
-        return fce;
-      }
-    }
-    @Override
-    public CommunityEdge connect(CommunityNode a, CommunityNode b, boolean dummy) {
-      CommunityEdge e = createEdge(a, b, dummy);
-      union(a, b);
-      
-      return e;
-    }
-
-    @Override
-    public void union(CommunityNode a, CommunityNode b) {
-      uf.union(a, b);
-    }
-
-    @Override
-    public boolean connected(CommunityNode a, CommunityNode b) {
-      return uf.find(a) == uf.find(b);
-    }
-
-    @Override
-    public CommunityNode getNode(int id) {
-      return nodes.get(id);
-    }
-
-    private FakeCommunityNode createNode(Community c){
-      FakeCommunity fc = new FakeCommunity(c);
-      FakeCommunityNode fcn = new FakeCommunityNode(fc, this);
-      fcn.setSize(gridPlacer.getCommunityWidth(c.getId()));
-      fc.setFakeCommunityNode(fcn);
-      if(!nodes.containsValue(fcn)){
-        nodes.put(c.getId(), fcn);
-      }
-      fcn = (FakeCommunityNode)nodes.get(c.getId());
-      return fcn;
-    }
-
-    @Override
-    public Collection<CommunityNode> getNodesList() {
-      return nodes.valueCollection();
-    }
-
-    @Override
-    public Collection<CommunityNode> getNodes(String set) {
-      return nodes.valueCollection();
-    }
-
-
-    @Override
-    public Collection<CommunityNode> getNodes() {
-      return nodes.valueCollection();
-    }
-
-    @Override
-    public int getNodeCount() {
-      return nodes.size();
-    }
-
-    @Override
-    public Collection<CommunityEdge> getEdges() {
-      return edges.values();
-    }
-
-  }
 }

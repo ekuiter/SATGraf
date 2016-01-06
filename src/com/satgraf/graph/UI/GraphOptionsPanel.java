@@ -132,6 +132,9 @@ public abstract class GraphOptionsPanel<N extends Node, E extends Edge, G extend
   @Override
   public void notify(GraphViewer graph, GraphViewerObserver.Action action){
     this.update();
+    if(action == Action.selectnode || action == Action.updatedEdges || action == Action.updatedNodes){
+        this.update();
+    }
     if(action == Action.selectnode){
       this.getNodePanel().setNode(graph.getSelectedNode());
       this.getNodePanel().update();

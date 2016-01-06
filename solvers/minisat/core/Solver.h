@@ -82,6 +82,7 @@ public:
 
     // Read state:
     //
+    
     lbool   value      (Var x) const;       // The current value of a variable.
     lbool   value      (Lit p) const;       // The current value of a literal.
     lbool   modelValue (Var x) const;       // The value of a variable in the last model. The last call to solve must have been satisfiable.
@@ -119,6 +120,7 @@ public:
     double    clause_decay;
     double    random_var_freq;
     double    random_seed;
+    bool choose;
     string pipe_location;
     bool      luby_restart;
     int       ccmin_mode;         // Controls conflict clause minimization (0=none, 1=basic, 2=deep).
@@ -178,6 +180,8 @@ protected:
     double              var_inc;          // Amount to bump next variable with.
     OccLists<Lit, vec<Watcher>, WatcherDeleted>
                         watches;          // 'watches[lit]' is a list of constraints watching 'lit' (will go there if literal becomes true).
+    vec<int>            assigns_true;      // The number of times a variable is assigned true
+    vec<int>            assigns_false;     // The number of times a variable is assigned false
     vec<lbool>          assigns;          // The current assignments.
     vec<char>           polarity;         // The preferred polarity of each variable.
     vec<char>           decision;         // Declares if a variable is eligible for selection in the decision heuristic.
@@ -217,10 +221,10 @@ protected:
     void     insertVarOrder   (Var x);                                                 // Insert a variable in the decision order priority queue.
     Lit      pickBranchLit    ();                                                      // Return the next decision variable.
     void     newDecisionLevel ();                                                      // Begins a new decision level.
-    void     uncheckedEnqueue (Lit p, bool isDecisionVariable, CRef from = CRef_Undef);                         // Enqueue a literal. Assumes value of literal is undefined.
+    void     uncheckedEnqueue (Lit p, bool isDecisionVariable = false, CRef from = CRef_Undef);                         // Enqueue a literal. Assumes value of literal is undefined.
     bool     enqueue          (Lit p, CRef from = CRef_Undef);                         // Test if fact 'p' contradicts current state, enqueue otherwise.
     CRef     propagate        ();                                                      // Perform unit propagation. Returns possibly conflicting clause.
-    void     cancelUntil      (int level, bool done);                                             // Backtrack until a certain level.
+    void     cancelUntil      (int level, bool done = false);                                             // Backtrack until a certain level.
     void     analyze          (CRef confl, vec<Lit>& out_learnt, int& out_btlevel);    // (bt = backtrack)
     void     analyzeFinal     (Lit p, vec<Lit>& out_conflict);                         // COULD THIS BE IMPLEMENTED BY THE ORDINARIY "analyze" BY SOME REASONABLE GENERALIZATION?
     bool     litRedundant     (Lit p, uint32_t abstract_levels);                       // (helper method for 'analyze()')
@@ -251,6 +255,7 @@ protected:
     // Misc:
     //
     int      decisionLevel    ()      const; // Gives the current decisionlevel.
+    lbool    decisionValue    (Var x) const;
     uint32_t abstractLevel    (Var x) const; // Used to represent an abstraction of sets of decision levels.
     CRef     reason           (Var x) const;
     int      level            (Var x) const;
@@ -324,6 +329,7 @@ inline void     Solver::newDecisionLevel()                      { trail_lim.push
 
 inline int      Solver::decisionLevel ()      const   { return trail_lim.size(); }
 inline uint32_t Solver::abstractLevel (Var x) const   { return 1 << (level(x) & 31); }
+inline lbool    Solver::decisionValue (Var x) const   { return assigns_true[x] < assigns_false[x] ? l_True : l_False; }
 inline lbool    Solver::value         (Var x) const   { return assigns[x]; }
 inline lbool    Solver::value         (Lit p) const   { return assigns[var(p)] ^ sign(p); }
 inline lbool    Solver::modelValue    (Var x) const   { return model[x]; }

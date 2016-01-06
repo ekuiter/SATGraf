@@ -41,7 +41,6 @@
  */
 package com.satgraf.graph.placer;
 
-import com.satlib.graph.DrawableNode;
 import com.satlib.graph.Node;
 
 
@@ -207,7 +206,7 @@ public class ForceFactory {
             // Get the distance
             double xDist = n1Layout.x - n2Layout.x;
             double yDist = n1Layout.y - n2Layout.y;
-            double distance = Math.sqrt(xDist * xDist + yDist * yDist) - (DrawableNode.NODE_DIAMETER);//n1.size() - n2.size();
+            double distance = Math.sqrt(xDist * xDist + yDist * yDist) - n1.getSize() - n2.getSize();
 
             if (distance > 0) {
                 // NB: factor = force / distance
@@ -460,7 +459,7 @@ public class ForceFactory {
             // Get the distance
             double xDist = n1Layout.x - n2Layout.x;
             double yDist = n1Layout.y - n2Layout.y;
-            double distance = Math.sqrt(xDist * xDist + yDist * yDist) - (DrawableNode.NODE_DIAMETER);//n1.size() - n2.size();
+            double distance = Math.sqrt(xDist * xDist + yDist * yDist) - n1.getSize() - n2.getSize();
 
             if (distance > 0) {
                 // NB: factor = force / distance
@@ -494,7 +493,7 @@ public class ForceFactory {
             // Get the distance
             double xDist = n1Layout.x - n2Layout.x;
             double yDist = n1Layout.y - n2Layout.y;
-            double distance = Math.sqrt(xDist * xDist + yDist * yDist) - (DrawableNode.NODE_DIAMETER);//n1.size() - n2.size();
+            double distance = Math.sqrt(xDist * xDist + yDist * yDist) - n1.getSize() - n2.getSize();
 
             if (distance > 0) {
                 // NB: factor = force / distance
@@ -528,7 +527,7 @@ public class ForceFactory {
             // Get the distance
             double xDist = n1Layout.x - n2Layout.x;
             double yDist = n1Layout.y - n2Layout.y;
-            double distance = Math.sqrt(xDist * xDist + yDist * yDist) - (DrawableNode.NODE_DIAMETER);//n1.size() - n2.size();
+            double distance = Math.sqrt(xDist * xDist + yDist * yDist) - n1.getSize() - n2.getSize();
 
             if (distance > 0) {
 
@@ -563,7 +562,7 @@ public class ForceFactory {
             // Get the distance
             double xDist = n1Layout.x - n2Layout.x;
             double yDist = n1Layout.y - n2Layout.y;
-            double distance = Math.sqrt(xDist * xDist + yDist * yDist) - (DrawableNode.NODE_DIAMETER);//n1.size() - n2.size();
+            double distance = Math.sqrt(xDist * xDist + yDist * yDist) - n1.getSize() - n2.getSize();
 
             if (distance > 0) {
 

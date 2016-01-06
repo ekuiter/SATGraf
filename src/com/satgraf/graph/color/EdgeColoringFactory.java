@@ -5,12 +5,13 @@
 package com.satgraf.graph.color;
 
 import com.satlib.GenericFactory;
+import com.satlib.graph.Graph;
 
 /**
  *
  * @author zacknewsham
  */
-public class EdgeColoringFactory extends GenericFactory<EdgeColoring>{
+public class EdgeColoringFactory extends GenericFactory<EdgeColoring, Graph>{
   private static EdgeColoringFactory singleton = new EdgeColoringFactory();
   public static EdgeColoringFactory getInstance(){
     return singleton;

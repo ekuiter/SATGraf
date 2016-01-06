@@ -273,13 +273,21 @@ public abstract class GraphViewer<T extends Node, T1 extends Edge> implements Ac
     return scale;
   }
 
+  public final static int UPDATE_FREQUENCY = 10;
+  private int updates = 0;
   public void setUpdatedNodes(Collection<Node> updatedNodes) {
     synchronized (this.updatedNodes) {
       for (Node n : updatedNodes) {
         this.updatedNodes.add(n);
       }
     }
-    notifyObservers(GraphViewerObserver.Action.updatedNodes);
+    if(!updatedNodes.isEmpty()){
+        if(updates == 0){
+            notifyObservers(GraphViewerObserver.Action.updatedNodes);
+        }
+        updates++;
+        updates %= UPDATE_FREQUENCY;
+    }
   }
 
   public void addUpdatedNode(Node n, NodeState s, boolean updateCanvas) {

@@ -5,12 +5,13 @@
 package com.satgraf.graph.color;
 
 import com.satlib.GenericFactory;
+import com.satlib.graph.Graph;
 
 /**
  *
  * @author zacknewsham
  */
-public class NodeColoringFactory extends GenericFactory<NodeColoring>{
+public class NodeColoringFactory extends GenericFactory<NodeColoring, Graph>{
   private static NodeColoringFactory singleton = new NodeColoringFactory();
   public static NodeColoringFactory getInstance(){
     return singleton;

@@ -50,6 +50,7 @@
 
 package com.satgraf.graph.placer;
 
+import com.satlib.community.Community;
 import com.satlib.graph.Clause;
 import com.satlib.graph.DrawableNode;
 import com.satlib.graph.Edge;
@@ -92,9 +93,9 @@ import java.util.*;
  * @author Skye Bender-deMoll email:skyebend@santafe.edu
  */
 
-public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>> {
+public class FruchNearestPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>> {
   static{
-    PlacerFactory.getInstance().register("f", "An implementation of the Fruchtermon and Reingold force directed layout algorithm", FruchPlacer.class);
+    PlacerFactory.getInstance().register("fn", "An implementation of the Fruchtermon and Reingold force directed layout algorithm, that selects the closet nodes", FruchNearestPlacer.class);
   }
 
     private int pad = 20;
@@ -112,8 +113,8 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
     private boolean isSeedSet = false;
 
     private Collection<Node> nodeList;
-    public int width = 5000;
-    public int height = 5000;
+    public int width = 2500;
+    public int height = 2500;
     private boolean update = true;
     private Random rand = new Random(this.seed);
     private HashMap locations = new HashMap();
@@ -125,16 +126,15 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
       return progress;
     }
     
-    public FruchPlacer(Graph g){
-      this(g, 2500, 2500);
+    public FruchNearestPlacer(Graph g){
+      this(g, Math.max(g.getNodeCount()/5, 2500), Math.max(g.getNodeCount()/5, 2500));
     }
-    public FruchPlacer(Graph g, int width, int height) {
+    public FruchNearestPlacer(Graph g, int width, int height) {
       super(g);
       nodeList = g.getNodes();
       this.width = width;
       this.height = height;
-      optDist = 100;   
-      //optDist = 0.46 * Math.sqrt(((width * height) / (this.graph.getNodeCount() + 1)));
+      optDist = 0.46 * Math.sqrt(((width * height) / (this.graph.getNodeCount() + 1)));
     }
 
     /**
@@ -317,6 +317,10 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
      * may exhibit rotations drift during the layout.
      *
      */
+    Random r = new Random();
+    PriorityQueue<Node> xOrderedNodes = new PriorityQueue<>();
+    PriorityQueue<Node> yOrderedNodes = new PriorityQueue<>();
+    HashMap<Node, Integer> indexes = new HashMap<>();
 	public void advancePositions() {
 		if (done) {
 		    return;
@@ -327,7 +331,6 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
 		    noBreak = true;
 	
 		    Object[] nl = nodeList.toArray();
-		    optDist = 0.46 * Math.sqrt(((width * height) / (nl.length + 1)));
 	
 		    // calc constants
 		    double temp = width / 10;
@@ -354,19 +357,19 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
 		    }
 	
 		    //make arrays corresponding to the coords of each node
-		    double[] xPos = new double[nNodes];
-		    double[] yPos = new double[nNodes];
+		    final double[] xPos = new double[nNodes];
+		    final double[] yPos = new double[nNodes];
 		    boolean[] fixed = new boolean[nNodes];
-	
+            edges.addAll(graph.getEdges());
 		    for (int i = 0; i < nNodes; i++) {
 				Node workNode = (Node)nl[i];
+                indexes.put(workNode, i);
 				xPos[i] = getX(workNode);
 				yPos[i] = getY(workNode);
 				maxWidth = Math.max(maxWidth,DrawableNode.NODE_DIAMETER + DrawableNode.NODE_X_SPACING);
 				maxHeight = Math.max(maxHeight,DrawableNode.NODE_DIAMETER + DrawableNode.NODE_X_SPACING);
 				//fixed[i] = workNode.__getattr_Fixed();
 				fixed[i] = false;
-				edges.addAll(workNode.getEdges());
 				nodeIndexer.put(workNode, new Integer(i));
 		    }
 	
@@ -384,16 +387,60 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
 		    while ((temp > 1) && (passes < maxPasses) && noBreak) {
 				//calculate repulsive forces between each pair of nodes (set both)
 				int limit = nNodes - 1;
-				for (int v = 0; v < limit; v++) {	
+                List<Integer> shuffled = new ArrayList<>();
+                shuffled.addAll(indexes.values());
+                Map<IntegerPair, Double> distances = new HashMap<>();
+				for (int v = 0; v < limit; v++) {
+                    shuffled.remove(0);
 					xDisp[v] = 0;
 			    	yDisp[v] = 0;
 					
 				    // can skip many loops by assuming that uv = -vu
 				    // and looping in factorial
-				    for (int u = v + 1; u < nNodes; u++) {
+                    
+                    Node n = (Node)nl[v];
+                    Iterator<Edge> n_edges = n.getEdges().iterator();
+                    final int _v = v;
+                      	
+                    Collections.sort(shuffled, new Comparator<Integer>(){
+                      private Map<IntegerPair, Integer> seenBefore = new HashMap<>();
+                      private Map<Integer, Integer> distances = new HashMap<>();
+                      
+                      @Override
+                      public int compare(Integer t, Integer t1) {
+                        IntegerPair pair = new IntegerPair(t, t1);
+                        if(!seenBefore.containsKey(pair)){
+                          Integer t1dist = distances.get(t1);
+                          Integer tdist = distances.get(t);
+                          if(tdist == null){
+                            tdist = (int)(Math.pow(xPos[t] - xPos[_v],2) + Math.pow(yPos[t] - yPos[_v],2));
+                            distances.put(t, tdist);
+                          }
+                          if(t1dist == null){
+                            t1dist = (int)(Math.pow(xPos[t1] - xPos[_v],2) + Math.pow(yPos[t1] - yPos[_v],2));
+                            distances.put(t1, t1dist);
+                          }
+                          int ret = tdist - t1dist;
+                          seenBefore.put(pair, ret);
+                          return ret;
+                        }
+                        return seenBefore.get(pair);
+                      }
+                      
+                    });
+                    int max = (int)Math.min(Math.sqrt(shuffled.size()),shuffled.size()) + n.getEdges().size();
+				    for (int u = 0; u < max; u++) {
+                        int x;
+                        if( u < n.getEdges().size()){
+                          x = indexes.get(n_edges.next().getOpposite(n));
+                        }
+                        else{
+                          x = shuffled.get(u - n.getEdges().size());
+                        }
+                        
 						//get difference of position vectors
-						xDelta = xPos[v] - xPos[u];
-						yDelta = yPos[v] - yPos[u];
+						xDelta = xPos[v] - xPos[x];
+						yDelta = yPos[v] - yPos[x];
 			
 						//trap condition where nodes have same position
 						if ((xDelta == 0) && (yDelta == 0)) {
@@ -407,15 +454,19 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
 						}
 						
 						//set vu disp vector
-						deltaLength = Math.sqrt((xDelta * xDelta) + (yDelta * yDelta));
+                        IntegerPair pair = new IntegerPair(v, x);
+                        if(!distances.containsKey(pair)){
+                          distances.put(pair, Math.sqrt((xDelta * xDelta) + (yDelta * yDelta)));
+                        }
+                        deltaLength = distances.get(pair);
 						force = calcRepulsion(deltaLength);
 						
 						xDisp[v] += (xDelta / deltaLength) * force;
 						yDisp[v] += (yDelta / deltaLength) * force;
 						
 						//set uv disp vector (-vu)
-						xDisp[u] -= (xDelta / deltaLength) * force;
-						yDisp[u] -= (yDelta / deltaLength) * force;
+						xDisp[x] -= (xDelta / deltaLength) * force;
+						yDisp[x] -= (yDelta / deltaLength) * force;
 				    }
 				}
 		
@@ -425,33 +476,25 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
 				while (iter.hasNext() && noBreak) {
 					z++;
 				    Edge edge = (Edge) iter.next();
-                    
-                    //hack for multi level e.g. community graphs
-                    if(!nodeIndexer.containsKey(edge.getEnd())){
-                      continue;
-                    }
-                    if(!nodeIndexer.containsKey(edge.getStart())){
-                      continue;
-                    }
 				    int vIndex = ((Integer) nodeIndexer.get(edge.getStart())).intValue();
 				    int uIndex = ((Integer) nodeIndexer.get(edge.getEnd())).intValue();
 		
 				    //get difference of position vectors
 				    xDelta = xPos[vIndex] - xPos[uIndex];
 				    yDelta = yPos[vIndex] - yPos[uIndex];
-				    
+				    IntegerPair pair = new IntegerPair(vIndex, uIndex);
+                    if(!distances.containsKey(pair)){
+                      distances.put(pair, Math.sqrt((xDelta * xDelta) + (yDelta * yDelta)));
+                    }
 				    //set vu disp vector
-				    deltaLength = Math.sqrt((xDelta * xDelta) + (yDelta * yDelta));
+				    deltaLength = distances.get(pair);
 				    
 				    // get div by 0 "errors" if deltaLength is 0.
 				    // BUT WHAT SHOULD deltaLength BE IN THESE CASES?
 				    if (deltaLength == 0) 
 				    	deltaLength = 0.001;
 				    
-				    force = calcAttraction(deltaLength);// * edge.getWeight();
-				    if(vIndex == 1167){
-                      int test = 1;
-                    }
+				    force = calcAttraction(deltaLength) * edge.getWeight();
 				    xDisp[vIndex] -= (xDelta / deltaLength) * force;
 				    yDisp[vIndex] -= (yDelta / deltaLength) * force;
 				    
@@ -484,7 +527,7 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
 					temp = coolTemp(temp);
 		
 				passes++;
-                progress += 0.001;
+                progress += 0.002;
 				//System.out.println("passes: " + passes);
 		    }
 	
@@ -651,19 +694,21 @@ public class FruchPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Clause>>
 
   @Override
   public Node getNodeAtXY(int x, int y, double scale) {
-        x /= scale;
-        y /= scale;
-        Iterator<Node> nodes = graph.getNodes("All").iterator();
-        Rectangle r = new Rectangle(0, 0, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER);
-        while(nodes.hasNext()){
-                Node node = (Node)nodes.next();
-                r.x = getX(node) - DrawableNode.NODE_DIAMETER / 2;
-                r.y = getY(node) - DrawableNode.NODE_DIAMETER / 2;
-                if(r.contains(x, y)){
-                        return node;
-                }
-        }
-        return null;
+	    x /= scale;
+		y /= scale;
+		Iterator<Node> nodes = graph.getNodes("All").iterator();
+		Rectangle r = new Rectangle(0, 0, DrawableNode.NODE_DIAMETER, DrawableNode.NODE_DIAMETER);
+		while(nodes.hasNext()){
+			Node node = (Node)nodes.next();
+            if(node.isVisible()){
+              r.x = getX(node) - DrawableNode.NODE_DIAMETER / 2;
+              r.y = getY(node) - DrawableNode.NODE_DIAMETER / 2;
+              if(r.contains(x, y)){
+                  return node;
+              }
+            }
+		}
+		return null;
   }
 
   @Override

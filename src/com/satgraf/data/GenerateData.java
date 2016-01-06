@@ -157,6 +157,27 @@ public class GenerateData {
                     + "num_top_20_inter_community,"
                     + "num_top_20_total_inter_community,"
                     
+                    + "real_shortest_mean,"
+                    + "real_shortest_min,"
+                    + "real_shortest_max,"
+                    + "real_shortest_count,"
+                    
+                    + "approx_shortest_mean,"
+                    + "approx_shortest_min,"
+                    + "approx_shortest_max,"
+                    + "approx_shortest_count,"
+                    + "approx_shortest_pairs_mean,"
+                    
+                    + "com_shortest_mean,"
+                    + "com_shortest_min,"
+                    + "com_shortest_max,"
+                    + "com_shortest_count,"
+                    
+                    + "inter_shortest_mean,"
+                    + "inter_shortest_min,"
+                    + "inter_shortest_max,"
+                    + "inter_shortest_count,"
+                    
                     + "total_clauses,"
                     + "var_unique_clauses,"
                     + "max_clause,"

@@ -34,7 +34,7 @@ public class ClausePanel extends JPanel{
     else if(c.isSatisfied()){
       this.setBorder(new LineBorder(Color.GREEN));
     }*/
-    Iterator<Node> ns = c.getNodes();
+    Iterator<Node> ns = c.getNodes().iterator();
     while(ns.hasNext()){
       Node n = ns.next();
       JPanel panel = new JPanel();

@@ -123,12 +123,14 @@ public class CalculateEvolution {
   public static void main(String[] args) throws IOException, InterruptedException, ParseException{
     if(args.length < 1){
       args = new String[]{
-        "-f","/home/zacknewsham/obfuscated/lc_test000001.cnf",
+        "-f","/media/zacknewsham/SAT/sat2013/SATBench/SC13_submissions/mayer-eichberger--carseq/pb_400_09_lb_04.cnf",
         "-d","/home/zacknewsham/",
         "-o","Q",
         "-o","VSIDST",
         "-o","VSIDSS",
         "-e","10240",
+        "-s","/home/zacknewsham/MapleSAT/simp/maplesat",
+        "-p","/home/zacknewsham/piping/"
       };
     }
     

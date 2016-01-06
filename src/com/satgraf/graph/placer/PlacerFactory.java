@@ -7,13 +7,14 @@
 package com.satgraf.graph.placer;
 
 import com.satlib.GenericFactory;
+import com.satlib.graph.Graph;
 
 
 /**
  *
  * @author zacknewsham
  */
-public class PlacerFactory extends GenericFactory<Placer>{
+public class PlacerFactory extends GenericFactory<Placer, Graph>{
   private static PlacerFactory singleton = new PlacerFactory();
   public static PlacerFactory getInstance(){
     return singleton;

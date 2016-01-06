@@ -15,15 +15,21 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class EdgeLayer extends Layer implements Progressive{
 	
   protected final GraphViewer graph;
-  private final ExecutorService pool;
+  private final ExecutorCompletionService pool;
   private int threadCount;
   private Graphics g;
   private int drawn = 0;
@@ -33,7 +39,7 @@ public class EdgeLayer extends Layer implements Progressive{
     super(size);
     this.graph = graph;
     threadCount = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
-    pool = Executors.newFixedThreadPool(threadCount);
+    pool = new ExecutorCompletionService(Executors.newFixedThreadPool(threadCount));
   }
 
   protected Color getColor(Edge e) {
@@ -53,20 +59,20 @@ public class EdgeLayer extends Layer implements Progressive{
           final int from = (int) Math.floor(edgeCount * (t - 1) / taskCount);
           final int to = (int) Math.floor(edgeCount * t / taskCount);
 
-          Future future = pool.submit(new Runnable() {
+          Future future = pool.submit(new Callable<Object>() {
               @Override
-              public void run() {
+              public Object call() {
                   drawEdges(from, to);
+                  return null;
               }
           });
           threads.add(future);
       }
-
       for (Future future : threads) {
         try {
-          future.get();
-        } catch (InterruptedException | ExecutionException ex) {
-          ex.printStackTrace();
+          pool.take();
+        } catch (InterruptedException ex) {
+          Logger.getLogger(EdgeLayer.class.getName()).log(Level.SEVERE, null, ex);
         }
       }
       graph.clearUpdatedEdges();

@@ -94,7 +94,8 @@ public class ForceAtlas2 extends AbstractPlacer {
     double outboundAttCompensation = 1;
     private int maxIterations = 5000;
     private int iterations = 0;
-    
+    private int offsetX = 0;
+    private int offsetY = 0;
     private ExecutorCompletionService pool;
 
     public ForceAtlas2(Graph g) {
@@ -111,7 +112,7 @@ public class ForceAtlas2 extends AbstractPlacer {
     @Override
     public void init() {
         speed = 1.;
-
+        maxIterations = Math.max(2000, Math.min(5000, (int)Math.pow(graph.getNodeCount(), 2)));
         // Initialise layout data
         for (Node n : (Collection<Node>)graph.getNodes()) {
             if (!layoutData.containsKey(n)) {
@@ -138,6 +139,18 @@ public class ForceAtlas2 extends AbstractPlacer {
             nodeThreads.clear();
             goAlgo();
         }
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        for(Node n : (Collection<Node>)graph.getNodes()){
+          if(getX(n) < minX){
+            minX = getX(n);
+          }
+          if(getY(n) < minY){
+            minY = getY(n);
+          }
+        }
+        offsetX = (0 - minX) + DrawableNode.COMMUNITY_SPACING;
+        offsetY = (0 - minY) + DrawableNode.COMMUNITY_SPACING;
     }
     public void randomizeLayout() {
         System.out.println("randomizing layout");
@@ -170,7 +183,7 @@ public class ForceAtlas2 extends AbstractPlacer {
                 layoutData.put(n, nLayout);
             }
             ForceAtlas2LayoutData nLayout = getLayoutData(n);
-            int deg = 0;
+            double deg = 0;
             for(Edge e: (Collection<Edge>)n.getEdges()){
                 deg += e.getWeight();
             }
@@ -559,12 +572,12 @@ public class ForceAtlas2 extends AbstractPlacer {
 
     @Override
     public int getX(Node node) {
-        return (int)getLayoutData(node).x;
+        return offsetX + (int)getLayoutData(node).x;
     }
 
     @Override
     public int getY(Node node) {
-        return (int)getLayoutData(node).y;
+        return offsetY + (int)getLayoutData(node).y;
     }
 
     @Override

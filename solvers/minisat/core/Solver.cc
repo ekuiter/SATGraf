@@ -44,7 +44,8 @@ static BoolOption    opt_luby_restart      (_cat, "luby",        "Use the Luby r
 static IntOption     opt_restart_first     (_cat, "rfirst",      "The base restart interval", 100, IntRange(1, INT32_MAX));
 static DoubleOption  opt_restart_inc       (_cat, "rinc",        "Restart interval increase factor", 2, DoubleRange(1, false, HUGE_VAL, false));
 static DoubleOption  opt_garbage_frac      (_cat, "gc-frac",     "The fraction of wasted memory allowed before a garbage collection is triggered",  0.20, DoubleRange(0, false, HUGE_VAL, false));
-static StringOption  opt_pipe_location     (_cat, "pipe", 	 "The location of the Pipe file for SATGraf", "solvers/piping/myPipe.txt");
+static StringOption  opt_pipe_location     (_cat, "pipe",        "The location of the Pipe file for SATGraf", "solvers/piping/myPipe.txt");
+static BoolOption    opt_choose            (_cat, "choose",      "Choose the decision variable", false);
 
 //=================================================================================================
 // Constructor/Destructor:
@@ -68,6 +69,7 @@ Solver::Solver() :
   , restart_first    (opt_restart_first)
   , restart_inc      (opt_restart_inc)
   , pipe_location    (opt_pipe_location)
+  , choose           (opt_choose)
 
     // Parameters (the rest):
     //
@@ -123,11 +125,13 @@ Var Solver::newVar(bool sign, bool dvar)
     watches  .init(mkLit(v, false));
     watches  .init(mkLit(v, true ));
     assigns  .push(l_Undef);
+    assigns_true.push(0);
+    assigns_false.push(0);
     vardata  .push(mkVarData(CRef_Undef, 0));
     //activity .push(0);
     activity .push(rnd_init_act ? drand(random_seed) * 0.00001 : 0);
     seen     .push(0);
-    polarity .push(sign);
+    polarity .push(2);
     decision .push();
     trail    .capacity(v+1);
     setDecisionVar(v, dvar);
@@ -157,6 +161,14 @@ bool Solver::addClause_(vec<Lit>& ps)
         uncheckedEnqueue(ps[0], false);
         return ok = (propagate() == CRef_Undef);
     }else{
+        for(i = 0; i < ps.size(); i++){
+          if(sign(ps[i]) == true){
+            assigns_true[var(ps[i])]++;
+          }
+          else{
+            assigns_false[var(ps[i])]++;
+          }
+        }
         CRef cr = ca.alloc(ps, false);
         clauses.push(cr);
         attachClause(cr);
@@ -258,7 +270,11 @@ Lit Solver::pickBranchLit()
         }else
             next = order_heap.removeMin();
 
-    return next == var_Undef ? lit_Undef : mkLit(next, rnd_pol ? drand(random_seed) < 0.5 : polarity[next]);
+    
+    //remember this is negated
+    bool chosen = choose ? (polarity[next] == 2 ? assigns_true[next] > assigns_false[next] : polarity[next]) : polarity[next] == 2 ? true : polarity[next];
+    
+    return next == var_Undef ? lit_Undef : mkLit(next, rnd_pol ? drand(random_seed) < 0.5 : chosen);//polarity[next]
 }
 
 
@@ -447,7 +463,14 @@ void Solver::analyzeFinal(Lit p, vec<Lit>& out_conflict)
 void Solver::uncheckedEnqueue(Lit p, bool isDecisionVariable, CRef from)
 {
     assert(value(p) == l_Undef);
-    assigns[var(p)] = lbool(!sign(p));
+    lbool val = lbool(!sign(p));
+    assigns[var(p)] = val;
+    if(val == l_True){
+      assigns_true[var(p)]++;
+    }
+    else if(val == l_False){
+      assigns_false[var(p)]++;
+    }
     vardata[var(p)] = mkVarData(from, decisionLevel());
     trail.push_(p);
     
@@ -712,11 +735,12 @@ lbool Solver::search(int nof_conflicts)
                 }
             }
 
+            bool pick = false;
             if (next == lit_Undef){
                 // New variable decision:
                 decisions++;
                 next = pickBranchLit();
-
+                pick = true;
                 if (next == lit_Undef)
                     // Model found:
                     return l_True;

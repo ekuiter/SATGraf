@@ -111,7 +111,7 @@ public class UniqueClauses {
     int largest_clause = 0;
     
     BufferedReader r = new BufferedReader(new FileReader(in));
-    HashMap<UniqueClause, Integer> clauses = new HashMap<UniqueClause, Integer>(); 
+    HashMap<UniqueClause, Integer> clauses = new HashMap<>(); 
     String line;
     while((line = r.readLine()) != null){
       if(line.length() == 0 || line.charAt(0) == 'c' || line.charAt(0) == 'p'){
