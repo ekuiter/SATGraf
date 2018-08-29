@@ -1,11 +1,12 @@
 #Build 
+```
 git clone git@bitbucket.org:znewsham/satgraf.git
 cd satgraf
 cp simpleBuild.xml build.xml
 ant compile
 ant jar
 ant run
-
+```
 #Dependencies:
 SATGraf is the graphical UI for visualising the evolution of a SAT solver. It uses [SATLib](https://bitbucket.org/znewsham/satlib) as the backend for strucural information and evolution data.
 Validation is provided by the [ValidatedCL](https://bitbucket.org/znewsham/validatedcl) package.
