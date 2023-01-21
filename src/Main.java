@@ -39,7 +39,10 @@ public class Main {
         newargs[i - 1] = args[i];
       }
     }
-    if(args[0].equals("com")){
+    if(args[0].equals("exp")){
+      Export.main(newargs);
+    }
+    else if(args[0].equals("com")){
       CommunityGraphFrame.main(newargs);
     }
     else if(args[0].equals("imp")){
