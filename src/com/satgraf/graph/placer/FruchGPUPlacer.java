@@ -837,7 +837,6 @@ public class FruchGPUPlacer extends AbstractPlacer<Node, Graph<Node, Edge, Claus
    * setRandomSeed method.
    */
   public void randomizeLayout() {
-    System.out.println("randomizing layout");
 		//MersenneTwister mt = null;
     //if (isSeedSet) mt = new MersenneTwister(seed);
     //else mt = new MersenneTwister(new Date());

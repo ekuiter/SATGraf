@@ -81,7 +81,7 @@ public class Export {
         graphViewer.setPlacer(p);
         graphViewer.setNodeColoring(NodeColoringFactory.getInstance().getByName(commandLine.getOptionValue("n"), graphViewer.graph));
         graphViewer.setEdgeColoring(EdgeColoringFactory.getInstance().getByName(commandLine.getOptionValue("e"), graphViewer.graph));
-        factory.getMetric().getCommunities(graphViewer.getGraph());
+        System.out.println(factory.getMetric().getCommunities(graphViewer.getGraph()));
     }
 
     public static void reportProgress(Progressive item, Runnable done) {
@@ -95,7 +95,7 @@ public class Export {
                     timer.cancel();
                     if (done != null)
                         done.run();
-                } else if (!Double.isNaN(value) && i[0] % 4 == 0)
+                } else if (!Double.isNaN(value) && value > 0 && i[0] % 20 == 0)
                     System.out.format("%.1f%%\n", value * 100);
                 i[0]++;
             }

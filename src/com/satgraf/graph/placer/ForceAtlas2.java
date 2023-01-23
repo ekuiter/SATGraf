@@ -153,7 +153,6 @@ public class ForceAtlas2 extends AbstractPlacer {
         offsetY = (0 - minY) + DrawableNode.COMMUNITY_SPACING;
     }
     public void randomizeLayout() {
-        System.out.println("randomizing layout");
         //MersenneTwister mt = null;
         //if (isSeedSet) mt = new MersenneTwister(seed);
         //else mt = new MersenneTwister(new Date());

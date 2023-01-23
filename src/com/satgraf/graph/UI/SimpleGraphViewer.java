@@ -33,10 +33,7 @@ public class SimpleGraphViewer extends GraphViewer<Node, Edge>{
   @Override
   public void init() {
     setUpdatedNodes(graph.getNodes());
-    long start = System.currentTimeMillis();
     placer.init();
-    long end = System.currentTimeMillis();
-    System.out.printf("%f Seconds\n", ((double)end -(double) start) /(double) 1000);
   }
   
   public void fromJson(JSONObject json){
