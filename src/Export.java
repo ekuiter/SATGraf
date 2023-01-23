@@ -82,6 +82,8 @@ public class Export {
         graphViewer.setNodeColoring(NodeColoringFactory.getInstance().getByName(commandLine.getOptionValue("n"), graphViewer.graph));
         graphViewer.setEdgeColoring(EdgeColoringFactory.getInstance().getByName(commandLine.getOptionValue("e"), graphViewer.graph));
         System.out.println(factory.getMetric().getCommunities(graphViewer.getGraph()));
+        if (commandLine.getOptionValue("l").equals("grid"))
+            System.exit(0);
     }
 
     public static void reportProgress(Progressive item, Runnable done) {
