@@ -7,7 +7,7 @@ Operation can be automated on the shell.
 git clone https://github.com/ekuiter/SATGraf
 cd satgraf
 ./gradlew shadowJar
-java -jar build/libs/dev-satgraf-1.0-SNAPSHOT-all.jar exp -f some-formula.cnf -o some-formula.jpg
+java -jar build/libs/SATGraf-1.0-SNAPSHOT-all.jar exp -f some-formula.cnf -o some-formula.jpg
 ```
 
 # Notes
